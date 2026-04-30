@@ -50,3 +50,7 @@
 ## Job Servers
 - **Rx Compound Store server** (table_prefix='rxcs')
 - **Mister Meds server** (table_prefix='mmed')
+
+## Gotchas
+
+- [Partial-data window](etl-partial-data-window.md) — `rxcs_rxqFullOrder` / `mmed_rxqFullOrder` rows are inserted in stages. There's a window where ScriptNumber and Quantity are present but Patient, Drug, Prescriber, and Clinic fields are NULL. Views over these tables produce empty strings (not nulls) for the computed Patient/Doctor/Clinic fields, which silently defeats `value || fallback` checks. Read the gotcha doc before writing code that consumes these tables.
