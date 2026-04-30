@@ -9,7 +9,7 @@ When the user says **"push prod"** or similar.
 ### Standard: "push prod" (auto-increment)
 
 1. Stage and commit any uncommitted changes with a descriptive commit message
-2. Push to `master`
+2. Push to `main`
 3. Look up the latest git tag: `git describe --tags --abbrev=0`
 4. Increment the **patch version** (last number) by 1 (e.g., `1.0.3` → `1.0.4`)
 5. Create an annotated tag with the new version
@@ -18,7 +18,7 @@ When the user says **"push prod"** or similar.
 ### Explicit version: "push prod x.x.x" (e.g., "push prod 2.0.0")
 
 1. Stage and commit any uncommitted changes with a descriptive commit message
-2. Push to `master`
+2. Push to `main`
 3. Use the **explicitly specified version** as the tag
 4. Create an annotated tag with that version
 5. Push the tag to trigger the CI/CD pipeline
@@ -37,7 +37,7 @@ When the user says **"push prod"** or similar.
 # Auto-increment patch
 git add -A
 git commit -m "feat(billing): add invoice PDF export"
-git push origin master
+git push origin main
 git tag -a 1.0.4 -m "Add invoice PDF export"
 git push origin 1.0.4
 

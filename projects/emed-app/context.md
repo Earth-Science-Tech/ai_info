@@ -4,7 +4,7 @@
 - **Tech:** Node.js / Express / EJS / Azure SQL (mssql)
 - **Entry point:** `app.js`
 - **Repo:** https://github.com/Earth-Science-Tech/eMed
-- **Branch:** `master` (tracks `origin/main`)
+- **Branch:** `main` (default branch; `dev` is the integration branch for feature work)
 - **Deploy:** Azure App Service via git tag CI/CD
 
 ## Server Architecture
