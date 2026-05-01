@@ -4,24 +4,128 @@
 
 When the user says **"push prod"** or similar.
 
-## What to Do
+## Two-Phase Flow
 
-### Standard: "push prod" (auto-increment)
+This skill has two phases. **Always run Phase 1 first and wait for explicit user confirmation before running Phase 2.** The only exception is the emergency bypass below.
 
-1. Stage and commit any uncommitted changes with a descriptive commit message
+- **Phase 1 — Pre-flight investigation:** read-only sanity check on the changes about to ship.
+- **Phase 2 — Push steps:** the actual commit / push / tag operations.
+
+### Emergency bypass
+
+If the user says **"push prod yolo"**, **"push prod skip checks"**, or **"push prod no review"**, skip Phase 1 entirely and go straight to Phase 2. Use only for hotfixes when the change is already known to be safe.
+
+## Phase 1: Pre-Flight Investigation
+
+### Step 1 — Snapshot the change set
+
+Run in parallel (read-only, no commits yet):
+
+```bash
+git status                                  # uncommitted/untracked
+git diff                                    # unstaged changes
+git diff --cached                           # staged changes
+git describe --tags --abbrev=0              # last released tag
+git log <last_tag>..HEAD --oneline          # commits since last release
+git diff <last_tag>..HEAD --stat            # file-level summary since last release
+git diff <last_tag>..HEAD                   # full diff since last release (large — sample if huge)
+```
+
+If `git diff <last_tag>..HEAD` exceeds ~2000 lines, read the `--stat` output, identify the highest-risk files (auth, billing, prescriptions, SQL migrations, ETL writes), and read those file diffs in full while sampling the rest.
+
+### Step 2 — Run the ETST checklist on the diff
+
+Apply the same categories used in `skills/review-pr.md`, but to the local working state vs. last released tag.
+
+#### Security
+- No hardcoded secrets, API keys, passwords, connection strings
+- No `.env` / `.env.local` files staged
+- No credentials in `console.log` / `print` / debug output
+- New routes have auth middleware; CSRF on state-changing endpoints
+- Inputs validated; queries parameterized (no SQL injection vectors)
+- No verbose stack traces leaked to clients
+
+#### SQL Safety (only if `.sql` files changed)
+- New tables include all 5 mandatory fields: `id`, `sql_user`, `date_created`, `date_modified`, `is_invalid`
+- Permission grant migration script exists for every new table/view/procedure
+- No `DELETE` granted to `emed_app` (soft delete only via `is_invalid`)
+- No DDL granted to application users
+- Domain prefix naming followed (`moct_*`, `emed_*`, `rxcs_*`, etc.)
+
+#### Naming Conventions
+- Backend files: snake_case; routes: `route_*.js`
+- Frontend files: kebab-case
+- Python scripts: `<domain>_<action>` prefix
+- SQL files: `table_*`, `migration_*`, `procedure_*`
+
+#### Code Quality
+- No leftover `console.log`, `debugger`, `print(`, `// XXX`, `// REMOVE ME` markers
+- No large blocks of commented-out code
+- Error handling on new routes / DB calls
+- New env vars added to `.env.example` (without secrets)
+
+#### Documentation
+- `CLAUDE.md` / `info.claude` updated if architecture, routes, schema, or endpoints changed
+- New tables reflected in schema docs (run `extract-schema` if needed)
+- Commit messages follow `type(scope): description`
+
+#### Risk Assessment
+Identify the blast radius. Flag any of these as **HIGH RISK**:
+- Authentication / MFA / session handling changes
+- Billing / invoicing / pricing logic changes
+- Prescription writing / `moct_drug_rx` writes
+- Database schema migrations (especially destructive: drops, alters, NOT NULL on existing columns)
+- ETL writes to shared tables
+- Changes to `route_public.js` (unauthenticated surface)
+- Changes to permission grants or roles
+
+### Step 3 — Output the report
+
+Use exactly this format:
+
+```
+## Pre-flight check for production push
+
+**Changes since <last_tag>:** <N> commits, <M> files (+<X> / -<Y> lines)
+**Areas touched:** <auth | billing | moct | etl | sql | views | etc.>
+**Proposed next tag:** <last_tag incremented by patch>
+
+### Findings
+- [PASS|WARN|FAIL] Security — <one-line note>
+- [PASS|WARN|FAIL] SQL Safety — <note or "N/A — no SQL changes">
+- [PASS|WARN|FAIL] Naming — <note>
+- [PASS|WARN|FAIL] Code Quality — <note>
+- [PASS|WARN|FAIL] Documentation — <note>
+
+### Risk: <LOW | MEDIUM | HIGH>
+<1–2 sentence reasoning naming specific risk vectors>
+
+### Recommendation: <PROCEED | PROCEED WITH CAUTION | DO NOT PUSH>
+```
+
+### Step 4 — Confirmation gate
+
+- **All PASS, risk LOW** → ask: "Looks clean. Proceed with push to prod?"
+- **Any WARN** → list the warnings and ask: "Proceed despite warnings?"
+- **Any FAIL** → list the failures, recommend fixing first, and **do NOT push** unless the user explicitly says "push anyway" / "override" / similar.
+
+Wait for the user's reply before doing anything in Phase 2.
+
+## Phase 2: Push Steps
+
+Only run after Phase 1 confirmation (or emergency bypass).
+
+### Standard: "push prod" (auto-increment patch)
+
+1. Stage and commit uncommitted changes with a descriptive commit message — informed by the Phase 1 investigation, not generic
 2. Push to `main`
-3. Look up the latest git tag: `git describe --tags --abbrev=0`
-4. Increment the **patch version** (last number) by 1 (e.g., `1.0.3` → `1.0.4`)
-5. Create an annotated tag with the new version
-6. Push the tag to trigger the CI/CD pipeline
+3. Increment the patch version of `git describe --tags --abbrev=0` (e.g., `1.0.3` → `1.0.4`)
+4. Create an annotated tag with the new version (message summarizing release)
+5. Push the tag to trigger CI/CD
 
-### Explicit version: "push prod x.x.x" (e.g., "push prod 2.0.0")
+### Explicit version: "push prod x.x.x"
 
-1. Stage and commit any uncommitted changes with a descriptive commit message
-2. Push to `main`
-3. Use the **explicitly specified version** as the tag
-4. Create an annotated tag with that version
-5. Push the tag to trigger the CI/CD pipeline
+Same flow but use the explicitly specified version (e.g., for a major / minor bump).
 
 ## Critical Rules
 
@@ -29,12 +133,14 @@ When the user says **"push prod"** or similar.
   - `1.0.4` triggers the pipeline
   - `v1.0.4` does NOT trigger the pipeline (learned the hard way)
 - **Annotated tags:** The tag message should briefly describe what's in the release
-- **CI trigger:** The GitHub Actions workflow (`.github/workflows/deploy-azure.yml`) triggers on tags matching `[0-9]+.[0-9]+.[0-9]+`
+- **CI trigger:** GitHub Actions workflow (`.github/workflows/deploy-azure.yml`) triggers on tags matching `[0-9]+.[0-9]+.[0-9]+`
+- **Never skip Phase 1** unless the user uses an emergency bypass phrase
+- **Never `git push --force`** to main from this skill
 
 ## Example Commands
 
 ```bash
-# Auto-increment patch
+# Auto-increment patch (after Phase 1 passes and user confirms)
 git add -A
 git commit -m "feat(billing): add invoice PDF export"
 git push origin main
