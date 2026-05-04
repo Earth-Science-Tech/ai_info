@@ -33,6 +33,29 @@ git diff <last_tag>..HEAD                   # full diff since last release (larg
 
 If `git diff <last_tag>..HEAD` exceeds ~2000 lines, read the `--stat` output, identify the highest-risk files (auth, billing, prescriptions, SQL migrations, ETL writes), and read those file diffs in full while sampling the rest.
 
+### Step 1.5 — SQL drift check (only when shipping schema changes)
+
+Run only if the user mentioned schema, or there are unapplied scripts in `emed_sql/migrations/`, or the change touches `.sql` files. Skip entirely for routing/UI-only deploys.
+
+```bash
+cd ../emed_sql                                          # adjust path as needed
+python python/extract_sql_files.py --db dev             # refresh dev/ snapshot first
+diff -rq prod/ dev/                                     # show schema drift
+ls migrations/                                          # list pending migration scripts
+```
+
+What to look for:
+- **Files only in `dev/`** → new objects on dev that need migrating to prod
+- **Differing files** → objects whose definition changed in dev (new column, view rewrite)
+- **`migrations/` files not yet applied to prod** → cross-check each script against the dev/prod diff to verify it captures the full change
+
+Reject the push if:
+- Any dev/prod drift is **not** covered by a corresponding migration script
+- Any migration script is non-idempotent (no `IF NOT EXISTS` / `IF OBJECT_ID IS NULL`)
+- A new table/view/procedure exists in dev without a `migration_grant_permissions_*.sql` covering it
+
+In Phase 2, the SQL changes must be applied to prod (`liberty_link_stage`) **before** the Node.js tag goes out. Spell out the exact run order in your Phase 1 report.
+
 ### Step 2 — Run the ETST checklist on the diff
 
 Apply the same categories used in `skills/review-pr.md`, but to the local working state vs. last released tag.
@@ -93,9 +116,14 @@ Use exactly this format:
 ### Findings
 - [PASS|WARN|FAIL] Security — <one-line note>
 - [PASS|WARN|FAIL] SQL Safety — <note or "N/A — no SQL changes">
+- [PASS|WARN|FAIL] SQL Drift — <files in dev/ not in prod/, pending migrations, or "N/A">
 - [PASS|WARN|FAIL] Naming — <note>
 - [PASS|WARN|FAIL] Code Quality — <note>
 - [PASS|WARN|FAIL] Documentation — <note>
+
+### SQL changes (if any)
+- Migrations to run on `liberty_link_stage`: <list filenames or "none">
+- After migrations: regenerate `prod/` with `python python/extract_sql_files.py --db prod`
 
 ### Risk: <LOW | MEDIUM | HIGH>
 <1–2 sentence reasoning naming specific risk vectors>
@@ -114,6 +142,18 @@ Wait for the user's reply before doing anything in Phase 2.
 ## Phase 2: Push Steps
 
 Only run after Phase 1 confirmation (or emergency bypass).
+
+### Step 0 — Apply pending SQL migrations (only if Phase 1 found drift)
+
+If Phase 1 identified pending `migrations/<...>.sql` scripts:
+
+1. **Apply each script to `liberty_link_stage`** in order, using the admin connection (sqlcmd or `node -e` with mssql). Confirm each succeeds before moving on.
+2. **Regenerate `prod/`** to reflect the new state: `cd ../emed_sql && python python/extract_sql_files.py --db prod`
+3. **Re-diff `prod/` vs `dev/`** — should now show only known dev-ahead-of-prod work, not the migration we just applied.
+4. **Commit the regenerated `prod/`** in `emed_sql` (separate commit from the Node.js code): `chore(sql): apply <migration name> to prod`
+5. **Push `emed_sql/main`** so the prod snapshot is durable.
+
+Only proceed to Step 1 after the SQL changes are live and committed.
 
 ### Standard: "push prod" (auto-increment patch)
 

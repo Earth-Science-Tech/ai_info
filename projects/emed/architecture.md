@@ -10,18 +10,21 @@ eMed is an electronic medical records and telemedicine consultation management s
 ## Three-Repository Architecture
 
 ```
-emed_app (Node.js)          emed_etl (Python)           emed_sql (SQL)
-├── Express server          ├── Peaks ETL               ├── Table schemas
-├── EJS views               ├── Liberty ETL             ├── Stored procedures
-├── API endpoints           ├── SMS integration         ├── Migrations
-├── Auth/permissions        ├── Prefect orchestration   └── Permission grants
+emed_app (Node.js)          emed_etl (Python)           emed_sql (SQL + tooling)
+├── Express server          ├── Peaks ETL               ├── prod/  (liberty_link_stage snapshots)
+├── EJS views               ├── Liberty ETL             ├── dev/   (liberty_link_dev snapshots)
+├── API endpoints           ├── SMS integration         ├── migrations/  (hand-written, dev → prod)
+├── Auth/permissions        ├── Prefect orchestration   └── python/  (extract_sql_files.py, extract_schema.py)
 └── PDF generation          └── Shared utilities
          │                          │                         │
          └──────────────────────────┴─────────────────────────┘
                                     │
-                          Azure SQL Server
-                        (liberty_link_stage)
+                          Azure SQL Server (liberty-link.database.windows.net)
+                          ├── liberty_link_stage   ← production (mirrored to emed_sql/prod/)
+                          └── liberty_link_dev     ← development (mirrored to emed_sql/dev/)
 ```
+
+Engineers work on `liberty_link_dev`, write a hand-rolled migration in `emed_sql/migrations/`, and the `push prod` skill applies it to `liberty_link_stage` and refreshes the `prod/` snapshot.
 
 ## Data Flow
 
@@ -52,8 +55,8 @@ Liberty RX Database
 ## Key Integration Points
 
 1. **eMed API:** `POST /api/public/moct-visit` — creates medical visits from ETL data
-2. **Shared Database:** Azure SQL (liberty_link_stage) — used by both app and ETL
-3. **SQL Schemas:** emed_sql repo — submodule in emed_etl, docs copied to emed_app
+2. **Shared Database:** Azure SQL — `liberty_link_stage` (prod) and `liberty_link_dev` (dev), used by both app and ETL
+3. **SQL Schemas:** emed_sql repo — single source of truth for both prod and dev, with auto-generated `.sql` snapshots and hand-written migrations
 
 ## User Roles
 

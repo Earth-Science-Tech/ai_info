@@ -36,16 +36,15 @@ Organized by feature: `billing/`, `clinic/`, `admin/`, `partials/`
 ## Context Files (info.claude)
 
 Claude auto-reads these when working in related areas:
-- `./info.claude` — Main app (routes, views, auth, DB schema)
-- `./sql/info.claude` — Auto-generated database schema (64 tables, 17 views, 18 procs)
-- `./python/info.claude` — Remaining Python scripts (extract_schema, email_helper, claude_speech)
+- `./info.claude` — Main app (routes, views, auth)
+- `../emed_sql/prod/info.claude` — Auto-generated database schema (production)
+- `../emed_sql/dev/info.claude` — Auto-generated database schema (dev)
 - `./python/email_helper/info.claude` — Outlook email sync tool
 - `./python/claude_speech/info.claude` — Voice interface
 
 ## Python Scripts (remaining in emed_app)
 
-ETL scripts moved to emed_etl. What remains:
-- `python/extract_schema.py` — Generates `sql/info.claude`
+ETL scripts in emed_etl. Schema-extraction scripts moved to `emed_sql/python/` (2026-05-04). What remains in emed_app:
 - `python/email_helper/` — Outlook COM automation (7 scripts)
 - `python/claude_speech/` — Voice-to-text interface (8 scripts)
 
