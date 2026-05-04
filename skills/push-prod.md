@@ -147,11 +147,19 @@ Only run after Phase 1 confirmation (or emergency bypass).
 
 If Phase 1 identified pending `migrations/<...>.sql` scripts:
 
-1. **Apply each script to `liberty_link_stage`** in order, using the admin connection (sqlcmd or `node -e` with mssql). Confirm each succeeds before moving on.
-2. **Regenerate `prod/`** to reflect the new state: `cd ../emed_sql && python python/extract_sql_files.py --db prod`
-3. **Re-diff `prod/` vs `dev/`** — should now show only known dev-ahead-of-prod work, not the migration we just applied.
-4. **Commit the regenerated `prod/`** in `emed_sql` (separate commit from the Node.js code): `chore(sql): apply <migration name> to prod`
-5. **Push `emed_sql/main`** so the prod snapshot is durable.
+1. **Apply each script to BOTH databases** with one command per script:
+   ```bash
+   cd ../emed_sql
+   python python/apply_migration.py migrations/<file>.sql --db both --confirm
+   ```
+   The `--db both` mode applies dev FIRST (so a buggy migration fails on dev, not prod), then prod. Migrations are idempotent so this is safe even when dev already has the change. Both `prod/` and `dev/` snapshot folders are regenerated automatically.
+2. **Re-diff `prod/` vs `dev/`** — should now show only unrelated in-flight dev work, not the migration we just applied.
+3. **Commit `emed_sql`** (separate commit from the Node.js code):
+   ```
+   git add migrations/ prod/ dev/
+   git commit -m "chore(sql): apply <migration name> to prod and dev"
+   git push origin main
+   ```
 
 Only proceed to Step 1 after the SQL changes are live and committed.
 

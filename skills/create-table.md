@@ -119,7 +119,48 @@ The `dev/` snapshot is part of the commit so other engineers see the intended en
 
 ### Step 5 — When ready to ship → "push prod"
 
-The `push prod` skill (Phase 1.5) will detect the pending migration via the `prod/` ↔ `dev/` diff, apply it to `liberty_link_stage`, regenerate `prod/`, commit, and proceed with the deploy. You don't run apply_migration.py with `--db prod` manually — push prod handles it.
+The `push prod` skill (Phase 1.5) will detect the pending migration via the `prod/` ↔ `dev/` diff, apply it to BOTH databases with `apply_migration.py --db both --confirm`, commit the regenerated snapshots, and proceed with the deploy. You don't run that command manually — push prod handles it.
+
+## Hotfix Flow (Owner / Senior Engineer Only)
+
+If the user has the experience and authority to ship a schema change directly to production without dev review (typical of an owner/admin handling a hotfix), use `--db both` from the start. This applies the migration to dev AND prod in one step, keeping the two databases in sync so engineers' dev work doesn't fall behind.
+
+### When to use this flow
+
+- An urgent production fix that can't wait for dev review
+- The user explicitly says "hotfix", "directly to prod", "I'll skip dev", or similar
+- The user is the project owner / senior maintainer
+
+### Steps
+
+1. Write the migration (same templates as Step 1 above)
+2. Apply to BOTH databases:
+   ```bash
+   cd emed_sql
+   python python/apply_migration.py migrations/<your_file>.sql --db both --confirm
+   ```
+   The script applies to **dev first** (so a buggy migration fails on dev, not prod), then to prod. Both snapshot folders are regenerated.
+3. Verify the diff is clean (only unrelated in-flight dev work should differ):
+   ```
+   === Diff: prod/ vs dev/ ===
+   Files prod/table_emed_widget.sql and dev/table_emed_widget.sql differ   ← unrelated dev work
+   No schema differences for <hotfix table>.
+   ```
+4. Commit:
+   ```bash
+   git add migrations/ prod/ dev/
+   git commit -m "feat(sql): <hotfix description>"
+   git push origin main
+   ```
+5. Then `push prod` for the Node.js side. Phase 1.5 of push prod will see the migration is **already applied** (dev/prod already match for this object), so it won't re-run. Phase 2 just deploys the code.
+
+### Why both databases?
+
+Engineers' dev branches keep `liberty_link_dev` as their working schema. If you hotfix prod-only, dev falls behind, and the next engineer who runs `apply_migration.py` for unrelated work sees confusing drift. Applying to both keeps the two in lock-step.
+
+### Engineers' in-flight work
+
+If an engineer was actively working on the same table on dev (uncommon but possible), the migration might create a no-op on dev (idempotent guards) or a real change. Either way, `IF NOT EXISTS` / `CREATE OR ALTER` keeps things safe — the engineer's separate migration will continue to work.
 
 ## Anti-Patterns to Avoid
 
