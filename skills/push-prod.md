@@ -33,28 +33,29 @@ git diff <last_tag>..HEAD                   # full diff since last release (larg
 
 If `git diff <last_tag>..HEAD` exceeds ~2000 lines, read the `--stat` output, identify the highest-risk files (auth, billing, prescriptions, SQL migrations, ETL writes), and read those file diffs in full while sampling the rest.
 
-### Step 1.5 — SQL drift check (only when shipping schema changes)
+### Step 1.5 — SQL drift check (always run if `emed_sql/` exists)
 
-Run only if the user mentioned schema, or there are unapplied scripts in `emed_sql/migrations/`, or the change touches `.sql` files. Skip entirely for routing/UI-only deploys.
+Detect pending schema changes automatically. The source of truth is `emed_sql/migrations/pending/` — any `.sql` file there is a migration that has not yet been applied to prod.
 
 ```bash
-cd ../emed_sql                                          # adjust path as needed
-python python/extract_sql_files.py --db dev             # refresh dev/ snapshot first
-diff -rq prod/ dev/                                     # show schema drift
-ls migrations/                                          # list pending migration scripts
+cd ../emed_sql                                # adjust path as needed
+ls migrations/pending/*.sql 2>/dev/null       # list pending migrations
+diff -rq prod/ dev/ | grep -v _GENERATED.md   # confirm dev/prod drift matches the pending set
 ```
 
-What to look for:
-- **Files only in `dev/`** → new objects on dev that need migrating to prod
-- **Differing files** → objects whose definition changed in dev (new column, view rewrite)
-- **`migrations/` files not yet applied to prod** → cross-check each script against the dev/prod diff to verify it captures the full change
+Read each pending migration file to confirm it:
+- Has idempotent guards (`IF OBJECT_ID IS NULL`, `IF NOT EXISTS`, `CREATE OR ALTER`)
+- Includes `GRANT` statements for any new object
+- Doesn't touch `liberty_link_stage` directly outside of the migration framework
+
+If `migrations/pending/` is empty AND `diff prod/ dev/` is empty, there are no SQL changes — set the SQL Drift finding to `[PASS] N/A` and move on.
+
+If `migrations/pending/` has files, list them in the Phase 1 report under "SQL changes" so the user knows exactly what will be applied. Phase 2 will run them automatically — the user just confirms the report.
 
 Reject the push if:
-- Any dev/prod drift is **not** covered by a corresponding migration script
-- Any migration script is non-idempotent (no `IF NOT EXISTS` / `IF OBJECT_ID IS NULL`)
-- A new table/view/procedure exists in dev without a `migration_grant_permissions_*.sql` covering it
-
-In Phase 2, the SQL changes must be applied to prod (`liberty_link_stage`) **before** the Node.js tag goes out. Spell out the exact run order in your Phase 1 report.
+- A pending migration is non-idempotent (will fail on re-run)
+- A new table/view/procedure exists without a corresponding `GRANT`
+- The dev/prod diff has changes that are NOT covered by any file in `migrations/pending/` (suggests someone modified a DB out-of-band)
 
 ### Step 2 — Run the ETST checklist on the diff
 
@@ -145,23 +146,33 @@ Only run after Phase 1 confirmation (or emergency bypass).
 
 ### Step 0 — Apply pending SQL migrations (only if Phase 1 found drift)
 
-If Phase 1 identified pending `migrations/<...>.sql` scripts:
+If Phase 1 listed files in `emed_sql/migrations/pending/`, apply them automatically:
 
-1. **Apply each script to BOTH databases** with one command per script:
-   ```bash
-   cd ../emed_sql
-   python python/apply_migration.py migrations/<file>.sql --db both --confirm
-   ```
-   The `--db both` mode applies dev FIRST (so a buggy migration fails on dev, not prod), then prod. Migrations are idempotent so this is safe even when dev already has the change. Both `prod/` and `dev/` snapshot folders are regenerated automatically.
-2. **Re-diff `prod/` vs `dev/`** — should now show only unrelated in-flight dev work, not the migration we just applied.
-3. **Commit `emed_sql`** (separate commit from the Node.js code):
-   ```
-   git add migrations/ prod/ dev/
-   git commit -m "chore(sql): apply <migration name> to prod and dev"
-   git push origin main
-   ```
+```bash
+cd ../emed_sql
+for f in migrations/pending/*.sql; do
+    python python/apply_migration.py "$f" --db both --confirm || exit 1
+done
+```
 
-Only proceed to Step 1 after the SQL changes are live and committed.
+What this does for each file:
+- Applies to `liberty_link_dev` first (catches bugs without touching prod)
+- Applies to `liberty_link_stage`
+- Regenerates `prod/` and `dev/` snapshot folders
+- Auto-moves the migration from `pending/` → `applied/`
+
+If any migration fails, stop the loop — do NOT continue, do NOT proceed to the Node.js push. Report the failure and let the user fix the migration.
+
+After all migrations succeed, commit and push `emed_sql`:
+
+```bash
+cd ../emed_sql
+git add migrations/ prod/ dev/
+git commit -m "chore(sql): apply <count> migration(s) to prod and dev"
+git push origin main
+```
+
+The commit message should briefly list the migrations applied. Then proceed to Step 1 of the Node.js push.
 
 ### Standard: "push prod" (auto-increment patch)
 

@@ -17,7 +17,7 @@ Any time the user wants to change the database schema. This includes:
 
 1. **Schema changes go to `liberty_link_dev` first, NEVER directly to `liberty_link_stage` (production).**
 2. **Never edit files inside `emed_sql/prod/` or `emed_sql/dev/` by hand.** They are auto-generated from the live database. Edits there will be silently overwritten.
-3. **Always write a migration script in `emed_sql/migrations/`.** That is the only hand-written SQL file you should produce.
+3. **Always write a migration script in `emed_sql/migrations/pending/`.** That is the only hand-written SQL file you should produce. (After it ships to prod, `apply_migration.py` auto-moves it to `migrations/applied/`.)
 4. **Migrations must be idempotent** — `IF OBJECT_ID IS NULL` for new tables, `IF NOT EXISTS` for new columns/indexes, `CREATE OR ALTER` for views/procs/triggers. They will be re-run during `push prod` and must succeed without error each time.
 5. **Every new object needs GRANT statements** in the same migration script (see `org/rules/sql-safety.md`).
 
@@ -25,7 +25,7 @@ Any time the user wants to change the database schema. This includes:
 
 ### Step 1 — Write the migration script
 
-Create `emed_sql/migrations/<YYYY-MM-DD>_<short_description>.sql`. Use today's date (the user's project memory has a `currentDate`; otherwise check via `date +%Y-%m-%d`).
+Create `emed_sql/migrations/pending/<YYYY-MM-DD>_<short_description>.sql`. Use today's date (the user's project memory has a `currentDate`; otherwise check via `date +%Y-%m-%d`).
 
 The script must contain everything needed to bring `liberty_link_stage` into the desired state from its current state. Group related changes into one migration when they ship together.
 
@@ -33,7 +33,7 @@ The script must contain everything needed to bring `liberty_link_stage` into the
 
 **New table:**
 ```sql
--- migrations/2026-05-04_add_emed_widget.sql
+-- migrations/pending/2026-05-04_add_emed_widget.sql
 -- Purpose: <one-line why>
 
 IF OBJECT_ID('dbo.emed_widget', 'U') IS NULL
@@ -58,7 +58,7 @@ GO
 
 **Add column to existing table:**
 ```sql
--- migrations/2026-05-04_add_moct_visit_priority_note.sql
+-- migrations/pending/2026-05-04_add_moct_visit_priority_note.sql
 
 IF NOT EXISTS (
     SELECT 1 FROM sys.columns
@@ -72,7 +72,7 @@ GO
 
 **New or updated view:**
 ```sql
--- migrations/2026-05-04_add_view_emed_active_prescribers.sql
+-- migrations/pending/2026-05-04_add_view_emed_active_prescribers.sql
 
 CREATE OR ALTER VIEW dbo.view_emed_active_prescribers AS
     SELECT prescriber_id, full_name, license_state
@@ -91,7 +91,7 @@ GO
 
 ```bash
 cd emed_sql
-python python/apply_migration.py migrations/<your_file>.sql
+python python/apply_migration.py migrations/pending/<your_file>.sql
 ```
 
 This:
@@ -99,6 +99,8 @@ This:
 2. Splits the script on `GO` and executes each batch
 3. Refreshes `emed_sql/dev/` by running `extract_sql_files.py --db dev`
 4. Prints `diff prod/ dev/` so you can verify the migration captures the intended change
+
+The migration file stays in `migrations/pending/` until push-prod ships it to prod and auto-moves it to `migrations/applied/`.
 
 If a batch fails, the script stops and prints which one — fix the migration, re-run.
 
@@ -110,7 +112,7 @@ The output of step 2 should show your new files only in `dev/`, plus any modifie
 
 ```bash
 cd emed_sql
-git add migrations/<your_file>.sql dev/
+git add migrations/pending/<your_file>.sql dev/
 git commit -m "feat(sql): <description>"
 git push origin main
 ```
@@ -137,7 +139,7 @@ If the user has the experience and authority to ship a schema change directly to
 2. Apply to BOTH databases:
    ```bash
    cd emed_sql
-   python python/apply_migration.py migrations/<your_file>.sql --db both --confirm
+   python python/apply_migration.py migrations/pending/<your_file>.sql --db both --confirm
    ```
    The script applies to **dev first** (so a buggy migration fails on dev, not prod), then to prod. Both snapshot folders are regenerated.
 3. Verify the diff is clean (only unrelated in-flight dev work should differ):

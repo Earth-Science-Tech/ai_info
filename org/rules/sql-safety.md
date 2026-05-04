@@ -7,7 +7,7 @@
 ```
 liberty_link_dev   ←  engineer makes change here first
        ↓
-emed_sql/migrations/<YYYY-MM-DD>_<desc>.sql   ←  hand-written, idempotent
+emed_sql/migrations/pending/<YYYY-MM-DD>_<desc>.sql   ←  hand-written, idempotent
        ↓
 liberty_link_stage   ←  applied via "push prod" skill
 ```
@@ -18,7 +18,7 @@ The engineer's standard tool:
 
 ```bash
 cd emed_sql
-python python/apply_migration.py migrations/<YYYY-MM-DD>_<desc>.sql
+python python/apply_migration.py migrations/pending/<YYYY-MM-DD>_<desc>.sql
 ```
 
 This applies the migration to `liberty_link_dev`, regenerates `dev/`, and shows the `prod/` vs `dev/` diff so you can verify the migration captures the full change. The `--db prod --confirm` flag exists for the "push prod" path; never invoke it manually.
@@ -33,7 +33,7 @@ This applies the migration to `liberty_link_dev`, regenerates `dev/`, and shows 
 | `emed_sql/prod/_GENERATED.md`, `emed_sql/dev/_GENERATED.md` | Auto-generated metadata. |
 
 The only hand-edited SQL files in `emed_sql/` are:
-- `migrations/<YYYY-MM-DD>_<desc>.sql` — new migrations
+- `migrations/pending/<YYYY-MM-DD>_<desc>.sql` — new migrations (auto-moved to `migrations/applied/` after shipping to prod)
 - `create_emed_app_user.sql` and `create_emed_etl_user.sql` — bootstrap (rarely changed)
 
 If you find yourself editing a file in `prod/` or `dev/`, STOP — you almost certainly want to write a migration instead.
