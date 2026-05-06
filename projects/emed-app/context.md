@@ -52,7 +52,11 @@ ETL scripts in emed_etl. Schema-extraction scripts moved to `emed_sql/python/` (
 
 **MFA:** Required for every role except those in `MFA_EXEMPT_ROLES` in `server/mfa.js` (currently only `API`). Lockout after 5 failed attempts for 15 minutes; window auto-clears on next attempt past expiry. Disabled on localhost.
 
-**Roles** (`server/permissions.js`): `Admin`, `SuperUser`, `MOCT`, `Peaks`, `Prescriber`, `Clarifications`, `ExternalRep`, `Billing`, `BillingPeaks`, `API`, `ClinicUser`, `Shipping`, `API_POP`, `ITSupport`.
+**Roles** (`server/permissions.js`): `Admin`, `SuperUser`, `MOCT`, `Peaks`, `Prescriber`, `Clarifications`, `ExternalRep`, `Billing`, `BillingPeaks`, `BillingMOCT`, `API`, `ClinicUser`, `Shipping`, `API_POP`, `ITSupport`.
+
+**Finance/audit roles:**
+- `BillingPeaks` — read-only finance role with Billing + Peaks sidebars visible (Peaks tagged `(read-only)`). No `Write_*` flags except `Write_Liberty` for the "Move to Paid" workflow.
+- `BillingMOCT` — read-only finance/audit role for CFO + assistant. Same shape as `BillingPeaks` but additionally exposes the **MOCT** sidebar section so all three systems (Billing, Peaks, MOCT) can be reviewed end-to-end. Both Peaks and MOCT headers are tagged `(read-only)`. SMS Messages link is hidden (matches the `BillingPeaks` pattern); `View_SMS=1` is still granted so embedded SMS modals on visit/script pages keep working.
 
 **ITSupport / Helpdesk role** — narrow recovery-only role for non-Admin support staff:
 - Single permission: `Manage_User_Auth` (no business-data access)
