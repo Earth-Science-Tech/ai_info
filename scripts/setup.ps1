@@ -71,21 +71,21 @@ foreach ($project in $projects) {
     Write-Host "Configuring $($project.Name)..." -ForegroundColor Yellow
 
     # Create .claude/rules/ directory
-    $rulesDir = Join-Path $project.Path ".claude" "rules"
+    $rulesDir = Join-Path (Join-Path $project.Path ".claude") "rules"
     if (-not (Test-Path $rulesDir)) {
         New-Item -ItemType Directory -Path $rulesDir -Force | Out-Null
         Write-Host "  Created .claude/rules/" -ForegroundColor Green
     }
 
     # Create .claude/commands/ directory
-    $commandsDir = Join-Path $project.Path ".claude" "commands"
+    $commandsDir = Join-Path (Join-Path $project.Path ".claude") "commands"
     if (-not (Test-Path $commandsDir)) {
         New-Item -ItemType Directory -Path $commandsDir -Force | Out-Null
         Write-Host "  Created .claude/commands/" -ForegroundColor Green
     }
 
     # Copy org rules
-    $orgRulesDir = Join-Path $aiInfoDir "org" "rules"
+    $orgRulesDir = Join-Path (Join-Path $aiInfoDir "org") "rules"
     if (Test-Path $orgRulesDir) {
         $orgRules = Get-ChildItem -Path $orgRulesDir -Filter "*.md"
         foreach ($rule in $orgRules) {
@@ -98,7 +98,7 @@ foreach ($project in $projects) {
     }
 
     # Copy project-specific rules
-    $projectRulesDir = Join-Path $aiInfoDir "projects" $project.ProjectRules "rules"
+    $projectRulesDir = Join-Path (Join-Path (Join-Path $aiInfoDir "projects") $project.ProjectRules) "rules"
     if (Test-Path $projectRulesDir) {
         $projectRules = Get-ChildItem -Path $projectRulesDir -Filter "*.md"
         foreach ($rule in $projectRules) {
