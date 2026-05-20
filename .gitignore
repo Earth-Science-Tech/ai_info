@@ -15,3 +15,4 @@ desktop.ini
 # Claude local files
 .claude/settings.local.json
 .claude/memory/
+.claude/hooks/
