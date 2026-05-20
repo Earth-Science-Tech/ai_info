@@ -181,10 +181,30 @@ The commit message should briefly list the migrations applied. Then proceed to S
 3. Increment the patch version of `git describe --tags --abbrev=0` (e.g., `1.0.3` → `1.0.4`)
 4. Create an annotated tag with the new version (message summarizing release)
 5. Push the tag to trigger CI/CD
+6. **Auto-close resolved issues** (post-deploy bookkeeping, see Step 6 below)
 
 ### Explicit version: "push prod x.x.x"
 
 Same flow but use the explicitly specified version (e.g., for a major / minor bump).
+
+### Step 6 — Auto-close resolved in-app issues
+
+After the tag is pushed (CI deploy is already underway and decoupled from this), scan the commits about to ship for `fixes emed-issue#N` markers and propagate the closure to both the SQL `emed_issue` table and the corresponding GitHub Issue.
+
+```bash
+cd ../emed_app   # adjust path; must run from emed_app/ to load .env
+node scripts/close_resolved_issues.js <prev-tag>..HEAD
+```
+
+The script:
+- Greps `git log <range>` for `(?:fixes|closes|resolves)\s+emed-issue#(\d+)` (case-insensitive)
+- For each match: SQL `UPDATE emed_issue SET status='resolved', resolved_by_app_user=<committer>, resolved_at=NOW, resolution_commit_sha=<sha>` (skips rows already in a closed status — idempotent)
+- If `github_issue_number` is populated and `GITHUB_TOKEN` is configured, posts a "resolved by commit X" comment on GitHub and closes the issue
+- Prints a summary of what it did
+
+This step is **non-fatal**. If the SQL update or GitHub close fails, the deploy is unaffected — surface the error so the user can re-run the script manually after fixing the issue.
+
+For commits that resolve an issue without a `fixes` marker (or for non-code resolutions like `wontfix` / `duplicate`), use the `/resolve-issue` skill instead.
 
 ## Critical Rules
 
