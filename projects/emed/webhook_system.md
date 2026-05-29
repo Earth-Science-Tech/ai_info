@@ -8,7 +8,7 @@ Self-service HMAC-signed POST notifications for clinics with API access, replaci
 
 | Event | Source | Trigger |
 |---|---|---|
-| `moct.visit.created` | Node | `POST /api/public/moct-visit` insert path in `route_public.js` |
+| `moct.visit.created` | Node | `POST /api/public/moct-visit` insert path in `route_public.js`. **Also fired by `POST /api/public/script-refill`** (rewritten 2026-05-29) when a refill MOCT visit is created — refills flow through the same subscriber pipeline as new orders. |
 | `moct.visit.status_changed` | Node | `POST /api/moct/set-status` in `route_moct.js:418` (after audit log) |
 | `moct.script.status_changed` | ETL | `usp_etl_emed_script_webhook_events` diff on `view_emed_full_order.OrderStatus` |
 | `moct.script.tracking_added` | ETL | same proc, when `TrackingNumber` goes from empty to non-empty |
