@@ -6,10 +6,22 @@ The eMed platform uses least-privilege database users. Application code NEVER us
 
 ## Users
 
-| User | Purpose | Permission Script | Used By |
-|------|---------|-------------------|---------|
-| `emed_app` | Node.js web application | `emed_sql/create_emed_app_user.sql` | emed_app |
-| `emed_etl` | Python ETL scripts | `emed_sql/create_emed_etl_user.sql` | emed_etl |
+| User | Database | Purpose | Permission Script | Used By |
+|------|----------|---------|-------------------|---------|
+| `emed_app` | `liberty_link_stage` | Node.js web application | `emed_sql/create_emed_app_user.sql` | emed_app |
+| `emed_etl` | `liberty_link_stage`, `etst_warehouse` | Python ETL scripts; warehouse load + dbt build | `emed_sql/create_emed_etl_user.sql` | emed_etl |
+| `emed_reporting_user` | `etst_warehouse` | Read-only access to `core` and `mart` schemas | `emed_sql/create_emed_reporting_user.sql` | BI / reporting / analytics tools |
+
+### `emed_reporting_user` scope
+
+Read-only consumer of the warehouse, intended for BI tools, dashboards, and ad-hoc analytics. Has **SELECT only** and **only on `etst_warehouse.core` and `etst_warehouse.mart`**:
+
+- ✅ `SELECT` on every object in `core` and `mart` (granted at the schema level so new dbt models are picked up automatically)
+- ❌ No access to `etst_warehouse.stg` (raw clones and dbt staging views are internal)
+- ❌ No access to `liberty_link_stage` at all
+- ❌ No INSERT/UPDATE/DELETE, no DDL, no EXECUTE
+
+When adding a new dbt model in `core` or `mart`, no per-object grant is needed — the schema-level GRANT covers it.
 
 ## Permission Grant Template
 
@@ -49,10 +61,12 @@ GRANT UPDATE ON <table_name> TO emed_etl;
 
 ## Decision Matrix
 
-| Scenario | emed_app | emed_etl |
-|----------|----------|----------|
-| New table used by Node.js routes | SELECT, INSERT, UPDATE | — |
-| New table used by ETL scripts | — | SELECT, INSERT, UPDATE |
-| New table used by both | SELECT, INSERT, UPDATE | SELECT, INSERT, UPDATE, (DELETE if bulk reload) |
-| New view | SELECT | SELECT (if ETL queries it) |
-| New stored procedure | — | EXECUTE (if ETL calls it) |
+| Scenario | emed_app | emed_etl | emed_reporting_user |
+|----------|----------|----------|---------------------|
+| New table in `liberty_link_stage` used by Node.js routes | SELECT, INSERT, UPDATE | — | — |
+| New table in `liberty_link_stage` used by ETL scripts | — | SELECT, INSERT, UPDATE | — |
+| New table in `liberty_link_stage` used by both | SELECT, INSERT, UPDATE | SELECT, INSERT, UPDATE, (DELETE if bulk reload) | — |
+| New view in `liberty_link_stage` | SELECT | SELECT (if ETL queries it) | — |
+| New stored procedure | — | EXECUTE (if ETL calls it) | — |
+| New `etst_warehouse.stg` raw table (clone target) | — | SELECT, INSERT, UPDATE, DELETE | — |
+| New dbt model in `etst_warehouse.core` or `mart` | — | (owned by dbt build) | covered by schema-level GRANT |

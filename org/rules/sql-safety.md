@@ -58,12 +58,13 @@ is_invalid BIT DEFAULT 0
 
 ## Least-Privilege Database Users
 
-The platform uses two application-level database users. **Never use the admin account in application code.**
+The platform uses three application-level database users. **Never use the admin account in application code.**
 
-| User | Purpose | Used By |
-|------|---------|---------|
-| `emed_app` | Node.js web application | emed_app |
-| `emed_etl` | Python ETL scripts | emed_etl |
+| User | Database(s) | Purpose | Used By |
+|------|-------------|---------|---------|
+| `emed_app` | `liberty_link_stage` | Node.js web application | emed_app |
+| `emed_etl` | `liberty_link_stage`, `etst_warehouse` | Python ETL scripts; warehouse load + dbt build | emed_etl |
+| `emed_reporting_user` | `etst_warehouse` (read-only on `core` + `mart` only) | BI / reporting / analytics tools | external reporting consumers |
 
 ## MANDATORY: Permission Grants for New Objects
 
@@ -107,10 +108,12 @@ GO
 
 ### Quick Decision Matrix
 
-| Scenario | emed_app | emed_etl |
-|----------|----------|----------|
-| Table used by Node.js routes | SELECT, INSERT, UPDATE | — |
-| Table used by ETL scripts | — | SELECT, INSERT, UPDATE |
-| Table used by both | SELECT, INSERT, UPDATE | SELECT, INSERT, UPDATE, (DELETE if bulk reload) |
-| New view | SELECT | SELECT (if ETL queries it) |
-| New stored procedure | — | EXECUTE |
+| Scenario | emed_app | emed_etl | emed_reporting_user |
+|----------|----------|----------|---------------------|
+| Table in `liberty_link_stage` used by Node.js routes | SELECT, INSERT, UPDATE | — | — |
+| Table in `liberty_link_stage` used by ETL scripts | — | SELECT, INSERT, UPDATE | — |
+| Table in `liberty_link_stage` used by both | SELECT, INSERT, UPDATE | SELECT, INSERT, UPDATE, (DELETE if bulk reload) | — |
+| New view in `liberty_link_stage` | SELECT | SELECT (if ETL queries it) | — |
+| New stored procedure | — | EXECUTE | — |
+| New dbt model in `etst_warehouse.core` or `mart` | — | (dbt-owned) | covered by schema-level GRANT — no per-object grant needed |
+| New `etst_warehouse.stg` raw table | — | SELECT, INSERT, UPDATE, DELETE | — (intentionally walled off) |

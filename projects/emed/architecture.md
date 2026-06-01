@@ -15,16 +15,24 @@ emed_app (Node.js)          emed_etl (Python)           emed_sql (SQL + tooling)
 ├── EJS views               ├── Liberty ETL             ├── dev/   (liberty_link_dev snapshots)
 ├── API endpoints           ├── SMS integration         ├── migrations/  (hand-written, dev → prod)
 ├── Auth/permissions        ├── Prefect orchestration   └── python/  (extract_sql_files.py, extract_schema.py)
-└── PDF generation          └── Shared utilities
+└── PDF generation          ├── Warehouse clone flow
+                            └── dbt project (etst_warehouse)
          │                          │                         │
-         └──────────────────────────┴─────────────────────────┘
+         └──────────────────────────┼─────────────────────────┘
                                     │
-                          Azure SQL Server (liberty-link.database.windows.net)
-                          ├── liberty_link_stage   ← production (mirrored to emed_sql/prod/)
-                          └── liberty_link_dev     ← development (mirrored to emed_sql/dev/)
+            ┌───────────────────────┼────────────────────────────┐
+            │                       │                            │
+  liberty_link_stage         liberty_link_dev              etst_warehouse
+  (operational, prod)        (operational, dev)            (analytics / reporting)
+       │                        │                                ▲
+       └── mirrored to ─────► emed_sql/prod/ + dev/               │ nightly clone + dbt
+                                                                  │
+                            All three on Azure SQL: liberty-link.database.windows.net
 ```
 
 Engineers work on `liberty_link_dev`, write a hand-rolled migration in `emed_sql/migrations/`, and the `push prod` skill applies it to `liberty_link_stage` and refreshes the `prod/` snapshot.
+
+The warehouse (`etst_warehouse`) is owned by emed_etl: the nightly stage→warehouse clone loads `stg.*` raw tables, and the dbt project then builds `core.dim_*`/`fct_*` and `mart.*` on top. See [emed-etl/warehouse.md](../emed-etl/warehouse.md).
 
 ## Data Flow
 
@@ -52,11 +60,20 @@ Liberty RX Database
   Transfer to Azure SQL ──→ Stored procedures merge data
 ```
 
+### Warehouse (nightly)
+```
+liberty_link_stage ──► etst_warehouse.stg.*         (Clone-Prod-to-Warehouse-Stage, 01:00 ET)
+                              │
+                              └──► stg.stg_*, core.dim_*, core.fct_*, mart.*
+                                    via `dbt build`  (Warehouse-DBT-Build, 02:00 ET)
+```
+
 ## Key Integration Points
 
 1. **eMed API:** `POST /api/public/moct-visit` — creates medical visits from ETL data
-2. **Shared Database:** Azure SQL — `liberty_link_stage` (prod) and `liberty_link_dev` (dev), used by both app and ETL
-3. **SQL Schemas:** emed_sql repo — single source of truth for both prod and dev, with auto-generated `.sql` snapshots and hand-written migrations
+2. **Operational Databases:** Azure SQL — `liberty_link_stage` (prod) and `liberty_link_dev` (dev), used by both app and ETL
+3. **Warehouse Database:** Azure SQL `etst_warehouse` — analytics/reporting, loaded nightly by emed_etl, modeled with dbt
+4. **SQL Schemas:** emed_sql repo — single source of truth for prod and dev, with auto-generated `.sql` snapshots and hand-written migrations
 
 ## User Roles
 
@@ -75,6 +92,7 @@ Liberty RX Database
 | Views | EJS templates |
 | Database | Azure SQL Server (mssql package) |
 | ETL | Python / Prefect |
+| Warehouse | Azure SQL (etst_warehouse) + dbt-sqlserver |
 | Email | Nodemailer + MS Graph API |
 | PDF | Puppeteer |
 | Deployment | Azure App Service (tag-based CI/CD) |
