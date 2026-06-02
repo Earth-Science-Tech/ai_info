@@ -42,7 +42,32 @@ If you find yourself editing a file in `prod/` or `dev/`, STOP — you almost ce
 
 Do not run `INSERT`/`UPDATE`/`DELETE`/DDL against `liberty_link_stage` from a script, REPL, or SSMS during development. The only sanctioned writes to prod are:
 1. The application's runtime database connection (uses `emed_app` / `emed_etl` users, never admin)
-2. The `push prod` skill applying a reviewed migration
+2. The `push prod` skill applying a reviewed migration — **run only by an authorized lead** (see "Database authority model" below)
+3. A direct change made by Carlos Cueto (database engineer) when a migration-based flow isn't practical
+
+## Database authority model (WHO may modify WHICH database)
+
+The dev-first workflow above is *how* schema changes flow. This is *who* is allowed to apply them. **Default-deny: assume you may NOT write to `liberty_link_stage` (production) unless you can positively confirm you are operating as one of the two authorized leads below.** Check the operating user (their email / git identity) — if you can't confirm, treat prod as read-only.
+
+| Person | Role | `liberty_link_dev` | `liberty_link_stage` (prod) |
+|--------|------|--------------------|------------------------------|
+| **Nicholas Cardell** (`nicholas.cardell@rxcs.net`) | Admin / engineering lead | ✅ | ✅ Owns prod promotion (`push prod`, `apply_migration.py --db prod` / `--db both`) |
+| **Carlos Cueto** | Database engineer (DB expert) | ✅ | ✅ May modify **both** databases directly when needed |
+| **Every other developer** | Engineer | ✅ dev only | ❌ Never — write the migration and hand it off |
+
+### If you are a developer's Claude instance (anyone other than Nicholas or Carlos)
+
+This is the common case. **Prioritize and restrict all schema work to `liberty_link_dev`:**
+
+1. Apply migrations to **dev only**: `python python/apply_migration.py migrations/pending/<file>.sql` — no `--db` flag means dev. **Never** pass `--db prod` or `--db both`.
+2. **Never** open a direct connection (mssql / REPL / SSMS / Node script) to `liberty_link_stage` to run `INSERT`/`UPDATE`/`DELETE`/DDL.
+3. Your job ends at: change applied to dev → idempotent migration written in `migrations/pending/` → committed (PR'd if the repo uses PRs).
+4. Then **stop and hand off.** Tell the user the migration is staged and ready for Nicholas (or Carlos) to ship to prod. Do **not** run the prod-applying step of `push prod` yourself.
+5. Even if a prod change feels urgent, don't apply it — write the migration and explicitly flag it for Nicholas or Carlos. Urgency never overrides the authority model.
+
+### If you are operating as Nicholas or Carlos
+
+You may promote to prod (`push prod`, `--db prod`, `--db both`) per the `push-prod` and `create-table` skills. Carlos, as the DB expert, may additionally make direct changes to either database when the migration framework isn't practical — but prefer migrations so `emed_sql` stays the source of truth and the change is reproducible on dev.
 
 ## Mandatory Table Fields
 

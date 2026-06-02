@@ -123,15 +123,16 @@ The `dev/` snapshot is part of the commit so other engineers see the intended en
 
 The `push prod` skill (Phase 1.5) will detect the pending migration via the `prod/` ↔ `dev/` diff, apply it to BOTH databases with `apply_migration.py --db both --confirm`, commit the regenerated snapshots, and proceed with the deploy. You don't run that command manually — push prod handles it.
 
-## Hotfix Flow (Owner / Senior Engineer Only)
+## Hotfix Flow (Authorized Leads Only)
 
-If the user has the experience and authority to ship a schema change directly to production without dev review (typical of an owner/admin handling a hotfix), use `--db both` from the start. This applies the migration to dev AND prod in one step, keeping the two databases in sync so engineers' dev work doesn't fall behind.
+**This flow is restricted to the two people authorized to write production — Nicholas Cardell (admin / engineering lead) or Carlos Cueto (database engineer).** See the "Database authority model" in `org/rules/sql-safety.md`. If you are operating as anyone else, do NOT use `--db both` or `--db prod` — stay on dev, write the migration, and hand it off.
+
+For an authorized lead shipping a schema change directly to production, use `--db both` from the start. This applies the migration to dev AND prod in one step, keeping the two databases in sync so engineers' dev work doesn't fall behind.
 
 ### When to use this flow
 
-- An urgent production fix that can't wait for dev review
-- The user explicitly says "hotfix", "directly to prod", "I'll skip dev", or similar
-- The user is the project owner / senior maintainer
+- You have positively confirmed you are operating as Nicholas or Carlos, AND
+- An urgent production fix that can't wait for dev review, or the user explicitly says "hotfix", "directly to prod", "I'll skip dev", or similar
 
 ### Steps
 
