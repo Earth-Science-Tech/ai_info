@@ -52,7 +52,7 @@ The dev-first workflow above is *how* schema changes flow. This is *who* is allo
 | Person | Role | `liberty_link_dev` | `liberty_link_stage` (prod) |
 |--------|------|--------------------|------------------------------|
 | **Nicholas Cardell** (`nicholas.cardell@rxcs.net`) | Admin / engineering lead | ✅ | ✅ Owns prod promotion (`push prod`, `apply_migration.py --db prod` / `--db both`) |
-| **Carlos Cueto** | Database engineer (DB expert) | ✅ | ✅ May modify **both** databases directly when needed |
+| **Carlos Cueto** (git username `carcuet`) | Database engineer (DB expert) | ✅ | ✅ May modify **both** databases directly when needed |
 | **Every other developer** | Engineer | ✅ dev only | ❌ Never — write the migration and hand it off |
 
 ### If you are a developer's Claude instance (anyone other than Nicholas or Carlos)
