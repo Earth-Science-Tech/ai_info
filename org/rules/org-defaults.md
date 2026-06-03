@@ -33,6 +33,13 @@ Types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`
 
 Examples: `feat(auth): add OAuth login`, `fix(api): handle empty response`
 
+## Branch & PR Lifecycle
+
+1. **One branch → one PR → merge → done.** A feature branch's life ends when its PR merges.
+2. **Never push to a branch after its PR has merged.** New commits on a merged branch do NOT reach `main`/`dev` — they silently go missing. This has caused real production gaps (commits added post-merge had to be recovered by a follow-up PR). For any follow-up work, **cut a fresh branch from the latest base and open a new PR.**
+3. **Recovering stranded commits:** if work was lost this way, `git cherry-pick` the orphaned commits onto a new branch and PR that — don't reopen/re-push the merged branch.
+4. **Delete merged branches** (locally and on origin) once their PR merges, so they can't be accidentally reused.
+
 ## Documentation Requirements
 
 Every project must have:

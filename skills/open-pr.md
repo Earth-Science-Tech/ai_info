@@ -114,6 +114,7 @@ Report exactly:
 - **If `gh pr create` errors with "no commits between base and head"**, the branch is at the same commit as base — there's nothing to PR. Tell the user.
 - **If `gh pr create` errors with "a pull request already exists"**, capture the existing PR URL from the error and report that — don't try to make a second one.
 - **CSRF / branch protection bypass is NOT needed at PR creation time** — bypasses come into play at merge. Creating a PR works regardless of branch protection rules on the base.
+- **NEVER keep pushing to a branch after its PR has merged.** Once a PR merges, that branch is done — any further commits pushed to it will NOT reach `main`/`dev` and will silently go missing. This has bitten the team more than once (commits added to `feat/crm-followup-order-tooltip` after PR #80 merged were lost until recovered by a separate PR). For follow-up work, **start a fresh branch off the latest base** and open a new PR. If you discover commits stranded on an already-merged branch, cherry-pick them onto a new branch and PR that. See "Branch & PR Lifecycle" in `org/rules/org-defaults.md`.
 
 ## Example
 
