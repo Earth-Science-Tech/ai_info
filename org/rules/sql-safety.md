@@ -69,6 +69,20 @@ This is the common case. **Prioritize and restrict all schema work to `liberty_l
 
 You may promote to prod (`push prod`, `--db prod`, `--db both`) per the `push-prod` and `create-table` skills. Carlos, as the DB expert, may additionally make direct changes to either database when the migration framework isn't practical — but prefer migrations so `emed_sql` stays the source of truth and the change is reproducible on dev.
 
+## Cross-repo: code PRs that depend on a migration
+
+Schema lives in `emed_sql`; the code that uses it lives in `emed_app` / `emed_etl`. When a code PR reads or writes a table/column/view that a migration introduces, the two live in **different repos and different PRs** — so the reviewer can't see the schema change from the code diff. Make that dependency explicit, or the reviewer will either miss it or have to go hunting (and a slightly stale `emed_sql` clone can make a perfectly good migration look like it doesn't exist).
+
+In the code PR's description, **link the migration explicitly**:
+
+- The migration **file path** (`emed_sql/migrations/pending/<date>_<desc>.sql`) and its **emed_sql PR/commit** — not just "migration added in emed_sql."
+- **Where it's been applied**: dev only (the normal state — `migrations/pending/`), or dev + prod.
+- **Deploy ordering**: the migration must be applied to prod **before or with** the code merge, never after. Code that queries a table prod doesn't have yet will throw at runtime.
+
+Do **not** just write "already applied to dev" with no link — that reads as "trust me," and the reviewer has no way to verify the table's shape, its grants, or that prod will have it. A one-line `emed_sql` link turns a cross-repo guessing game into a 10-second check.
+
+Corollary: **never apply schema straight to a database without committing the migration to `emed_sql` first.** Even when you've applied it to dev yourself, the committed `migrations/pending/` file (with grants + indexes) is what lets a lead ship the exact same change to prod. An un-committed dev change forces someone to reverse-engineer the DDL from the live DB — and they'll miss things like indexes and unique constraints that aren't obvious from the column list.
+
 ## Mandatory Table Fields
 
 ALL tables in the database MUST include these fields:
