@@ -59,11 +59,25 @@ git diff <base>..HEAD --stat
 ## Summary
 <1–3 bullet points of what changed and why>
 
+## Dependencies & risk
+<schema/prod prerequisites, behavioral changes, known limitations — or "none">
+
 ## Test plan
 - [ ] <how a reviewer would verify this works>
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
+
+#### Mandatory disclosures (the reviewer/deployer cannot see these from the diff)
+
+A correct, complete diff is not enough — the body must call out anything that affects how the PR is reviewed or deployed. **Omitting these has repeatedly caused near-misses where a code PR would have broken production on deploy.** Before you run `gh pr create`, walk this checklist and put anything that applies in a **Dependencies & risk** section:
+
+1. **Schema / prod prerequisites — the #1 miss.** If the code reads or writes any table/column/view/proc that a migration introduces, say so explicitly: name the `emed_sql/migrations/...` file, link its emed_sql PR/commit, and state **where it's been applied** (dev only? dev + prod?). The migration must be in prod **before or with** the code merge — code that queries a table prod doesn't have yet throws at runtime. (See `org/rules/sql-safety.md` → "Cross-repo: code PRs that depend on a migration".) Never create the table by hand on dev without committing the migration — there'll be nothing to promote to prod.
+2. **Behavioral changes the title doesn't imply.** If the PR is titled like a UI tweak but also changes routing/charging/permission logic, name that change. A reviewer who trusts the title will skim right past it. (Real case: a PR titled "add a summary table" also rewrote prescription-routing cleanup logic — invisible from the title.)
+3. **Known limitations / security gaps / unverified paths.** Anything `UNVERIFIED end-to-end`, sandbox-only, missing a bound (e.g. an uncapped loop over public input), or a deliberately-deferred hardening step. Flagging it lets the deployer gate appropriately instead of discovering it live.
+4. **New env vars / config** the deploy target needs (and whether prod already has them).
+
+Rule of thumb: if shipping this PR safely requires someone to *do or know something that isn't in the diff*, it goes in the body. "Trust me, it's applied to dev" with no link is not a disclosure — give the file path and the apply-state so it's a 10-second verify, not an archaeology dig.
 
 ### 4. Run gh pr create — actually run it, don't just draft
 
