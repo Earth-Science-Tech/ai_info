@@ -67,6 +67,26 @@ The raw clone tables and dbt staging views live side-by-side in `stg`. The custo
 - `+persist_docs` is **off**: `dbt-sqlserver` does not implement `alter_relation_comment`, so enabling it errors on every staging view. Descriptions still show in `dbt docs serve` and YAML.
 - dbt model `.sql` files **are** edit-allowed (transformations, not migrations). The `block_sql_creation` hook carves `dbt/` out specifically. Schema migrations still belong in `../emed_sql/migrations/`.
 
+### Multi-source / multi-tenant facts (discriminator in the grain)
+
+Facts that can hold rows from more than one source/tenant carry a **discriminator column that is part of the grain _and_ the surrogate key** — because the upstream natural keys are only unique *within* a source:
+
+| Fact | Discriminator | Values | Surrogate key |
+|------|---------------|--------|---------------|
+| `core.fct_order` | `source_site` | `peaks_curative`, `peaknow` | `hash(source_site, order_id, line_item_id)` |
+| `core.fct_payment_transaction` | `pharmacy` | `rxcs`, `mmed` | `hash(pharmacy, transaction_id)` |
+| `core.fct_payment_action` | `pharmacy` | `rxcs`, `mmed` | `hash(pharmacy, transaction_id, action_seq)` |
+
+**Why (the gotcha):** WooCommerce `order_id`s are per-install auto-increment sequences, so PeaksCurative order `1234` and PeakNow order `1234` are *different* orders sharing an id. Keying `fct_order` on `order_id` alone would collide and conflate them the moment a second storefront lands (the SK `unique` test breaks, or worse, rows silently merge). Same logic for `transaction_id` across pharmacies.
+
+**Conventions:**
+- Stamp the discriminator at the **staging boundary** as a literal — each `stg_*` view maps 1:1 to one source's physical table (`stg_woo_orders` → `'peaks_curative'`). When a second source lands, add its own staging models (`stg_pn_woo_*` → `'peaknow'`) and `UNION ALL` in the fact; don't re-key.
+- Make every cross-table join inside the fact **source-aware** (`on a.order_id = b.order_id and a.source_site = b.source_site`), or the union cross-joins sources.
+- Marts grain by the discriminator too (`mart_daily_orders` is per `(date_key, source_site)`); enforce uniqueness with a `dbt_utils.unique_combination_of_columns` test on the combo, and let consumers `SUM(...) GROUP BY date_key` to roll sources up.
+- Adding the discriminator while there's still one source is **non-breaking** (a constant column / one-row-per-day) and far cheaper than retrofitting after the keyspace is polluted — do it early.
+
+> `source_site` (storefront: peaks_curative / peaknow) and `pharmacy` (payment tenant: rxcs / mmed) are **different axes** — don't conflate them. The order↔payment join (`fct_payment_transaction.order_id`) crosses the two.
+
 ## Database Users
 
 | User | Access | Used by |
