@@ -61,7 +61,7 @@ Raw `stg` table DDL is owned by `emed_sql` migrations; `stg_*` views and all `co
 | User | Access |
 |------|--------|
 | `emed_etl` | Read/write across `etst_warehouse` — runs the nightly clone and dbt build |
-| `emed_reporting_user` | **Read-only on `core` + `mart` only** — for BI / reporting / analytics tools. No access to `stg` or to `liberty_link_stage`. Grants are schema-level, so new dbt models in `core`/`mart` are picked up without a follow-up migration. |
+| `emed_reporting_user` | **Read-only** — `core` + `mart` (schema-level) plus object-level SELECT on 6 `stg.emed_*` reporting tables (`emed_invoice`, `emed_invoice_line_item`, `emed_invoice_notes`, `emed_cost_adjustment`, `emed_cost_adjustment_report`, `emed_dispense_report`). No other `stg` access, none to `liberty_link_stage`. New `core`/`mart` models are picked up automatically; a new `stg` reporting table needs its own explicit grant. Full matrix → [org/security/sql-permissions.md](../../org/security/sql-permissions.md). |
 
 Full user matrix: [org/security/sql-permissions.md](../../org/security/sql-permissions.md).
 

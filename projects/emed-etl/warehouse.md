@@ -92,9 +92,11 @@ Facts that can hold rows from more than one source/tenant carry a **discriminato
 | User | Access | Used by |
 |------|--------|---------|
 | `emed_etl` | Full read/write on `etst_warehouse` (loads `stg.*`, dbt builds `stg.stg_*`, `core.*`, `mart.*`) | Clone flow + dbt build |
-| `emed_reporting_user` | **Read-only**, **`core` + `mart` schemas only** | BI / reporting / analytics tools |
+| `emed_reporting_user` | **Read-only** — `core` + `mart` schemas, plus SELECT on 6 `stg.emed_*` reporting tables | BI / reporting / analytics tools |
 
-`emed_reporting_user` is the consumer-side identity for the warehouse. It is **not** used by emed_etl or emed_app — it exists so that downstream reporting tools can connect to `etst_warehouse` without ever touching `stg` (raw clones + dbt staging views) or `liberty_link_stage`. Grants are at the **schema level**, so new dbt models in `core` or `mart` are automatically readable without a follow-up migration.
+`emed_reporting_user` is the consumer-side identity for the warehouse. It is **not** used by emed_etl or emed_app — it exists so downstream reporting tools can connect to `etst_warehouse` without touching `liberty_link_stage` or the internal raw/staging objects in `stg`. Grants on `core` and `mart` are at the **schema level**, so new dbt models there are automatically readable without a follow-up migration.
+
+It additionally has **object-level** `SELECT` on 6 eMed billing/dispense reporting tables in `stg` that BI consumes directly: `stg.emed_cost_adjustment`, `stg.emed_cost_adjustment_report`, `stg.emed_dispense_report`, `stg.emed_invoice`, `stg.emed_invoice_line_item`, `stg.emed_invoice_notes`. These are individual grants (there is no schema-level access to `stg`), so a new `stg` reporting table BI must read needs its own explicit grant. The rest of `stg` (`woo_*`, `propelr_*`, `moct_*`, and the `stg_*` views) is **not** readable by this user.
 
 See [org/security/sql-permissions.md](../../org/security/sql-permissions.md) for the full user matrix.
 

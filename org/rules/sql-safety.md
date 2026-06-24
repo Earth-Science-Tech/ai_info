@@ -103,7 +103,7 @@ The platform uses three application-level database users. **Never use the admin 
 |------|-------------|---------|---------|
 | `emed_app` | `liberty_link_stage` | Node.js web application | emed_app |
 | `emed_etl` | `liberty_link_stage`, `etst_warehouse` | Python ETL scripts; warehouse load + dbt build | emed_etl |
-| `emed_reporting_user` | `etst_warehouse` (read-only on `core` + `mart` only) | BI / reporting / analytics tools | external reporting consumers |
+| `emed_reporting_user` | `etst_warehouse` — read-only on `core` + `mart`, plus SELECT on 6 `stg.emed_*` reporting tables (see [security/sql-permissions.md](../security/sql-permissions.md)) | BI / reporting / analytics tools | external reporting consumers |
 
 ## MANDATORY: Permission Grants for New Objects
 
@@ -155,4 +155,4 @@ GO
 | New view in `liberty_link_stage` | SELECT | SELECT (if ETL queries it) | — |
 | New stored procedure | — | EXECUTE | — |
 | New dbt model in `etst_warehouse.core` or `mart` | — | (dbt-owned) | covered by schema-level GRANT — no per-object grant needed |
-| New `etst_warehouse.stg` raw table | — | SELECT, INSERT, UPDATE, DELETE | — (intentionally walled off) |
+| New `etst_warehouse.stg` raw table | — | SELECT, INSERT, UPDATE, DELETE | — by default; object-level SELECT only if BI must read it directly (e.g. the `stg.emed_*` reporting tables) |
