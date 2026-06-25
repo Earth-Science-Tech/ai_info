@@ -43,6 +43,8 @@ ls migrations/pending/*.sql 2>/dev/null       # list pending migrations
 diff -rq prod/ dev/ | grep -v _GENERATED.md   # confirm dev/prod drift matches the pending set
 ```
 
+**Only `pending/` ships.** `migrations/wip/` is a holding area for on-hold / not-ready features and is intentionally **never** applied by push prod — do not scan it, do not apply it. Expect the `prod/` ↔ `dev/` diff to show dev-ahead objects whose migrations live in `wip/` (or that are documented in `wip/STATUS.md`); those are **known, intentional drift**, not an out-of-band change. Only treat dev/prod drift as a problem when it's covered by neither `pending/` nor `wip/`.
+
 Read each pending migration file to confirm it:
 - Has idempotent guards (`IF OBJECT_ID IS NULL`, `IF NOT EXISTS`, `CREATE OR ALTER`)
 - Includes `GRANT` statements for any new object
@@ -55,7 +57,7 @@ If `migrations/pending/` has files, list them in the Phase 1 report under "SQL c
 Reject the push if:
 - A pending migration is non-idempotent (will fail on re-run)
 - A new table/view/procedure exists without a corresponding `GRANT`
-- The dev/prod diff has changes that are NOT covered by any file in `migrations/pending/` (suggests someone modified a DB out-of-band)
+- The dev/prod diff has changes that are NOT covered by any file in `migrations/pending/` **or** `migrations/wip/` and are not noted in `wip/STATUS.md` (suggests someone modified a DB out-of-band). Drift explained by a `wip/` migration or STATUS entry is intentional on-hold work — not a reject.
 
 ### Step 2 — Run the ETST checklist on the diff
 

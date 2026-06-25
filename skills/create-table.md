@@ -123,6 +123,18 @@ The `dev/` snapshot is part of the commit so other engineers see the intended en
 
 The `push prod` skill (Phase 1.5) will detect the pending migration via the `prod/` ↔ `dev/` diff, apply it to BOTH databases with `apply_migration.py --db both --confirm`, commit the regenerated snapshots, and proceed with the deploy. You don't run that command manually — push prod handles it.
 
+## On-hold / not-ready features → `migrations/wip/`
+
+**`migrations/pending/` means "apply to prod on the *next* `push prod`."** So a migration only belongs in `pending/` when its feature is finished and you intend to ship it on the next deploy.
+
+For a feature that is **built/prototyped on dev but not ready for prod** (on hold, deprioritized, or waiting on a PR), keep its migration in **`migrations/wip/`** instead. `push prod` does **not** scan `wip/`, so nothing there can ship by accident — but the schema stays captured, reproducible, and shippable on demand.
+
+Rules of thumb:
+- Still apply the migration to **dev** (`apply_migration.py migrations/wip/<file>.sql` works from any path) and still write it idempotent with GRANTs — `wip/` is a real migration, just parked.
+- If you create a table directly on dev for a prototype, **write the migration anyway** and park it in `wip/`. Never leave dev-only schema with no migration — that schema becomes un-shippable (someone has to reverse-engineer the DDL later).
+- Keep a one-line entry per parked feature in `migrations/wip/STATUS.md` (owner, tables, why it's on hold, where the code lives).
+- **To ship a parked feature:** move its file(s) `wip/ → pending/`, then `push prod`.
+
 ## Hotfix Flow (Authorized Leads Only)
 
 **This flow is restricted to the two people authorized to write production — Nicholas Cardell (admin / engineering lead) or Carlos Cueto (database engineer).** See the "Database authority model" in `org/rules/sql-safety.md`. If you are operating as anyone else, do NOT use `--db both` or `--db prod` — stay on dev, write the migration, and hand it off.
