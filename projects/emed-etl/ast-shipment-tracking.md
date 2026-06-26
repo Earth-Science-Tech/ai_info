@@ -20,6 +20,9 @@ UPDATE moct_order_tracking SET tracking_sent=1, tracking_sent_date=GETDATE()
   `peakscurative.com`. `AST_API_BASE` = `https://peakscurative.com/wp-json/wc-shipment-tracking/v3`.
 - The send is **idempotent by design**: a failed POST leaves `tracking_sent=0`, so
   the next run retries it. No date filter — any unsent row, however old, is eligible.
+- **404 → auto-retire (PR #28):** if AST returns 404 (`woocommerce_rest_order_invalid_id`,
+  i.e. the WP order was deleted), the record is marked `is_invalid=1` so it stops being
+  retried forever. Safe because the WP order exists before tracking is pushed.
 - Selection: `tracking_sent=0 AND tracking_number IS NOT NULL AND tracking_provider
   NOT LIKE '%Picked Up%' AND clinic IN ('PEAKS Curative, LLC','PEAKS CURATIVE','MOC TELEDOC')`,
   filtered per-pharmacy (`pharmacy = 'Rx Compound Store'` / `'Mister Meds'`).
@@ -31,6 +34,17 @@ It is **not** a standalone deployment. It's step 6 (a subflow) of
 **Run-All-ETL-RXCS** (hourly) and **Run-All-ETL-MMED** (every 15 min). The
 subflow `peaks_update_ast` does 3 things in order: ready-for-pickup emails →
 mark picked-up orders complete → **push tracking** (the last step).
+
+**Why an email step here (two fulfillment paths):** steps 1–2 handle **in-store
+pickup** orders (`OrderStatus='Ready'`, no shipping address, `shipping_total=0`).
+WordPress/AST emails the customer the *shipping-tracking* email when tracking is
+added via the API (step 3) — but pickup orders have no shipment, so the Python
+**"Your prescription is ready for pickup"** email (step 1) is the only thing that
+notifies those customers. The two paths don't overlap; no double-emailing.
+The pickup email uses `scripts/shared_email_azure.py:peak_send` (MS Graph). Its
+Azure creds must come from Prefect Secret blocks **`azure-tenant-id` /
+`azure-email-client-id` / `azure-email-client-secret`** — reading `os.getenv` on
+the worker yielded `None` and silently broke every pickup email (fixed PR #29).
 
 ## The 2026-05/06 outage (root cause + the coupling gotcha)
 
