@@ -53,8 +53,12 @@ via `wait_for`. Hardened in emed_etl PR #26 (2026-06):
 - `peaks_update_ast` waits only on `order_tracking`.
 - The 3 subflow steps are isolated (a pickup/email failure can't abort the push).
 - `_build_wcapi()` moved inside the `try` in `process_picked_up_orders`.
-- `send_tracking_updates` now **raises** on a DB error or all-sends-failed, so a
-  real outage shows as a red run (chronic per-order 404s don't trip it).
+- `send_tracking_updates` **raises** on a DB error or an all-**systemic**-failure
+  run (zero successes + ≥1 non-404 failure), so a real outage shows red. Per-order
+  **404s** (order deleted on WP) are logged `WARN` and never fail the run.
+  (PR #26's first cut raised on *any* all-failed run; once the backlog drained, the
+  one chronic 404 per pharmacy made every run fail red — corrected in **PR #28** to
+  be systemic-aware.)
 
 A second guard already exists at the table: unique filtered index
 `UX_emed_script_status_snapshot_key (pharmacy, script_number, fill_number) WHERE is_invalid=0`.
