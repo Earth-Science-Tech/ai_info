@@ -13,6 +13,7 @@ Parent company that owns and operates multiple subsidiary businesses in the phar
 |---------|--------|-------------|
 | Rx Compound Store (RXCS) | rxcs | Compounding pharmacy |
 | Mister Meds (MMed) | mmed | Pharmacy services |
+| Meduvo (MDVO) | mdvo | Pharmacy services |
 | Peaks Curative | peaks | Curative e-commerce (client of eMed) |
 
 ## Engineering Team

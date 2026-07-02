@@ -23,13 +23,14 @@
 | `rxcs_*` | 19 | Rx Compound Store pharmacy data |
 | `emed_*` | 15 | Users, email, SMS, billing, pricing |
 | `mmed_*` | 13 | Mister Meds pharmacy data |
+| `mdvo_*` | 18 | Meduvo pharmacy data + pricing |
 | `woo_*` | 4 | WooCommerce integration |
 | `wpforms_*` | 2 | WPForms patient questionnaires |
 | Other | 4+ | sessions, etl_metadata, sql_log, etc. |
 
 ## Views and Stored Procedures
 
-- **19 views:** `view_emed_*`, `view_mmed_*`, `view_moct_*`, `view_rxcs_*`, `view_peaks_*`, `view_woo_*`
+- **19 views:** `view_emed_*`, `view_mmed_*`, `view_mdvo_*`, `view_moct_*`, `view_rxcs_*`, `view_peaks_*`, `view_woo_*`
 - **18 stored procedures:** `usp_etl_*` (ETL), `usp_insert_*`, `usp_normalize_*`, `usp_refresh_*`
 
 ## Schema Documentation

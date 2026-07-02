@@ -19,6 +19,7 @@ Both live on `liberty-link.database.windows.net`. See [emed-etl/warehouse.md](..
 | `rxcs_*` | 19 | Rx Compound Store | Pharmacy data + pricing |
 | `emed_*` | 15 | eMed platform | Users, email, SMS, billing, pricing, invoicing |
 | `mmed_*` | 13 | Mister Meds | Pharmacy data |
+| `mdvo_*` | 18 | Meduvo | Pharmacy data + pricing |
 | `woo_*` | 4 | WooCommerce | Order staging from WordPress |
 | `wpforms_*` | 2 | WPForms | Patient questionnaire staging |
 | Other | 4+ | System | `sessions`, `etl_metadata`, `sql_log`, `blaze_patients` |
@@ -35,7 +36,7 @@ Both live on `liberty-link.database.windows.net`. See [emed-etl/warehouse.md](..
 
 ### Views (19)
 
-Prefixed by domain: `view_emed_*`, `view_mmed_*`, `view_moct_*`, `view_rxcs_*`, `view_peaks_*`, `view_woo_*`
+Prefixed by domain: `view_emed_*`, `view_mmed_*`, `view_mdvo_*`, `view_moct_*`, `view_rxcs_*`, `view_peaks_*`, `view_woo_*`
 
 ### Stored Procedures (18)
 

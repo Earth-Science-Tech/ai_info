@@ -40,6 +40,7 @@ CREATE TABLE <table_name> (
 | `emed_*` | eMed | Users, email, SMS, billing, pricing |
 | `rxcs_*` | Rx Compound Store | Pharmacy data + pricing |
 | `mmed_*` | Mister Meds | Pharmacy data |
+| `mdvo_*` | Meduvo | Pharmacy data + pricing |
 | `woo_*` | WooCommerce | Staging tables for WordPress orders |
 | `wpforms_*` | WPForms | Patient questionnaires |
 

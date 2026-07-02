@@ -25,7 +25,7 @@ UPDATE moct_order_tracking SET tracking_sent=1, tracking_sent_date=GETDATE()
   retried forever. Safe because the WP order exists before tracking is pushed.
 - Selection: `tracking_sent=0 AND tracking_number IS NOT NULL AND tracking_provider
   NOT LIKE '%Picked Up%' AND clinic IN ('PEAKS Curative, LLC','PEAKS CURATIVE','MOC TELEDOC')`,
-  filtered per-pharmacy (`pharmacy = 'Rx Compound Store'` / `'Mister Meds'`).
+  filtered per-pharmacy (`pharmacy = 'Rx Compound Store'` / `'Mister Meds'` / `'Meduvo'`).
 
 ## Where it runs
 

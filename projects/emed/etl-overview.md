@@ -32,7 +32,7 @@ emed_etl runs four pipeline families on Prefect (`prefect.yaml`):
 - **Target:** Azure SQL `liberty_link_stage`
 - **Schedule:** Per-table cadence (15–60 min)
 - **Purpose:** Transfer pharmacy operational data
-- **Multi-tenant:** Supports `rxcs` (Rx Compound Store) and `mmed` (Mister Meds) via `table_prefix`
+- **Multi-tenant:** Supports `rxcs` (Rx Compound Store), `mmed` (Mister Meds), and `mdvo` (Meduvo) via `table_prefix`
 
 **Key flows:**
 - `flows/emed_etl/liberty_run_etl_flow.py` — Transfer a single configured table
@@ -75,6 +75,7 @@ See [emed-etl/warehouse.md](../emed-etl/warehouse.md) for the full warehouse ref
 ## Job Servers
 - **Rx Compound Store server** (`rxcs-jobserver-workqueue`, table_prefix='rxcs')
 - **Mister Meds server** (`mmed-jobserver-workqueue`, table_prefix='mmed')
+- **Meduvo server** (`mdvo-jobserver-workqueue`, table_prefix='mdvo') — pending provisioning
 
 ## Gotchas
 
