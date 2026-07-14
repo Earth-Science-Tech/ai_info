@@ -10,7 +10,7 @@
 
 ## Table Naming
 
-Use domain prefix: `moct_*`, `emed_*`, `rxcs_*`, `mmed_*`, `woo_*`, `wpforms_*`
+Use domain prefix: `moct_*`, `emed_*`, `rxcs_*`, `mmed_*`, `mdvo_*`, `woo_*`, `wpforms_*`
 
 ## Mandatory Fields
 

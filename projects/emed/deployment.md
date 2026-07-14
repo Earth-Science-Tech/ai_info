@@ -20,6 +20,7 @@ See `skills/push-prod.md` for the full workflow. Summary:
 ETL scripts run on job servers (Windows Task Scheduler or Prefect):
 - **Rx Compound Store server** — rxcs pharmacy data
 - **Mister Meds server** — mmed pharmacy data
+- **Meduvo server** — mdvo pharmacy data (pending provisioning)
 - **Schedule:** Every 30 minutes
 
 ## Database Changes

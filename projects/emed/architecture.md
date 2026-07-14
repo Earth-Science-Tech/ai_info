@@ -55,7 +55,8 @@ WordPress (peakscurative.com)
 ```
 Liberty RX Database
   ├── rxcs_* tables (Rx Compound Store)
-  └── mmed_* tables (Mister Meds)
+  ├── mmed_* tables (Mister Meds)
+  └── mdvo_* tables (Meduvo)
          │
   Transfer to Azure SQL ──→ Stored procedures merge data
 ```

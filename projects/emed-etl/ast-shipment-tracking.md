@@ -25,7 +25,7 @@ UPDATE moct_order_tracking SET tracking_sent=1, tracking_sent_date=GETDATE()
   retried forever. Safe because the WP order exists before tracking is pushed.
 - Selection: `tracking_sent=0 AND tracking_number IS NOT NULL AND tracking_provider
   NOT LIKE '%Picked Up%' AND clinic IN ('PEAKS Curative, LLC','PEAKS CURATIVE','MOC TELEDOC')`,
-  filtered per-pharmacy (`pharmacy = 'Rx Compound Store'` / `'Mister Meds'`).
+  filtered per-pharmacy (`pharmacy = 'Rx Compound Store'` / `'Mister Meds'` / `'Meduvo'`).
 
 ## Where it runs
 
@@ -116,6 +116,29 @@ A rebuilding backlog + a flow that "completes" = the classic silent-failure shap
 **Known chronic failures:** a small number of orders 404 ("Invalid order ID")
 because they no longer exist on the WP site (e.g. order numbers far below the
 current range). These never succeed via the API and need a human, not a retry.
+
+## The 2026-06/07 picked-up duplicate flood (NULL = NULL gotcha)
+
+`process-picked-up-orders` ballooned to ~41 min/run (hourly Run-All-ETL-RXCS hit ~56
+min). Root cause: `usp_etl_moct_order_tracking`'s dedup guard compared
+`f.tracking_number = e.TrackingNumber`, and picked-up rows carry **NULL** tracking
+numbers — `NULL = NULL` is UNKNOWN, so `NOT EXISTS` never matched and every hourly run
+re-inserted ~5,900 picked-up rows (~790 orders, ~140k rows/day). The subflow then
+re-PUT all ~790 orders to WooCommerce every run (~3 s each). Table bloated to 1.94M
+rows (~98.7% junk). Volume exploded 2026-06-27 when the refresh-recent fix made
+picked-up orders flow again — the latent bug finally had data to chew on.
+
+Fixed 2026-07-08 (emed_sql, both DBs):
+- `2026-07-08_fix_usp_etl_moct_order_tracking_null_dedup.sql` — NULL-safe predicate.
+- `2026-07-08_cleanup_moct_order_tracking_pickup_dups.sql` — deleted ~1.91M dups
+  (kept oldest per key), propagated sent-state, retired chronic 404 order 704, and
+  added filtered unique index `UX_moct_order_tracking_pickup_key ... WHERE
+  tracking_number IS NULL` so any dedup regression now fails the INSERT loudly (red
+  run) instead of silently re-bloating.
+
+**Lesson:** any dedup/merge predicate over a NULLable column needs an explicit
+NULL-safe branch (`OR (a IS NULL AND b IS NULL)`); watch for daily-insert-volume
+explosions after enabling a new data flow upstream.
 
 ## Observability gaps (open)
 

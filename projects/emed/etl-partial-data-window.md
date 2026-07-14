@@ -1,12 +1,12 @@
-# Gotcha: rxcs/mmed ETL Partial-Data Window
+# Gotcha: rxcs/mmed/mdvo ETL Partial-Data Window
 
 ## TL;DR
 
-Liberty Pharmacy ETL inserts `rxcs_rxqFullOrder` / `mmed_rxqFullOrder` rows in **stages**. There is a window — sometimes hours long — where the row exists with `ScriptNumber`, `RefillNumber`, and `QuantityDispensed` populated, but `P_*`, `Dr_*`, `Dr_ClinicName`, and `Name` (drug name) are still NULL. Code that reads from these tables (or from views built on them) during that window gets an incomplete record back, not a missing one.
+Liberty Pharmacy ETL inserts `rxcs_rxqFullOrder` / `mmed_rxqFullOrder` / `mdvo_rxqFullOrder` rows in **stages**. There is a window — sometimes hours long — where the row exists with `ScriptNumber`, `RefillNumber`, and `QuantityDispensed` populated, but `P_*`, `Dr_*`, `Dr_ClinicName`, and `Name` (drug name) are still NULL. Code that reads from these tables (or from views built on them) during that window gets an incomplete record back, not a missing one.
 
 ## How it manifests
 
-The downstream views (`view_rxcs_full_order`, `view_mmed_full_order`, `view_emed_full_order`) compute display fields like this:
+The downstream views (`view_rxcs_full_order`, `view_mmed_full_order`, `view_mdvo_full_order`, `view_emed_full_order`) compute display fields like this:
 
 ```sql
 LTRIM(RTRIM(CONCAT(P_FirstName, ' ', P_LastName))) AS Patient
