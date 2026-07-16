@@ -10,7 +10,8 @@ just convention.
 - **Dev is open. Production is gated.** Move fast in dev; only Nicholas & Carlos touch production.
 - Anything wrong in dev is isolated and recoverable; anything wrong in prod reaches customers. The rules reflect that asymmetry.
 
-GitHub usernames: **Nicholas = `nicholas-cardell`**, **Carlos = `carcuet`**.
+GitHub usernames: **Nicholas = `nicholas-cardell`**, **Carlos (Cueto) = `carcuet`**. Full
+team roster (and the two-Carlos gotcha) in [../../team/roster.md](../../team/roster.md).
 
 ## Merge / push matrix
 
