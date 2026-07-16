@@ -5,15 +5,15 @@ you never misattribute work or grant the wrong person production access. Last up
 
 ## Developers
 
-| Full name | GitHub username | Role / notes |
-|-----------|-----------------|--------------|
-| **Nicholas Cardell** | `nicholas-cardell` | Engineering lead & most senior developer. Production gatekeeper. |
-| **Carlos Cueto** | `carcuet` | Senior database engineer. Production gatekeeper (esp. prod DB / emed_sql). |
-| **Carlos Obregon** | `Obregon1993` | Developer. **Not** the same person as Carlos Cueto — see gotcha below. |
-| **Jose Daniel Garcia Gonzalez** | `etst-josegonzalez` | Developer. |
-| **Jorge Trigoura** | `jtrigourarxcs` | Developer. |
-| **Mario Tabraue** | `mariotabraue` | Developer (CRM / pricing feature work). |
-| **Chris Rose** | `earth-science-dev` | **CTO.** Org owner — set up the GitHub org/subscription. Does not commit code. As an org owner this account *can* bypass branch protection (latent gatekeeper), though unused day-to-day. |
+| Full name | GitHub username | Title | Notes |
+|-----------|-----------------|-------|-------|
+| **Nicholas Cardell** | `nicholas-cardell` | Senior Staff Engineering Manager & Engineering Lead | Org owner. Production gatekeeper. |
+| **Chris Rose** | `earth-science-dev` | CTO, Earth Science Tech | Org owner — set up the GitHub org/subscription. Does not commit code. As an org owner *can* bypass branch protection (latent gatekeeper), though unused day-to-day. |
+| **Mario Tabraue** | `mariotabraue` | COO, Earth Science Tech | Also does CRM / pricing feature work in the repos. |
+| **Carlos Cueto** | `carcuet` | Senior Database Engineer | Production gatekeeper (esp. prod DB / emed_sql). **Not** the same person as Carlos Obregon — see gotcha below. |
+| **Carlos Obregon** | `Obregon1993` | Senior SW Engineer | **Not** the same person as Carlos Cueto — see gotcha below. |
+| **Jose Daniel Garcia Gonzalez** | `etst-josegonzalez` | SW Engineer | |
+| **Jorge Trigoura** | `jtrigourarxcs` | Web Developer | |
 
 **GitHub org owners** (can bypass branch protection): **Nicholas Cardell** (`nicholas-cardell`)
 and **Chris Rose** (`earth-science-dev`). Everyone else is a regular org member, bound by the
