@@ -12,8 +12,12 @@ you never misattribute work or grant the wrong person production access. Last up
 | **Carlos Obregon** | `Obregon1993` | Developer. **Not** the same person as Carlos Cueto — see gotcha below. |
 | **Jose Daniel Garcia Gonzalez** | `etst-josegonzalez` | Developer. |
 | **Jorge Trigoura** | `jtrigourarxcs` | Developer. |
-| **Mario Tabraue** | `mariotabraue` | Developer (CRM / pricing feature work). *Surname inferred from username — confirm.* |
-| Chris Rose (per profile) | `earth-science-dev` | Org/shared account — no commits in the app/etl/sql repos. Purpose unconfirmed; treat as a non-personal account until verified. |
+| **Mario Tabraue** | `mariotabraue` | Developer (CRM / pricing feature work). |
+| **Chris Rose** | `earth-science-dev` | **CTO.** Org owner — set up the GitHub org/subscription. Does not commit code. As an org owner this account *can* bypass branch protection (latent gatekeeper), though unused day-to-day. |
+
+**GitHub org owners** (can bypass branch protection): **Nicholas Cardell** (`nicholas-cardell`)
+and **Chris Rose** (`earth-science-dev`). Everyone else is a regular org member, bound by the
+branch/database gates.
 
 ## ⚠️ Gotcha: there are two people named "Carlos"
 

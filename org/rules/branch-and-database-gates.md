@@ -49,6 +49,13 @@ All branches block force-pushes and deletions.
 - Standard flow: build on dev DB → write migration in emed_sql → Nicholas/Carlos apply to prod.
   See `sql-safety.md` and the emed_sql prod/dev split docs.
 
+## Enforcement note
+
+GitHub **org owners can bypass branch protection.** Current org owners: `nicholas-cardell`
+(Nicholas) and `earth-science-dev` (Chris Rose, CTO — does not commit). Everyone else is a
+regular org member and is bound by the rules above. `enforce_admins` is currently **off** on the
+gated branches; enable it if you ever need a hard lock that even owners cannot bypass.
+
 ## Why this model
 
 - The old flow required a PR + 1 peer approval for **every** merge into `dev`, which stalled
