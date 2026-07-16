@@ -35,6 +35,8 @@ Examples: `feat(auth): add OAuth login`, `fix(api): handle empty response`
 
 ## Branch & PR Lifecycle
 
+> **Who can merge where** — `dev` is open to all devs (no PR); `main`/production and the prod database are gated to Nicholas + Carlos — is defined in [branch-and-database-gates.md](branch-and-database-gates.md).
+
 1. **One branch → one PR → merge → done.** A feature branch's life ends when its PR merges.
 2. **Never push to a branch after its PR has merged.** New commits on a merged branch do NOT reach `main`/`dev` — they silently go missing. This has caused real production gaps (commits added post-merge had to be recovered by a follow-up PR). For any follow-up work, **cut a fresh branch from the latest base and open a new PR.**
 3. **Recovering stranded commits:** if work was lost this way, `git cherry-pick` the orphaned commits onto a new branch and PR that — don't reopen/re-push the merged branch.
