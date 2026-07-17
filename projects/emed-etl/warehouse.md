@@ -76,6 +76,28 @@ Facts that can hold rows from more than one source/tenant carry a **discriminato
 | `core.fct_order` | `source_site` | `peaks_curative`, `peaknow` | `hash(source_site, order_id, line_item_id)` |
 | `core.fct_payment_transaction` | `pharmacy` | `rxcs`, `mmed` | `hash(pharmacy, transaction_id)` |
 | `core.fct_payment_action` | `pharmacy` | `rxcs`, `mmed` | `hash(pharmacy, transaction_id, action_seq)` |
+| `core.fct_stripe_balance_transaction` | `stripe_account` | acct_… id per company (`account_alias` label, e.g. `villashealth`) | `hash(stripe_account, balance_transaction_id)` |
+| `core.fct_stripe_charge` | `stripe_account` | same | `hash(stripe_account, charge_id)` |
+| `core.fct_bank_transaction` | `item_id` | one Plaid bank login (`account_alias` label: `chase`, `boa`) | `hash(item_id, transaction_id)` |
+| `core.fct_bank_balance_snapshot` | `item_id` | same | `hash(item_id, account_id, as_of)` |
+
+The Stripe/Plaid facts deliberately have **no `accepted_values` test on the discriminator** — onboarding a second Stripe company or bank login is purely an ETL-side change (new Secret block + deployment param / registry row); the dbt models pick the new value up with zero edits.
+
+### Finance feed models (Stripe + Plaid), added 2026-07-16
+
+Staging views (`stg_stripe_balance_transactions`, `stg_stripe_charges`, `stg_plaid_transactions`, `stg_plaid_account_balances`) clean the direct-write feeds: empty-string→NULL, test-mode/sandbox rows filtered, and **sign conventions resolved at the staging boundary** — Plaid's inverted amount (positive = money OUT) is split into always-positive `outflow_amount`/`inflow_amount`; Stripe ledger amounts stay signed (refunds/payouts/fees negative) so `SUM(net_amount)` = balance impact.
+
+| Model | Grain | Purpose |
+|-------|-------|---------|
+| `core.fct_stripe_balance_transaction` | (stripe_account, balance_transaction_id) | Money truth: Stripe ledger w/ gross/fee/net, `reporting_category` buckets, charge context joined on |
+| `core.fct_stripe_charge` | (stripe_account, charge_id) | Payment funnel incl. failed attempts (failed rows have NULL balance_transaction_id) |
+| `core.dim_bank_account` | (item_id, account_id) | Latest-snapshot attrs + `latest_*` balances. **Entity axis = `account_name`** (one bank login holds many entities' accounts), not `account_alias` |
+| `core.fct_bank_balance_snapshot` | (item_id, account_id, as_of) | Append-only balance history; `is_latest_of_day` / `is_latest` flags |
+| `core.fct_bank_transaction` | (item_id, transaction_id) | Bank transactions; `is_pending` flag (pending rows re-post under a NEW id — filter to 0 for money) |
+| `mart.mart_daily_stripe_activity` | (date, stripe_account) | Funnel counts + ledger bucketed by `reporting_category` (sales/refunds/disputes/fees/payouts) |
+| `mart.mart_daily_bank_activity` | (date, bank_account_sk) | Posted-only inflow/outflow/net + end-of-day balance where a snapshot exists that day |
+
+Reconciliation hook (not yet built): Stripe payout rows (`reporting_category='payout'`, negative) should tie out to Plaid deposits in `fct_bank_transaction` a few days later — the Stripe-side analog of `mart_settlement_batches`.
 
 **Why (the gotcha):** WooCommerce `order_id`s are per-install auto-increment sequences, so PeaksCurative order `1234` and PeakNow order `1234` are *different* orders sharing an id. Keying `fct_order` on `order_id` alone would collide and conflate them the moment a second storefront lands (the SK `unique` test breaks, or worse, rows silently merge). Same logic for `transaction_id` across pharmacies.
 
