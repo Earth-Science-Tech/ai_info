@@ -55,6 +55,7 @@ The raw clone tables and dbt staging views live side-by-side in `stg`. The custo
 | `models/staging/stg_*.sql` | Cleanup views (e.g., `stg_woo_orders`, `stg_woo_order_items`) |
 | `models/core/dim_*.sql`, `fct_*.sql` | Dimensions and facts (`dim_date`, `fct_order`) |
 | `models/marts/mart_*.sql` | Denormalized marts (`mart_daily_orders`) |
+| `ANALYST_GUIDE.md` | Consumer-facing guide for BI/analysts (question→model map, tenant axes, sign conventions, grains, history windows) — hand to anyone reporting off `core`/`mart` |
 
 ### Adding a new model
 1. New source table? Add it to `models/sources.yml`.
