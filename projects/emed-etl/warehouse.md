@@ -77,7 +77,7 @@ Facts that can hold rows from more than one source/tenant carry a **discriminato
 | `core.fct_order` | `source_site` | `peaks_curative`, `peaknow` | `hash(source_site, order_id, line_item_id)` |
 | `core.fct_payment_transaction` | `pharmacy` | `rxcs`, `mmed` | `hash(pharmacy, transaction_id)` |
 | `core.fct_payment_action` | `pharmacy` | `rxcs`, `mmed` | `hash(pharmacy, transaction_id, action_seq)` |
-| `core.fct_stripe_balance_transaction` | `stripe_account` | acct_… id per company (`account_alias` label, e.g. `villashealth`) | `hash(stripe_account, balance_transaction_id)` |
+| `core.fct_stripe_balance_transaction` | `stripe_account` | acct_… id per company (`account_alias` labels: `villashealth`, `doconsultations`) | `hash(stripe_account, balance_transaction_id)` |
 | `core.fct_stripe_charge` | `stripe_account` | same | `hash(stripe_account, charge_id)` |
 | `core.fct_bank_transaction` | `item_id` | one Plaid bank login (`account_alias` label: `chase`, `boa`) | `hash(item_id, transaction_id)` |
 | `core.fct_bank_balance_snapshot` | `item_id` | same | `hash(item_id, account_id, as_of)` |
