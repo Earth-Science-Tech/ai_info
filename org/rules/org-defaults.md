@@ -2,6 +2,11 @@
 
 These conventions apply to all Earth Science Tech projects unless a project explicitly documents exceptions.
 
+<!-- Auto-load org-wide access policy + team roster wherever org-defaults is imported.
+     Every project's CLAUDE.md imports this file, so these nested @imports propagate to all. -->
+@branch-and-database-gates.md
+@../../team/roster.md
+
 ## Naming Conventions
 
 | Context | Convention | Examples |
