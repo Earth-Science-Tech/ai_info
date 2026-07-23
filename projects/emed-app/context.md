@@ -42,6 +42,10 @@ Claude auto-reads these when working in related areas:
 - `./python/email_helper/info.claude` — Outlook email sync tool
 - `./python/claude_speech/info.claude` — Voice interface
 
+## Liberty sandbox mode
+
+The app supports talking to Liberty's dev sandbox (`devapi.libertysoftware.com`) instead of prod, as an opt-in per run via `LIBERTY_USE_SANDBOX=1` / `npm run start:dev:sandbox`. Used for exercising write flows (inventory push, prescription submit, patient create) without touching prod. rxcs credentials only right now; sandbox drug catalog is separate from prod so DrugIds do NOT map across environments. Full doc: [liberty-sandbox.md](liberty-sandbox.md).
+
 ## Python Scripts (remaining in emed_app)
 
 ETL scripts in emed_etl. Schema-extraction scripts moved to `emed_sql/python/` (2026-05-04). What remains in emed_app:
