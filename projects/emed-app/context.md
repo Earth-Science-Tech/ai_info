@@ -46,6 +46,10 @@ Claude auto-reads these when working in related areas:
 
 The app supports talking to Liberty's dev sandbox (`devapi.libertysoftware.com`) instead of prod, as an opt-in per run via `LIBERTY_USE_SANDBOX=1` / `npm run start:dev:sandbox`. Used for exercising write flows (inventory push, prescription submit, patient create) without touching prod. rxcs credentials only right now; sandbox drug catalog is separate from prod so DrugIds do NOT map across environments. Full doc: [liberty-sandbox.md](liberty-sandbox.md).
 
+## Liberty API callback contract (a timeout is NOT a success)
+
+Every `liberty.js` `api()` call gets a `(data, error)` callback. Liberty returns an **empty body on success**, so `data===null` is ambiguous (success-with-empty-body OR timeout) — mutations MUST decide failure from `error`, not `data`. Ignoring `error` is what marked visits "Approved by Prescriber" while the Rx never sent (2026-07-15 incident). Full rule + audit status: [../emed/liberty-api-callback-contract.md](../emed/liberty-api-callback-contract.md).
+
 ## Python Scripts (remaining in emed_app)
 
 ETL scripts in emed_etl. Schema-extraction scripts moved to `emed_sql/python/` (2026-05-04). What remains in emed_app:
