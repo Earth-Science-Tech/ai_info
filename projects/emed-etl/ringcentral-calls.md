@@ -32,7 +32,7 @@ RingCentral purges recording **audio** on a rolling ~90-day basis but keeps the
 
 ## Where the audio goes: Azure Blob, not SQL
 
-Container `call-recordings`, path `rc/{account}/{yyyy}/{MM}/{dd}/{recording_id}.{ext}`.
+Container `ringcentral-call-recordings`, path `rc/{account}/{yyyy}/{MM}/{dd}/{recording_id}.{ext}`.
 Only the container-relative path is stored in SQL (`archive_blob_path`) — not a full URL, so
 the storage account can change without rewriting every row.
 
