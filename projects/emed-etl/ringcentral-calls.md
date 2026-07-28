@@ -30,6 +30,29 @@ RingCentral purges recording **audio** on a rolling ~90-day basis but keeps the
 - RingCentral never keeps recordings under ~30 seconds. 592 of the 9,944 prod rows are
   under 30s, so those always 404 — the archive flow marks them `unavailable`, not `failed`.
 
+## AI stages (2026-07-29): transcription + summarization in the archive flow
+
+`calls_archive_recordings` is three stages on one 20-min run clock (archive stage yields at
+12 min so a backlog drain can't starve the AI stages). `ai_status` lifecycle:
+`pending` → `transcribed` → `completed`; failures park as `transcribe_failed` /
+`summarize_failed` (requeue = reset to `pending` / `transcribed`; no attempts column, so
+parking is terminal by design).
+
+- **Stage 2 — Azure Speech *fast transcription*** (synchronous REST, no SAS/polling) →
+  `ai_transcript` as `[m:ss] Speaker N: text` lines. Diarized (2 speakers), language ID
+  `en-US`/`es-US` (~15–20% of calls are Spanish), profanity unmasked for QA fidelity.
+  Newest-first (no purge deadline once audio is in blob; newest calls are the actionable
+  ones). ~40× realtime observed. Secret `azure-speech-credentials`:
+  `{"key", "region"|"endpoint"}` (JSON-object or string secret both work).
+- **Stage 3 — Azure OpenAI (Foundry) chat completion** → `ai_summary` (type tag / narrative /
+  follow-up / sentiment, English, <200 words). Secret `azure-openai-credentials`:
+  `{"key", "endpoint", "deployment"}` — `deployment` is the Foundry deployment name
+  (currently `gpt-5.4-nano`); the helper strips a trailing `/openai[/v1]` from the endpoint.
+- Both stages **skip with a log line if their secret is missing** — an AI outage never blocks
+  the purge race. Helpers: `flows/utilities/azure_speech.py`, `flows/utilities/azure_openai.py`.
+- Gotcha: RingCentral's `duration_seconds` counts ring/hold — actual recorded audio is often
+  much shorter. Don't size transcription workloads from that column.
+
 ## Where the audio goes: Azure Blob, not SQL
 
 Container `ringcentral-call-recordings`, path `rc/{account}/{yyyy}/{MM}/{dd}/{recording_id}.{ext}`.
