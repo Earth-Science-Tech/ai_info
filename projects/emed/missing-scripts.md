@@ -90,20 +90,29 @@ dismissed" toggle + Undo restore them. Test orders (patient name contains "test"
 
 ### Bulk auto-dismiss duplicates (dismiss accelerator)
 
-`suggest_auto_dismissals` proposes **provable excess-duplicate** orphans for one-click batch
-dismissal (`/dismiss-bulk`). An orphan qualifies iff the **same human** already has a
-**different order for the exact same drug+dose+fill that is linked** to a pharmacy script,
-AND the orphan is **not itself linkable** (no unclaimed script it should link to instead).
-Rationale: the pharmacy filled that drug once (the linked sibling); this extra identical copy
-can never be fulfilled. **Safety keys (do not weaken these):**
+`suggest_auto_dismissals` proposes **high-confidence excess-duplicate** orphans for one-click
+batch dismissal (`/dismiss-bulk`). Dismissing must NEVER hide a genuine missing script, so the
+rule is **deliberately strict** — an earlier looser version false-positived **27%** in an
+adversarial prod review (it dismissed legitimate monthly refills of chronic drugs). An orphan
+qualifies **only when ALL** hold (do not weaken these):
 
-- **Dose-INCLUSIVE, exact drug key** (`drug_strict_key`, e.g. `TIRZEPATIDE50MG`) — NOT the
-  fuzzy/dose-stripped link key. A `75mg` order must never be dismissed as a dup of a linked
-  `100mg` (that would hide a genuine missing script). Dose-escalation cases are spared.
-- **Name+DOB patient key** (`person_key`), NOT `person_id` — the same human routinely has
-  several `moct_person` records, and `person_id` would miss cross-record duplicates.
-- **Fill-aware** — a refill (fill>0) is never a dup of the original (fill 0).
-- **Not-linkable gate** — if an unclaimed matching pharmacy script exists, prefer linking.
+- **Dose present** — the drug_name contains a digit. Excludes consumables (Insulin Syringe,
+  co-shipped every fill) and dose-ambiguous free-text names, which over-dismiss.
+- **Cool-off** — aged ≥ **14 days** (`DISMISS_COOLOFF_DAYS`). Fresh orders may still be in the
+  RXCS compounding / ETL pipeline and flip to linked; never dismiss them.
+- **Same-cycle, same-pharmacy, FULFILLED sibling** — a *different* same-human (name+DOB, spans
+  duplicate `moct_person` records) order for the **exact dose-inclusive drug** (`drug_strict_key`
+  — `75mg` ≠ `100mg`) that is linked **at the same pharmacy**, whose linked mirror row actually
+  **shipped/dispensed** (real `TrackingNumber` or dispensed date — NOT a bare link row; the fuzzy
+  bulk auto-matcher produces some wrong links, and `moct_order_tracking.rx_id` is a bad proxy —
+  barely populated), signed within **10 days** (`DISMISS_CYCLE_DAYS`) of the orphan (the *same*
+  ordering episode — never a later monthly refill).
+- **No live link target** — no unclaimed pharmacy script the orphan could link to instead: any
+  unclaimed same-ingredient script that is **pending/undispensed** (`9999-09-09` sentinel) or
+  dispensed on/after (sign − 2d) forces SPARE.
+
+Adversarially verified on prod (parallel per-candidate review + rule-critique): the guarded rule
+yields a set that is 100% inside the independently-confirmed-safe subset.
 
 ## Key gotchas
 
