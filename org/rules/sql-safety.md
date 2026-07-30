@@ -83,6 +83,13 @@ Do **not** just write "already applied to dev" with no link — that reads as "t
 
 Corollary: **never apply schema straight to a database without committing the migration to `emed_sql` first.** Even when you've applied it to dev yourself, the committed `migrations/pending/` file (with grants + indexes) is what lets a lead ship the exact same change to prod. An un-committed dev change forces someone to reverse-engineer the DDL from the live DB — and they'll miss things like indexes and unique constraints that aren't obvious from the column list.
 
+### Drift is enforced, not just documented
+
+Two automated backstops catch a missing migration even when the rules above get skipped:
+
+1. **At prod-promotion (authoritative).** `push prod` runs `emed_sql/python/check_migration_drift.py`, which diffs the **live** `liberty_link_dev` and `liberty_link_stage` catalogs and hard-stops the deploy on any dev-ahead table/column/view/proc/trigger that no `pending/` or `wip/` migration covers. When it fires, recover the migration with `python python/check_migration_drift.py --scaffold` (it reverse-engineers an idempotent draft, with grants, from the dev catalog) — never hand-reverse-engineer or push around it. This is stronger than `diff prod/ dev/`, which is blind to a dev change whose `dev/` snapshot was never committed.
+2. **At PR time (tool-agnostic).** emed_app and emed_etl carry a `.github/PULL_REQUEST_TEMPLATE.md` "Schema changes" section and a `migration-check` CI job that fails a PR unless it either declares "no schema change" or links a migration file that actually exists in emed_sql. This binds every author, not only Claude-driven work. (CI can't reach Azure SQL, so it verifies the PR *links a real migration file* — the live-DB truth check is backstop #1.)
+
 ## Mandatory Table Fields
 
 ALL tables in the database MUST include these fields:

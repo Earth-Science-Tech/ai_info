@@ -35,11 +35,18 @@ The scope is optional but recommended. Use the module or feature area:
 
 ## Branch Strategy
 
-Trunk-based development:
-- Short-lived feature branches off `main`
-- Pull request with 1 approval from an `admin` member
-- Merge and deploy
-- No long-lived develop/release branches unless specifically needed
+eMed uses a **feature-promotion model with an open preview branch** (canonical definition + gates in
+[branch-and-database-gates.md](../rules/branch-and-database-gates.md)):
+- A long-lived **open `dev`** integration/preview branch is intentional — all devs push to it freely
+  (no PR) and it auto-deploys to the Azure dev slot.
+- **Shippable feature branches are cut from `main`** (not `dev`), and also merged into `dev` for combined
+  preview while open.
+- **`main` (production) is identity-gated**, not PR-approval-gated: only the three gatekeepers can
+  merge/push it. A regular dev's `feat/* → main` PR is merged by a gatekeeper, who then cuts the `x.x.x`
+  deploy tag.
+- **Subset a release by promoting a feature branch**, never by branch surgery on `dev`; a gatekeeper may
+  batch several ready feature PRs into one tag. (emed_etl `main` uses PR + 1 approval; ai_info commits
+  straight to `main`.)
 
 ## ai_info Commit Prefixes
 

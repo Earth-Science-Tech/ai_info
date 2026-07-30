@@ -40,7 +40,12 @@ Examples: `feat(auth): add OAuth login`, `fix(api): handle empty response`
 
 ## Branch & PR Lifecycle
 
-> **Who can merge where** — `dev` is open to all devs (no PR); `main`/production and the prod database are gated to Nicholas + Carlos — is defined in [branch-and-database-gates.md](branch-and-database-gates.md).
+> **Who can merge where** — `dev` is open to all devs (no PR); `main`/production and the prod database are gated to the three gatekeepers (Nicholas, Carlos Cueto, Jose) — is defined in [branch-and-database-gates.md](branch-and-database-gates.md), which also defines the **release model** (feature branches cut from `main` are the shippable unit; `dev` is an open preview that never sources a production tag).
+
+For eMed, a **shippable** feature branch's base is always `main` (`git switch main && git pull &&
+git switch -c feat/<name>`), **never `dev`** — `dev` is an open preview collector that receives feature
+merges for combined testing but is never itself merged into `main` as a tag source. The lifecycle rules
+below apply to that promotion PR (`feat/* → main`).
 
 1. **One branch → one PR → merge → done.** A feature branch's life ends when its PR merges.
 2. **Never push to a branch after its PR has merged.** New commits on a merged branch do NOT reach `main`/`dev` — they silently go missing. This has caused real production gaps (commits added post-merge had to be recovered by a follow-up PR). For any follow-up work, **cut a fresh branch from the latest base and open a new PR.**

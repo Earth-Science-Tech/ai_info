@@ -40,6 +40,40 @@ Full team roster (and the two-Carlos gotcha) in [../../team/roster.md](../../tea
 
 All branches block force-pushes and deletions.
 
+## Release model — feature promotion + open preview-dev
+
+**Effective 2026-07-30.** eMed ships a *subset* of in-flight work by making the **feature branch the
+shippable unit**, cut from `main` — not by tagging a slice of `dev`. This is what lets a ready feature
+go live while an unready one stays behind.
+
+- **`feat/<name>` (cut from `main`) is the shippable unit.** Start every shippable change with
+  `git switch main && git pull && git switch -c feat/<name>`. **Never cut a shippable branch off `dev`**
+  (or off another feature branch — org-defaults rule 5). A branch descended from `main` carries only its
+  own commits, so it is a clean, subsettable artifact; a branch cut off `dev` would drag `dev`'s unready
+  work along on promotion.
+- **`dev` is an open integration/preview branch, never a release source.** All devs push to it freely
+  (no PR). While a feature branch is open, **also merge it into `dev`** (`git switch dev &&
+  git merge feat/<name> && git push`) so `dev` always shows the combined in-flight feature set on the
+  Azure dev slot. That merge ships nothing and creates no obligation to `main`. `dev` may hold unready or
+  abandoned work; it is **never** the source of an `x.x.x` tag.
+- **Ship by promotion.** Bring the feature current with prod (`git switch feat/x && git fetch origin &&
+  git merge origin/main`, resolving any conflict here on the feature branch), push, then open a
+  **`feat/x → main` PR** (see `skills/open-pr.md`). Only a gatekeeper merges it. A gatekeeper may merge
+  **several** ready feature PRs before cutting **one** `x.x.x` tag (batching). Prod = the tagged commit on
+  `main`; unready work physically can't ride along because it isn't in the merged branch.
+- **Merge `feat/x → main` as a merge commit, not a squash.** The feature's commits are already on `dev`
+  (the preview merge), so a merge commit keeps `dev` and `main` sharing commit identity and the
+  `main → dev` back-merge (`sync-main-to-dev.yml`) stays a clean no-op. A squash diverges and conflicts on
+  back-merge.
+- **Two lanes, one guard.** When *everything* on `dev` ahead of `main` is production-ready, the fast
+  **batch** lane is still valid: fast-forward `main` to the `dev` SHA and tag. When `dev` holds *any*
+  unready work, use the **feature-promotion** lane above. Never fast-forward `main` to `dev` while unready
+  work is on `dev`.
+- **Schema rides with its feature.** A feature's migration lives in `emed_sql/migrations/wip/` while
+  unready, and moves `wip/ → pending/` at the moment its promotion PR opens; `push prod` applies only the
+  migration file(s) the shipping PR declares. So the schema subset tracks the code subset. (See
+  `skills/create-table.md` + `skills/push-prod.md`.)
+
 ## Production deploy tags (eMed → Azure)
 
 A prod deploy of eMed is triggered by pushing a git tag matching `x.x.x` (e.g. `1.0.114`) →
@@ -56,8 +90,10 @@ to edit branch protection, bypass the merge gate, or delete anything.)
    branch for all feature work.
 2. **eMed `main` / emed_sql `main` (production):** do **not** push or merge here unless the person
    you are working for is a gatekeeper (Nicholas, Carlos, or Jose). Everyone else is blocked at the
-   GitHub level. Path for others: land on `dev`, then a gatekeeper promotes to `main` and cuts the
-   deploy tag (see the push-prod skill).
+   GitHub level. Path for others: author the change on a `feat/*` branch **cut from `main`**, preview it
+   by merging into `dev`, then open a `feat/* → main` PR that a gatekeeper reviews, merges, and tags (see
+   the "Release model" section above and the push-prod / open-pr skills). Do **not** ship by tagging a
+   `dev` SHA — that carries all of `dev`, including unready work.
 3. **emed_etl `main`:** open a PR and get 1 approval from any developer. (Nicholas & Carlos may push
    directly.) emed_etl auto-deploys to prod on the next scheduled Prefect run, so its `main` is
    production even though it isn't the database.

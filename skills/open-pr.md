@@ -31,16 +31,27 @@ If there are uncommitted changes the user wants in the PR, commit them first (pe
 
 ### 2. Pick the base branch
 
+For **emed_app**, a *shippable* feature PRs to **`main`** (feature promotion — see
+`org/rules/branch-and-database-gates.md` → "Release model"). Merging a feature INTO `dev` for combined
+preview is a plain `git merge`, **not a PR**. Start a shippable feature from `main`:
+
+```bash
+git switch main && git pull && git switch -c feat/<name>
+```
+
+The `base-freshness` CI check fails a `feat/* → main` PR whose branch was accidentally cut off `dev`
+instead of `main` (it would drag `dev`'s unready work along) — so always branch from `main`.
+
 Default base by repo:
 
-| Repo | Default base | When to override |
-|------|--------------|------------------|
-| `emed_app` | `dev` | Hotfix going straight to `main` |
-| `emed_sql` | `main` | (no integration branch in this repo) |
-| `emed_etl` | `main` | (no integration branch in this repo) |
+| Repo | Default base | Notes |
+|------|--------------|-------|
+| `emed_app` | **`main`** | Shippable feature → `main`. (A rare true hotfix also targets `main` directly, by a gatekeeper.) |
+| `emed_sql` | `main` | no integration branch in this repo |
+| `emed_etl` | `main` | no integration branch in this repo |
 | `ai_info` | `main` | always — knowledge updates commit directly to main, no PR |
 
-If the user named a base explicitly ("PR this against main"), honor it.
+If the user named a base explicitly ("PR this against dev"), honor it.
 
 ### 3. Draft title and body
 
@@ -72,7 +83,7 @@ git diff <base>..HEAD --stat
 
 A correct, complete diff is not enough — the body must call out anything that affects how the PR is reviewed or deployed. **Omitting these has repeatedly caused near-misses where a code PR would have broken production on deploy.** Before you run `gh pr create`, walk this checklist and put anything that applies in a **Dependencies & risk** section:
 
-1. **Schema / prod prerequisites — the #1 miss.** If the code reads or writes any table/column/view/proc that a migration introduces, say so explicitly: name the `emed_sql/migrations/...` file, link its emed_sql PR/commit, and state **where it's been applied** (dev only? dev + prod?). The migration must be in prod **before or with** the code merge — code that queries a table prod doesn't have yet throws at runtime. (See `org/rules/sql-safety.md` → "Cross-repo: code PRs that depend on a migration".) Never create the table by hand on dev without committing the migration — there'll be nothing to promote to prod.
+1. **Schema / prod prerequisites — the #1 miss.** If the code reads or writes any table/column/view/proc that a migration introduces, say so explicitly: name the `emed_sql/migrations/...` file, link its emed_sql PR/commit, and state **where it's been applied** (dev only? dev + prod?). The migration must be in prod **before or with** the code merge — code that queries a table prod doesn't have yet throws at runtime. (See `org/rules/sql-safety.md` → "Cross-repo: code PRs that depend on a migration".) Never create the table by hand on dev without committing the migration — there'll be nothing to promote to prod. The repo's `.github/PULL_REQUEST_TEMPLATE.md` has a **Schema changes** section for exactly this: either tick "no schema change" or fill in the migration file path + emed_sql commit + where-applied. A `migration-check` CI job fails the PR if that section is left blank or points at a migration that doesn't exist in emed_sql — so fill it in truthfully rather than fighting the check.
 2. **Behavioral changes the title doesn't imply.** If the PR is titled like a UI tweak but also changes routing/charging/permission logic, name that change. A reviewer who trusts the title will skim right past it. (Real case: a PR titled "add a summary table" also rewrote prescription-routing cleanup logic — invisible from the title.)
 3. **Known limitations / security gaps / unverified paths.** Anything `UNVERIFIED end-to-end`, sandbox-only, missing a bound (e.g. an uncapped loop over public input), or a deliberately-deferred hardening step. Flagging it lets the deployer gate appropriately instead of discovering it live.
 4. **New env vars / config** the deploy target needs (and whether prod already has them).

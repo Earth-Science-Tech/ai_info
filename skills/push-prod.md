@@ -35,13 +35,15 @@ If `git diff <last_tag>..HEAD` exceeds ~2000 lines, read the `--stat` output, id
 
 ### Step 1.5 — SQL drift check (always run if `emed_sql/` exists)
 
-Detect pending schema changes automatically. The source of truth is `emed_sql/migrations/pending/` — any `.sql` file there is a migration that has not yet been applied to prod.
+Detect pending schema changes automatically — **against the live databases**, which is authoritative. Run the drift checker: it diffs live `liberty_link_dev` vs `liberty_link_stage` and classifies every dev-ahead object/column as covered by `pending/` (ships), parked in `wip/` (held on purpose), or **UNCOVERED** (no migration exists anywhere — the failure this step must catch).
 
 ```bash
 cd ../emed_sql                                # adjust path as needed
-ls migrations/pending/*.sql 2>/dev/null       # list pending migrations
-diff -rq prod/ dev/ | grep -v _GENERATED.md   # confirm dev/prod drift matches the pending set
+python python/check_migration_drift.py        # exits non-zero if any UNCOVERED drift
+ls migrations/pending/*.sql 2>/dev/null       # list what will ship
 ```
+
+Why the tool and not just `diff -rq prod/ dev/`: the snapshot-folder diff only compares the committed `prod/`/`dev/` files, so it is blind whenever someone changed the dev DB but never regenerated/committed the `dev/` snapshot — which is exactly the situation that leaves a migration missing. `check_migration_drift.py` reads the live catalogs, so a stale snapshot can't hide drift from it.
 
 **Only `pending/` ships.** `migrations/wip/` is a holding area for on-hold / not-ready features and is intentionally **never** applied by push prod — do not scan it, do not apply it. Expect the `prod/` ↔ `dev/` diff to show dev-ahead objects whose migrations live in `wip/` (or that are documented in `wip/STATUS.md`); those are **known, intentional drift**, not an out-of-band change. Only treat dev/prod drift as a problem when it's covered by neither `pending/` nor `wip/`.
 
@@ -57,7 +59,7 @@ If `migrations/pending/` has files, list them in the Phase 1 report under "SQL c
 Reject the push if:
 - A pending migration is non-idempotent (will fail on re-run)
 - A new table/view/procedure exists without a corresponding `GRANT`
-- The dev/prod diff has changes that are NOT covered by any file in `migrations/pending/` **or** `migrations/wip/` and are not noted in `wip/STATUS.md` (suggests someone modified a DB out-of-band). Drift explained by a `wip/` migration or STATUS entry is intentional on-hold work — not a reject.
+- `check_migration_drift.py` reports **UNCOVERED** drift (dev-ahead schema that no `pending/` or `wip/` migration covers — it exits non-zero). This is the "missing migration" case. **HARD STOP: do not proceed, and do NOT reverse-engineer the DDL by hand.** Recover it deterministically instead: run `python python/check_migration_drift.py --scaffold`, review each generated draft in `migrations/pending/`, confirm it's idempotent by applying to dev (`python python/apply_migration.py migrations/pending/<file>.sql`), commit the migration to emed_sql, then re-run push prod. (Drift the tool classifies as `wip`-parked or prod-ahead is NOT a reject — that's intentional on-hold work / a prod change not yet backported to dev.)
 
 ### Step 2 — Run the ETST checklist on the diff
 
@@ -146,16 +148,37 @@ Wait for the user's reply before doing anything in Phase 2.
 
 Only run after Phase 1 confirmation (or emergency bypass).
 
+Run on a **clean, up-to-date `main`** — normally right after the feature's `feat/* → main` promotion PR
+has merged (feature-promotion lane), or after fast-forwarding `main` to a fully-ready `dev` SHA (batch
+lane; valid only when *everything* on `dev` ahead of `main` is shipping). Do **not** run from `dev`, and
+do **not** auto-commit unrelated working-tree changes onto `main` — the tag is cut on `main` HEAD.
+(See `org/rules/branch-and-database-gates.md` → "Release model".)
+
 ### Step 0 — Apply pending SQL migrations (only if Phase 1 found drift)
 
-If Phase 1 listed files in `emed_sql/migrations/pending/`, apply them automatically:
+Do NOT reach this step while `check_migration_drift.py` still reports **UNCOVERED** drift — Phase 1 must be clean first (every uncovered item either scaffolded + committed into `pending/`, or intentionally moved to `wip/`).
+
+**Guard against strays first.** In the feature-promotion model, `migrations/pending/` should hold **only**
+the migrations for the feature(s) in *this* release (each was moved `wip/ → pending/` when its promotion PR
+opened). Compare `ls migrations/pending/*.sql` against the feature(s) being shipped. If `pending/` holds a
+migration that is **not** part of this ship — a leftover from another feature — **STOP**: move it back to
+`wip/` (or explicitly fold it into this release). This prevents eMed's recurring "an unrelated migration
+stranded in `pending/` rides along on the next push prod" landmine.
+
+Apply **only the migration file(s) confirmed in the Phase 1 report** (the ones belonging to the shipping
+feature[s]) — not a blind `pending/*.sql` glob:
 
 ```bash
 cd ../emed_sql
-for f in migrations/pending/*.sql; do
+# PENDING=( the pending/ files confirmed in Phase 1 — one per feature being shipped )
+for f in "${PENDING[@]}"; do
     python python/apply_migration.py "$f" --db both --confirm || exit 1
 done
+python python/check_migration_drift.py    # re-verify: should report no uncovered drift now
 ```
+
+(When `pending/` legitimately contains exactly this release's migrations and nothing else — the normal
+case — that set *is* every file under `pending/`.)
 
 What this does for each file:
 - Applies to `liberty_link_dev` first (catches bugs without touching prod)

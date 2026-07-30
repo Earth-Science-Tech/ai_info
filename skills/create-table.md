@@ -17,7 +17,7 @@ Any time the user wants to change the database schema. This includes:
 
 1. **Schema changes go to `liberty_link_dev` first, NEVER directly to `liberty_link_stage` (production).**
 2. **Never edit files inside `emed_sql/prod/` or `emed_sql/dev/` by hand.** They are auto-generated from the live database. Edits there will be silently overwritten.
-3. **Always write a migration script in `emed_sql/migrations/pending/`.** That is the only hand-written SQL file you should produce. (After it ships to prod, `apply_migration.py` auto-moves it to `migrations/applied/`.)
+3. **Always write a migration script by hand** — it is the only hand-written SQL file you should produce. **Default location is `emed_sql/migrations/wip/`** while the feature is still in flight (its `feat/*` branch is unmerged to `main`). Move it `wip/ → pending/` only when the feature's `feat/* → main` promotion PR opens — `pending/` means "applies on the *next* `push prod`", so it must hold only migrations for features shipping next. (After it ships to prod, `apply_migration.py` auto-moves it to `migrations/applied/`.) See "On-hold / in-flight features" below.
 4. **Migrations must be idempotent** — `IF OBJECT_ID IS NULL` for new tables, `IF NOT EXISTS` for new columns/indexes, `CREATE OR ALTER` for views/procs/triggers. They will be re-run during `push prod` and must succeed without error each time.
 5. **Every new object needs GRANT statements** in the same migration script (see `org/rules/sql-safety.md`).
 
@@ -25,7 +25,7 @@ Any time the user wants to change the database schema. This includes:
 
 ### Step 1 — Write the migration script
 
-Create `emed_sql/migrations/pending/<YYYY-MM-DD>_<short_description>.sql`. Use today's date (the user's project memory has a `currentDate`; otherwise check via `date +%Y-%m-%d`).
+Create `emed_sql/migrations/wip/<YYYY-MM-DD>_<short_description>.sql` — **`wip/` is the default drop-point for in-flight feature work**; it moves to `pending/` when the feature's `feat/* → main` promotion PR opens (see Hard Rule 3 and "On-hold / in-flight features" below). Use today's date (the user's project memory has a `currentDate`; otherwise check via `date +%Y-%m-%d`). *(The templates below show a `pending/` path in their header comment for brevity — write the file into `wip/` while the feature is unready.)*
 
 The script must contain everything needed to bring `liberty_link_stage` into the desired state from its current state. Group related changes into one migration when they ship together.
 
@@ -108,6 +108,14 @@ If a batch fails, the script stops and prints which one — fix the migration, r
 
 The output of step 2 should show your new files only in `dev/`, plus any modified files (e.g. for an added column, the `dev/table_<name>.sql` would differ). If the diff shows changes you didn't intend, your migration is doing more than expected — narrow it down.
 
+Then run the drift checker to confirm your migration actually **covers** the dev change (it catches a *partial* migration — e.g. one that ships the table but forgot a new column):
+
+```bash
+python python/check_migration_drift.py
+```
+
+Your object must NOT appear under "UNCOVERED". If it does, your `pending/` migration doesn't reference everything you changed on dev — fix it. And if schema was built directly on dev with no migration at all, recover it in one command: `python python/check_migration_drift.py --scaffold` reverse-engineers a draft idempotent migration (with grants) into `pending/` from the live dev catalog for you to review.
+
 ### Step 4 — Commit emed_sql
 
 ```bash
@@ -119,21 +127,21 @@ git push origin main
 
 The `dev/` snapshot is part of the commit so other engineers see the intended end state.
 
-### Step 5 — When ready to ship → "push prod"
+### Step 5 — When ready to ship → open the promotion PR, then "push prod"
 
-The `push prod` skill (Phase 1.5) will detect the pending migration via the `prod/` ↔ `dev/` diff, apply it to BOTH databases with `apply_migration.py --db both --confirm`, commit the regenerated snapshots, and proceed with the deploy. You don't run that command manually — push prod handles it.
+When the feature is ready, move its migration `wip/ → pending/` (`git mv`) **at the moment you open the feature's `feat/* → main` PR**, and name the file in the PR's "Schema changes" section. The `push prod` skill (run by a gatekeeper after the PR merges) applies **only the migration file(s) that PR declared** to BOTH databases with `apply_migration.py --db both --confirm`, commits the regenerated snapshots, and proceeds with the deploy. You don't run that command manually — push prod handles it.
 
-## On-hold / not-ready features → `migrations/wip/`
+## On-hold / in-flight features → `migrations/wip/` (the default while unready)
 
-**`migrations/pending/` means "apply to prod on the *next* `push prod`."** So a migration only belongs in `pending/` when its feature is finished and you intend to ship it on the next deploy.
+**`migrations/pending/` means "apply to prod on the *next* `push prod`."** So a migration only belongs in `pending/` once its feature is finished and its `feat/* → main` promotion PR is opening — until then it lives in `wip/`.
 
-For a feature that is **built/prototyped on dev but not ready for prod** (on hold, deprioritized, or waiting on a PR), keep its migration in **`migrations/wip/`** instead. `push prod` does **not** scan `wip/`, so nothing there can ship by accident — but the schema stays captured, reproducible, and shippable on demand.
+**`migrations/wip/` is the default home for a feature's migration while its code is still in flight** (on the `feat/*` branch, not yet merged to `main`) — whether it is being actively built, on hold, deprioritized, or waiting on its PR. `push prod` does **not** scan `wip/`, so nothing there can ship by accident — but the schema stays captured, reproducible, and shippable on demand. This is the schema analog of "unready code stays on its feature branch, off `main`."
 
 Rules of thumb:
 - Still apply the migration to **dev** (`apply_migration.py migrations/wip/<file>.sql` works from any path) and still write it idempotent with GRANTs — `wip/` is a real migration, just parked.
 - If you create a table directly on dev for a prototype, **write the migration anyway** and park it in `wip/`. Never leave dev-only schema with no migration — that schema becomes un-shippable (someone has to reverse-engineer the DDL later).
 - Keep a one-line entry per parked feature in `migrations/wip/STATUS.md` (owner, tables, why it's on hold, where the code lives).
-- **To ship a parked feature:** move its file(s) `wip/ → pending/`, then `push prod`.
+- **To ship a feature:** move its file(s) `wip/ → pending/` (`git mv`) when you open the feature's `feat/* → main` promotion PR, and name them in the PR's "Schema changes" section. `push prod` then applies only those declared files.
 
 ## Hotfix Flow (Authorized Leads Only)
 
