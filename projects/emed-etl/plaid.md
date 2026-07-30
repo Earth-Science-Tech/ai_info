@@ -27,7 +27,8 @@ Item** (= one institution login, which can hold several bank accounts). Tokens l
 ONLY in Prefect Secret blocks (`plaid-access-token-<alias>`); the registry stores the
 block **name**, never the token. The alias lands in `account_alias`; the true Plaid
 `item_id` is the natural-key discriminator. Linked: `chase` (Chase, 24mo history),
-`boa` (Bank of America, ~18mo - institutions serve what they have).
+`boa` (Bank of America, ~18mo - institutions serve what they have), `truist`
+(Truist, ~24mo, added 2026-07-30).
 
 ## How the nightly sync works
 
