@@ -33,13 +33,13 @@ emed_etl/
 4. **Warehouse dbt build** — `flows/emed_etl/dbt_warehouse_build.py` runs `dbt deps && dbt build` against the `etst_warehouse` project after the stage clone finishes.
 5. **Payment/bank feeds → warehouse** — Stripe (`flows/stripe/`), Propelr (`flows/propelr/`), and Plaid (`flows/plaid/`) pull directly into `etst_warehouse.stg` nightly before the dbt build. Stripe has two feeds run by the `stripe_sync_all` orchestrator (deployment `Stripe-Sync-All`, 1:35 AM): balance transactions (the ledger — `stg.stripe_balance_transactions`, 30-day window) and charges (payment context: customer, card summary, refund/dispute state — `stg.stripe_charges`, 90-day window since charge rows mutate in place); shared machinery lives in `flows/stripe/stripe_common.py`, which also documents the stripe-python v15 StripeObject-is-not-a-dict gotcha (missing fields raise AttributeError; use `getattr(obj, "field", None)`). See [plaid.md](plaid.md) for the Plaid feed and its gotchas (case-sensitive ids vs SQL collation, link-time `days_requested`, Item re-link/removal).
 
-6. **RingCentral call recordings** — two flows: `flows/calls/calls_fetch_recordings.py` syncs
-   call-log **metadata** → `dbo.emed_call_recording` (live in prod), and
-   `flows/calls/calls_archive_recordings.py` copies the **audio** to Azure Blob before
-   RingCentral's ~90-day purge (new 2026-07-25, not yet in prod — needs a storage account).
-   Audio deliberately does not go in SQL. RingSense AI insights were removed 2026-07-24 (not
-   licensed). Permission model, the 90-day cliff, PHI rules + gotchas in
-   [ringcentral-calls.md](ringcentral-calls.md).
+6. **RingCentral call recordings** — two flows, both **live in prod**:
+   `flows/calls/calls_fetch_recordings.py` syncs call-log **metadata** →
+   `dbo.emed_call_recording`, and `flows/calls/calls_archive_recordings.py` copies the
+   **audio** to Azure Blob before RingCentral's ~90-day purge, then transcribes (Azure
+   Speech) and summarizes (Azure OpenAI) into the `ai_*` columns. Audio deliberately does
+   not go in SQL. RingSense AI insights were removed 2026-07-24 (not licensed). Permission
+   model, the 90-day cliff, PHI rules + gotchas in [ringcentral-calls.md](ringcentral-calls.md).
 
 See [warehouse.md](warehouse.md) for the warehouse layer in detail.
 

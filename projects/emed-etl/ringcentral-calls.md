@@ -1,10 +1,9 @@
 # RingCentral Call Recordings (emed_etl)
 
-**Status (2026-07-25):** metadata sync is **live in prod** (9,944 rows in
-`liberty_link_stage.dbo.emed_call_recording`, all from the `etst` account). The audio
-**archive** flow is new as of 2026-07-25 — migration in `emed_sql/migrations/pending/`,
-applied to dev, **not yet in prod**, and it needs an Azure Storage account provisioned
-before it can run anywhere.
+**Status (2026-07-31):** the whole pipeline is **live in prod** — metadata sync
+(`dbo.emed_call_recording`, sourced from the `etst` account), the audio archive flow
+(Azure Storage account provisioned, container `ringcentral-call-recordings`, migration
+applied to prod), and the AI transcription + summarization stages.
 
 ## Two flows, two jobs
 
@@ -97,7 +96,8 @@ PHI lives**. Requirements:
    extension-level call log (that JWT user's own calls only). Grant it for account-wide coverage.
 3. **RingSense / AI Conversation Expert:** not licensed. The insights stage was **removed
    2026-07-24** — it only ever returned 404. The `ai_status` / `ai_summary` / `ai_transcript`
-   columns are retained deliberately for a future RingSense license or in-house AI parsing.
+   columns it left behind were repurposed 2026-07-29 by the in-house Azure Speech / Azure
+   OpenAI stages (see "AI stages" above).
 
 ## Gotchas
 
@@ -119,8 +119,8 @@ PHI lives**. Requirements:
 
 `dbo.emed_call_recording` — `recording_id` (unique), `call_id`, `telephony_session_id`,
 `rc_account_phone`, `recording_type`, `direction`, from/to phone + name, `start_time`
-(Eastern, naive), `duration_seconds`, `call_result`, `content_uri`, the unused `ai_*`
-trio, the `archive_*` bookkeeping columns, + the 5 mandatory fields.
+(Eastern, naive), `duration_seconds`, `call_result`, `content_uri`, the `ai_*` columns
+(populated by the AI stages), the `archive_*` bookkeeping columns, + the 5 mandatory fields.
 
 `archive_status` lifecycle: `pending` → `archived` | `unavailable` (purged / never recorded,
 terminal) | `failed` (retried until `MAX_ARCHIVE_ATTEMPTS = 5`, then parked).
