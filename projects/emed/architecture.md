@@ -75,6 +75,7 @@ liberty_link_stage ──► etst_warehouse.stg.*         (Clone-Prod-to-Warehou
 2. **Operational Databases:** Azure SQL — `liberty_link_stage` (prod) and `liberty_link_dev` (dev), used by both app and ETL
 3. **Warehouse Database:** Azure SQL `etst_warehouse` — analytics/reporting, loaded nightly by emed_etl, modeled with dbt
 4. **SQL Schemas:** emed_sql repo — single source of truth for prod and dev, with auto-generated `.sql` snapshots and hand-written migrations
+5. **Liberty SOURCE database:** `RXQRXCOMPOUNDSTORE` — the upstream Liberty/RxQ pharmacy system the ETL pulls from (shared schema across the `rxcs`/`mmed`/`mdvo` tenants). Its full 360-table schema is documented in [`ai_info/reference/liberty-db/`](../../reference/liberty-db/README.md) so you don't have to re-query it; only 11 of those tables are currently mirrored into `liberty_link_stage`.
 
 ## User Roles
 

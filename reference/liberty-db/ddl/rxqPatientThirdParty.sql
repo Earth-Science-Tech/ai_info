@@ -1,0 +1,56 @@
+-- rxqPatientThirdParty   (2 rows, 46 columns)
+-- Source: RXQRXCOMPOUNDSTORE (Liberty). Read-only reference DDL, synthesized from catalog metadata.
+CREATE TABLE [dbo].[rxqPatientThirdParty] (
+    [cPatientThirdPartyId] int IDENTITY NOT NULL,
+    [PatientId] varchar(50) NOT NULL,
+    [AgencyCode] varchar(50) NOT NULL,
+    [AgencyIdentification] varchar(50) NULL,
+    [GroupNumber] varchar(50) NULL,
+    [CardHolderNumber] varchar(50) NULL,
+    [PersonNumber] varchar(50) NULL,
+    [ScriptCount] int NULL,
+    [DollarLimit] float NULL,
+    [DollarMonthToDate] float NULL,
+    [CopayCode] varchar(50) NULL,
+    [OtherCoverageCode] int NULL,
+    [PriorCode] int NULL,
+    [PriorAuthorizationNumber] numeric(18,0) NULL,
+    [CardHolderLastName] varchar(50) NULL,
+    [CardHolderFirstName] varchar(50) NULL,
+    [CardHolderMiddleInitial] varchar(50) NULL,
+    [DefaultAgencySwitch] varchar(50) NULL,
+    [EmployerIdentification] varchar(50) NULL,
+    [OtherIdentification] varchar(50) NULL,
+    [PlanIdentification] varchar(50) NULL,
+    [FacilityIdentification] varchar(50) NULL,
+    [HomePlan] varchar(50) NULL,
+    [PcpDoctorIdentification] varchar(50) NULL,
+    [PatientLocation] varchar(50) NULL,
+    [PcnOverride] varchar(50) NULL,
+    [REC_LEN] int NULL,
+    [LastModified] datetime NULL,
+    [IsValid] bit NULL,
+    [InactiveSwitch] char(1) NULL,
+    [LastUsed] date NULL,
+    [CoverageEnd] date NULL,
+    [PatientAssignmentIndicator] char(1) NOT NULL,
+    [ProviderAcceptsAssignment] char(1) NOT NULL,
+    [QualifiedFacility] char(1) NOT NULL,
+    [Medigap] char(20) NOT NULL,
+    [MedicaidIndicator] char(2) NOT NULL,
+    [MedicaidId] varchar(20) NOT NULL,
+    [Comment] varchar(500) NULL,
+    [DOBOverride] date NULL,
+    [Coupon] bit NULL,
+    [AgencySequence] int NOT NULL,
+    [void] bit NULL,
+    [CreationDate] datetime NULL,
+    [E1TransactionId] int NULL,
+    [GenderOverride] int NULL,
+    CONSTRAINT [PK_rxqPatientThirdParty] PRIMARY KEY ([PatientId], [AgencyCode], [AgencySequence])
+);
+
+-- Indexes
+CREATE INDEX [IX_cPatientThirdParty] ON [dbo].[rxqPatientThirdParty] ([PatientId]);
+CREATE INDEX [IX_PatientThirdParty_PcpDoctorIdentification] ON [dbo].[rxqPatientThirdParty] ([PcpDoctorIdentification]);
+CREATE INDEX [LibertyAuto_23_22_rxqPatientThirdParty] ON [dbo].[rxqPatientThirdParty] ([AgencySequence]) INCLUDE ([PatientId], [AgencyCode], [PcpDoctorIdentification]);

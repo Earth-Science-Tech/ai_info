@@ -1,0 +1,6602 @@
+[
+  {
+    "table": "rxqAuditLogChange",
+    "row_count": 18125646,
+    "col_count": 8,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAuditLogMaster",
+    "row_count": 6249384,
+    "col_count": 33,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "BatchId",
+        "ref_table": "rxqDrugBatch",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "cPhoneNumberId",
+        "ref_table": "rxqPhoneNumber",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "cPatientThirdPartyId",
+        "ref_table": "rxqPatientThirdParty",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "cNHPatId",
+        "ref_table": "rxqNHPat",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "ShipmentId",
+        "ref_table": "rxqShipment",
+        "match_rate": 0.9993,
+        "confidence": "high"
+      },
+      {
+        "column": "cAddressId",
+        "ref_table": "rxqAddress",
+        "match_rate": 0.9983,
+        "confidence": "high"
+      },
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0.9722,
+        "confidence": "high"
+      },
+      {
+        "column": "cPatientHipaaAcknowledgeId",
+        "ref_table": "rxqPatientHipaaAcknowledge",
+        "match_rate": 0.9706,
+        "confidence": "high"
+      },
+      {
+        "column": "drugCompoundInstructionsID",
+        "ref_table": "rxqDrugCompoundInstructions",
+        "match_rate": 0.0421,
+        "confidence": "low"
+      },
+      {
+        "column": "operation",
+        "ref_table": "rxqAuditLogMasterOperation",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      },
+      {
+        "column": "cPatientPreferencesId",
+        "ref_table": "rxqPatientPreferences",
+        "match_rate": 0,
+        "confidence": "low"
+      },
+      {
+        "column": "cRX365PatientLinkId",
+        "ref_table": "RX365PatientLink",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      },
+      {
+        "column": "cVendorId",
+        "ref_table": "rxqVendor",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptTransactionAudit",
+    "row_count": 2182822,
+    "col_count": 14,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cTranAuditId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9993,
+        "confidence": "high"
+      },
+      {
+        "column": "cScriptTransactionId",
+        "ref_table": "rxqScriptTransaction",
+        "match_rate": 0.999,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqChangeLogEntry",
+    "row_count": 1471629,
+    "col_count": 127,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber",
+      "ChangeDate"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9954,
+        "confidence": "high"
+      },
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0.9807,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqImageControl",
+    "row_count": 754142,
+    "col_count": 11,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ImageKeyType",
+      "ImageKey"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqFaxCenter",
+      "rxqPrintableAttachment"
+    ]
+  },
+  {
+    "table": "rxqDrugInventoryLogChange",
+    "row_count": 691346,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugInventoryLogMaster",
+    "row_count": 675756,
+    "col_count": 12,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cCategoryId",
+        "ref_table": "rxqCategories",
+        "match_rate": 0.9504,
+        "confidence": "high"
+      },
+      {
+        "column": "Operation",
+        "ref_table": "rxqAuditLogMasterOperation",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptTransaction",
+    "row_count": 602607,
+    "col_count": 155,
+    "is_empty": false,
+    "mirrored_by_etl": true,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "cQueueId",
+        "ref_table": "rxqQueue",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "AgencySequence",
+        "ref_table": "rxqPatientThirdParty",
+        "match_rate": 0.9997,
+        "confidence": "high"
+      },
+      {
+        "column": "Icd9Code",
+        "ref_table": "rxqIcd9",
+        "match_rate": 0,
+        "confidence": "low"
+      },
+      {
+        "column": "DrugType",
+        "ref_table": "rxqDirFees",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": [
+      "rxqScriptTransactionAudit"
+    ]
+  },
+  {
+    "table": "rxqImmunizationInfo",
+    "row_count": 602552,
+    "col_count": 17,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9952,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptBase",
+    "row_count": 573164,
+    "col_count": 49,
+    "is_empty": false,
+    "mirrored_by_etl": true,
+    "primary_key": [
+      "ScriptNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "DrugKey",
+        "ref_table": "rxqDrug",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "DoctorId",
+        "ref_table": "rxqDoctor",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": [
+      "PendingStockReturn",
+      "rxqScriptCounsel",
+      "rxqScriptDrugBatch",
+      "rxqScriptTransaction",
+      "rxqShipmentScriptNumber",
+      "ScriptTransactionPackageLink",
+      "rxqPatientMessageScriptTransactions",
+      "rxqScriptTransactionAudit",
+      "rxqPmpGatewayAudit",
+      "rxqAccountReceivable",
+      "rxqRxAlert",
+      "rxqAuditMedSync",
+      "rxqScheduleDrugReportLog",
+      "rxqChangeLogEntry",
+      "rxqImmunizationInfo",
+      "rxqWorkFlowItem",
+      "rxqClinicalInteractionsAndAlertsNotes",
+      "rxqClinicalInteractionsAndAlerts",
+      "rxqTransfers",
+      "rxqAuditAutoRefill",
+      "StockReturnHistory",
+      "PrescriptionRequests",
+      "rxqCancelRx",
+      "rxqEScript",
+      "rxqProfileOnlyScripts",
+      "rxqDrugCompoundPending",
+      "rxqProblemQueue",
+      "BillingEvents",
+      "BillingStatus",
+      "BinAssignmentHistory",
+      "CentralFillDeliveryAudit",
+      "CentralFillScriptDetails",
+      "ECRSSubmission",
+      "LtcOutboundMessage",
+      "PickUpNotes",
+      "PriorAuthorizationRequests",
+      "QuestionnaireReview",
+      "rxqAccountReceivableHistory",
+      "rxqAuxiliaryLabels",
+      "rxqCycleFillAuthorization",
+      "rxqDUR",
+      "rxqImmunizationSubmission",
+      "rxqInterfaceSubmission",
+      "rxqNcpdpNarrative",
+      "rxqOnlineHistory",
+      "rxqPendingStockReturn",
+      "rxqResubmit",
+      "rxqRxChangeRequest",
+      "rxqScheduledDiscontinuation",
+      "rxqScriptDrugSplit",
+      "rxqScriptIOU",
+      "rxqScriptPartial",
+      "rxqScriptPayments",
+      "rxqScriptReconcile",
+      "rxqSpecialtySubmission",
+      "rxqThirdPartyAccountingAmountExpected",
+      "rxqUnitDose",
+      "rxqUnitDoseIndividual",
+      "rxqWorkComp",
+      "rxqWorkCompPayment",
+      "rxqWorkFlowFaxHistory",
+      "rxqWorkFlowMedSyncCall",
+      "rxqWorkflowNDCScanHistory",
+      "ScriptNotes",
+      "ScriptOperations",
+      "WorkFlowNotes"
+    ]
+  },
+  {
+    "table": "rxqPendingScript",
+    "row_count": 501678,
+    "col_count": 35,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "TransactionId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0.1314,
+        "confidence": "low"
+      },
+      {
+        "column": "cQueueId",
+        "ref_table": "rxqQueue",
+        "match_rate": 0,
+        "confidence": "low"
+      },
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptDrugBatch",
+    "row_count": 464932,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "BatchId",
+        "ref_table": "rxqDrugBatch",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqNotes",
+    "row_count": 407166,
+    "col_count": 14,
+    "is_empty": false,
+    "mirrored_by_etl": true,
+    "primary_key": [
+      "cNotesId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "TypeKey",
+        "ref_table": "rxqCustomFields",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPhoneNumber",
+    "row_count": 358479,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cPhoneNumberId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "LookUpId",
+        "ref_table": "rxqPatientPreferences",
+        "match_rate": 0.3715,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": [
+      "rxqAuditLogMaster"
+    ]
+  },
+  {
+    "table": "rxqAddress",
+    "row_count": 341175,
+    "col_count": 12,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cAddressId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "LookUpId",
+        "ref_table": "rxqPatientPreferences",
+        "match_rate": 0.3265,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": [
+      "rxqAuditLogMaster"
+    ]
+  },
+  {
+    "table": "rxqSecurityLogEntry",
+    "row_count": 328613,
+    "col_count": 7,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cSecurityLogEntryId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqShipmentScriptNumber",
+    "row_count": 327094,
+    "col_count": 7,
+    "is_empty": false,
+    "mirrored_by_etl": true,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ShipmentId",
+        "ref_table": "rxqShipment",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAuditTracking",
+    "row_count": 227864,
+    "col_count": 10,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqShipment",
+    "row_count": 190121,
+    "col_count": 16,
+    "is_empty": false,
+    "mirrored_by_etl": true,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqShipmentScriptNumber",
+      "rxqAuditLogMaster"
+    ]
+  },
+  {
+    "table": "rxqPatientPreferences",
+    "row_count": 171540,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "LookUpId",
+      "PreferenceType",
+      "Preference"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqEScriptResponseTime",
+      "rxqPhoneNumber",
+      "rxqAddress",
+      "BillingEvents",
+      "rxqAuditLogMaster",
+      "rxqPrintableAttachment"
+    ]
+  },
+  {
+    "table": "rxqPatient",
+    "row_count": 165756,
+    "col_count": 117,
+    "is_empty": false,
+    "mirrored_by_etl": true,
+    "primary_key": [
+      "PatientId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "Language",
+        "ref_table": "rxqDirection",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "cQueueId",
+        "ref_table": "rxqQueue",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": [
+      "PrescriptionRequests",
+      "rxqEcarePlan",
+      "RxqLabPatientRecord",
+      "rxqMedicareEligibility",
+      "rxqMedicareEligibilityPayers",
+      "rxqNHPat",
+      "rxqPatientConsultation",
+      "rxqPatientThirdParty",
+      "rxqPmpGatewayAudit",
+      "rxqProfileOnlyScripts",
+      "rxqScriptBase",
+      "StockReturnHistory",
+      "rxqRxAlert",
+      "rxqPatientAllergies",
+      "rxqPatientHipaaAcknowledge",
+      "rxqPatientMessage",
+      "rxqChangeLogEntry",
+      "rxqAuditLogMaster",
+      "rxqPatientDisease",
+      "rxqEScript",
+      "rxqTreatmentSchedule",
+      "rxqWorkFlowItem",
+      "rxqPendingScript",
+      "DrugPreference",
+      "HistoricalAppointment",
+      "MedSyncNotes",
+      "MedSyncPatientReview",
+      "PatientAuxiliary",
+      "PatientConsultationNotes",
+      "PatientNotes",
+      "Rx365PatientAppendix",
+      "RX365PatientLink",
+      "rxqClinicalOppAnswer",
+      "rxqInsuranceCard",
+      "rxqInsuranceCardsImages",
+      "rxqMTMAlert",
+      "rxqNewRxRequest",
+      "rxqNHMedSheetReportDefaultOrdering",
+      "rxqParameterGeneral",
+      "rxqPatientAlias",
+      "rxqPatientBulkMessage",
+      "rxqPatientCreditCard",
+      "rxqPatientMedicalInsurance",
+      "rxqQuotes",
+      "rxqSMSMessage",
+      "rxqTasks",
+      "rxqVideoConference",
+      "rxqWorkComp",
+      "rxqWorkCompPlan",
+      "rxqWorkFlowMedSyncCall"
+    ]
+  },
+  {
+    "table": "rxqRxAlert",
+    "row_count": 164804,
+    "col_count": 12,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0.9999,
+        "confidence": "high"
+      },
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9981,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqClinicalLookup",
+    "row_count": 150445,
+    "col_count": 2,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NdcNumber"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqDrugBatchCompoundIngredient",
+      "rxqDrug",
+      "rxqAcceptInventoryDetail",
+      "rxqCouponDrug",
+      "rxqInventoryTransferLine"
+    ]
+  },
+  {
+    "table": "rxqPatientAllergies",
+    "row_count": 142771,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PatientId",
+      "Allergy",
+      "SystemType",
+      "AllergyType"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0.9998,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqEScript",
+    "row_count": 103753,
+    "col_count": 19,
+    "is_empty": false,
+    "mirrored_by_etl": true,
+    "primary_key": [
+      "eScriptId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0.9571,
+        "confidence": "high"
+      },
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.7875,
+        "confidence": "medium"
+      }
+    ],
+    "referenced_by": [
+      "PrescriptionRequestEscripts",
+      "rxqProblemQueue",
+      "LtcMessage",
+      "rxqNewRxRequest"
+    ]
+  },
+  {
+    "table": "rxqIcd10",
+    "row_count": 74720,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Icd10Code"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPatientMessage",
+    "row_count": 68412,
+    "col_count": 21,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0.9856,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPatientHipaaAcknowledge",
+    "row_count": 67745,
+    "col_count": 8,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cPatientHipaaAcknowledgeId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0.9992,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": [
+      "rxqAuditLogMaster"
+    ]
+  },
+  {
+    "table": "rxqPatientMessageScriptTransactions",
+    "row_count": 62421,
+    "col_count": 3,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PatientMessageId",
+      "ScriptNumber",
+      "RefillNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9997,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": [
+      "rxqPatientBulkMessage",
+      "rxqPatientMessageAttachment"
+    ]
+  },
+  {
+    "table": "rxqDrugBatchCompoundIngredient",
+    "row_count": 54314,
+    "col_count": 18,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "BatchId",
+        "ref_table": "rxqDrugBatch",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "MixtureSequence",
+        "ref_table": "rxqDrugCompoundIngredient",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "NDCNumber",
+        "ref_table": "rxqClinicalLookup",
+        "match_rate": 0.5784,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAccountReceivable",
+    "row_count": 49909,
+    "col_count": 27,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Partition",
+      "ARBatch",
+      "AccountId",
+      "ARType",
+      "RecordNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9988,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqZCode",
+    "row_count": 42069,
+    "col_count": 7,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ZipCode"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqMedicareEligibility",
+      "rxqPatientCreditCard",
+      "rxqWorkCompLawyer"
+    ]
+  },
+  {
+    "table": "rxqClinicalInteractionsAndAlerts",
+    "row_count": 39787,
+    "col_count": 14,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cClinicalInteractionsAndAlertsId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9942,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqNADACAverageAcq",
+    "row_count": 37934,
+    "col_count": 12,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NDC"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqClinicalInteractionsAndAlertsNotes",
+    "row_count": 34626,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cClinicalInteractionsAndAlertsNoteId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9943,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScheduleDrugReportHistory",
+    "row_count": 22303,
+    "col_count": 10,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "RxCompoundStoreCode",
+    "row_count": 20346,
+    "col_count": 3,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [],
+    "inferred_edges": [
+      {
+        "column": "Code",
+        "ref_table": "rxqEcareCode",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugBatch",
+    "row_count": 17379,
+    "col_count": 15,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "BatchId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": 0.9997,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": [
+      "rxqAuditLogMaster",
+      "rxqDrugBatchCompoundIngredient",
+      "rxqDrugCompoundPending",
+      "rxqScriptDrugBatch"
+    ]
+  },
+  {
+    "table": "rxqIcd9",
+    "row_count": 15338,
+    "col_count": 8,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Icd9Prefix",
+      "Icd9Code"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqIcd9CrossReference",
+      "rxqScriptTransaction"
+    ]
+  },
+  {
+    "table": "rxqPatientAccountReceivable",
+    "row_count": 14220,
+    "col_count": 31,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "AccountId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cAccountReceivablePrintCodeId",
+        "ref_table": "rxqAccountReceivablePrintCode",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScheduleDrugReportLog",
+    "row_count": 12094,
+    "col_count": 10,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9964,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "DrugUnitMultiplier",
+    "row_count": 6410,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": 0.9594,
+        "confidence": "high"
+      },
+      {
+        "column": "Value",
+        "ref_table": "DiscountCard",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugCompoundIngredient",
+    "row_count": 6062,
+    "col_count": 13,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ParentDrugKey",
+      "MixtureSequence"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqDrugBatchCompoundIngredient"
+    ]
+  },
+  {
+    "table": "rxqAuditMedSync",
+    "row_count": 5675,
+    "col_count": 8,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cAuditMedSyncId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9974,
+        "confidence": "high"
+      },
+      {
+        "column": "ActionDate",
+        "ref_table": "rxqTimeClockEntry",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugPricingHistory",
+    "row_count": 5165,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cDrugPricingHistoryId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": 0.9986,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugItemNumber",
+    "row_count": 4987,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "DrugKey",
+      "VendorId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugKey",
+        "ref_table": "rxqDrug",
+        "match_rate": 0.9972,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugCompoundPending",
+    "row_count": 4876,
+    "col_count": 13,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cDrugCompoundPendingId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "BatchId",
+        "ref_table": "rxqDrugBatch",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.0078,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAutoReportAudit",
+    "row_count": 4576,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cAutoReportAudit"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cAutoReport",
+        "ref_table": "rxqAutoReport",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAuxiliaryLabels",
+    "row_count": 3741,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "AuxiliaryLabelId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": 0.9984,
+        "confidence": "high"
+      },
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "PendingStockReturn",
+    "row_count": 3617,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDirection",
+    "row_count": 3575,
+    "col_count": 14,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "KeyType",
+      "Language",
+      "KeyCode"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqPatient"
+    ]
+  },
+  {
+    "table": "rxqDoctor",
+    "row_count": 3191,
+    "col_count": 44,
+    "is_empty": false,
+    "mirrored_by_etl": true,
+    "primary_key": [
+      "DoctorId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "PrescriptionRequests",
+      "rxqProfileOnlyScripts",
+      "rxqScriptBase",
+      "HistoricalAppointment",
+      "rxqNewRxRequest"
+    ]
+  },
+  {
+    "table": "rxqPmpGatewayAudit",
+    "row_count": 3148,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.999,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrug",
+    "row_count": 2941,
+    "col_count": 111,
+    "is_empty": false,
+    "mirrored_by_etl": true,
+    "primary_key": [
+      "DrugId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "NdcNumber",
+        "ref_table": "rxqClinicalLookup",
+        "match_rate": 0.3747,
+        "confidence": "low"
+      },
+      {
+        "column": "PriceBreak",
+        "ref_table": "rxqCopayPriceBreaks",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": [
+      "DrugPreferredVendor",
+      "PrescriptionRequests",
+      "rxqDrugCompoundPending",
+      "rxqDrugGenerics",
+      "rxqDrugImmunizationDose",
+      "rxqDrugSigs",
+      "rxqProfileOnlyScripts",
+      "rxqScriptBase",
+      "rxqScriptTransaction",
+      "rxqUserDrugClass",
+      "StockReturnHistory",
+      "rxqDrugBatch",
+      "rxqDrugOptions",
+      "rxqDrugPricingHistory",
+      "rxqAuxiliaryLabels",
+      "rxqDrugItemNumber",
+      "DrugUnitMultiplier",
+      "CompoundMonographNotes",
+      "DrugNotes",
+      "DrugPreference",
+      "HistoricalAppointment",
+      "InventoryOperations",
+      "InventoryTransactions",
+      "rxqAcceptInventoryDetail",
+      "rxqBCell",
+      "rxqDrugXM",
+      "rxqInventoryTransferLine",
+      "rxqNewRxRequest",
+      "rxqOnlineHistory",
+      "rxqParameterGeneral",
+      "rxqPendingScript",
+      "rxqScriptDrugSplit",
+      "ScriptOperations"
+    ]
+  },
+  {
+    "table": "rxqDrugOptions",
+    "row_count": 2820,
+    "col_count": 8,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "StoreNumber",
+      "DrugId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": 0.9989,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugInventory",
+    "row_count": 2550,
+    "col_count": 12,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "DrugInventoryKey",
+      "StoreNumber"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPatientDisease",
+    "row_count": 2403,
+    "col_count": 11,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PatientId",
+      "CodeType",
+      "ICD9_CM_CODE"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0.96,
+        "confidence": "high"
+      },
+      {
+        "column": "DiseaseCode",
+        "ref_table": "rxqDisease",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAuditAutoRefill",
+    "row_count": 1959,
+    "col_count": 7,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cAuditAutoRefillId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9791,
+        "confidence": "high"
+      },
+      {
+        "column": "ActionDate",
+        "ref_table": "rxqTimeClockEntry",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPriceUpdateHistory",
+    "row_count": 1742,
+    "col_count": 13,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "RxqLabPatientRecord",
+    "row_count": 1737,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "LabId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "TypeId",
+        "ref_table": "RxqLabType",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqSigsCodes",
+    "row_count": 1454,
+    "col_count": 8,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "SigCode",
+      "SigLanguage"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cUnitDoseTemplateId",
+        "ref_table": "rxqUnitDoseTemplate",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": [
+      "rxqSigsTreatmentSchedule"
+    ]
+  },
+  {
+    "table": "rxqTasks",
+    "row_count": 1353,
+    "col_count": 16,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cTaskId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": [
+      "rxqTasksRecurrence"
+    ]
+  },
+  {
+    "table": "rxqProblemQueue",
+    "row_count": 1156,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cProblemQueueId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "eScriptId",
+        "ref_table": "rxqEScript",
+        "match_rate": 0.9922,
+        "confidence": "high"
+      },
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.0069,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPrivileges",
+    "row_count": 1148,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Type",
+      "Entity",
+      "PrivilegeId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "UserPermissions"
+    ]
+  },
+  {
+    "table": "rxqVoidedItem",
+    "row_count": 1105,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "voidedItemID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "DrugPreferredVendor",
+    "row_count": 1059,
+    "col_count": 3,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "DrugId",
+      "StoreNumber",
+      "VendorId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScheduleDrugReportField",
+    "row_count": 986,
+    "col_count": 10,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqSettings",
+    "row_count": 955,
+    "col_count": 3,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "SettingKey",
+      "UserId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugCompoundInstructions",
+    "row_count": 853,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "drugCompoundInstructionsID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqAuditLogMaster"
+    ]
+  },
+  {
+    "table": "rxqCancelRx",
+    "row_count": 837,
+    "col_count": 7,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "RequestEscriptId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9179,
+        "confidence": "medium"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkFlowItem",
+    "row_count": 755,
+    "col_count": 46,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "SequenceNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9947,
+        "confidence": "high"
+      },
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0.6093,
+        "confidence": "medium"
+      },
+      {
+        "column": "cQueueId",
+        "ref_table": "rxqQueue",
+        "match_rate": 0.0477,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqEscriptResponse",
+    "row_count": 738,
+    "col_count": 2,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ResponseEscriptId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "Anchor",
+    "row_count": 351,
+    "col_count": 8,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "anc_table"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "sync_ScopeTables",
+    "row_count": 349,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScopeId",
+      "TableName"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "sync_ColumnUpdates"
+    ]
+  },
+  {
+    "table": "rxqNcpdpCodes",
+    "row_count": 334,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "CodeType",
+      "CodeKey"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqEcareCode",
+    "row_count": 333,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "SystemId",
+      "Code",
+      "Type"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "RxCompoundStoreCode",
+      "rxqPriceFormula",
+      "SupportedLanguages"
+    ]
+  },
+  {
+    "table": "rxqTransfers",
+    "row_count": 319,
+    "col_count": 26,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "TransferType",
+      "ScriptNumber",
+      "RecordNumber",
+      "RefillNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9906,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAppointmentsResources",
+    "row_count": 172,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "UniqueID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqUserRoles",
+    "row_count": 149,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "RecordId",
+      "UserRoleType"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqMFP",
+    "row_count": 141,
+    "col_count": 7,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "MfpId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqSigDays",
+    "row_count": 140,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "SigCode"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "StockReturnHistory",
+    "row_count": 137,
+    "col_count": 19,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientID",
+        "ref_table": "rxqPatient",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "DrugID",
+        "ref_table": "rxqDrug",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9635,
+        "confidence": "high"
+      },
+      {
+        "column": "cScriptBaseId",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9635,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqUser",
+    "row_count": 134,
+    "col_count": 50,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "RecordId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "RxqLabType",
+    "row_count": 123,
+    "col_count": 7,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "TypeId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "CatId",
+        "ref_table": "RxqLabCategories",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": [
+      "RxqLabPatientRecord"
+    ]
+  },
+  {
+    "table": "rxqNCPDP",
+    "row_count": 106,
+    "col_count": 335,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "AgencyCode"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugGPICategories",
+    "row_count": 101,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cDrugGPINotesID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "DigitalPatientEducation",
+    "row_count": 96,
+    "col_count": 3,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NDC",
+      "LanguageCode"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPatientMessageAttachment",
+    "row_count": 96,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientMessageId",
+        "ref_table": "rxqPatientMessageScriptTransactions",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScheduleDrugReportSetup",
+    "row_count": 88,
+    "col_count": 114,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPrintingTemplate",
+    "row_count": 82,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "TemplateKey",
+      "StoreNumber"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDataViewLayout",
+    "row_count": 77,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cDataViewLayoutId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScheduleDrugReportSegment",
+    "row_count": 68,
+    "col_count": 12,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPif",
+    "row_count": 60,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "KeyName",
+      "KeySequence"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAgency",
+    "row_count": 58,
+    "col_count": 42,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "AgencyCode"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqVendor",
+    "row_count": 56,
+    "col_count": 16,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cVendorId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqAcceptInventory",
+      "rxqAuditLogMaster"
+    ]
+  },
+  {
+    "table": "rxqSavedAuxiliaryLabels",
+    "row_count": 50,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "SavedAuxiliaryLabelId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqSMSMessage",
+    "row_count": 50,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "PrescriptionRequests",
+    "row_count": 36,
+    "col_count": 16,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "DrugKey",
+        "ref_table": "rxqDrug",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "DoctorId",
+        "ref_table": "rxqDoctor",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.9444,
+        "confidence": "medium"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkflowStages",
+    "row_count": 35,
+    "col_count": 16,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cWorkflowStageId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "WorkflowStage",
+        "ref_table": "rxqStorePrintOptions",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": [
+      "rxqWorkflowCustomStage"
+    ]
+  },
+  {
+    "table": "RxqRestrictionsFilters",
+    "row_count": 29,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "RestrictionId",
+      "RestrictionClass",
+      "RestrictionProperty",
+      "RestrictionOperationFilter",
+      "RestrictionValue"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "RxqRestrictionsMaster",
+    "row_count": 27,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "RestrictionId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "PrescriptionRequestEscripts",
+    "row_count": 26,
+    "col_count": 3,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "MessageId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "eScriptId",
+        "ref_table": "rxqEScript",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkflowLocation",
+    "row_count": 26,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": true,
+    "primary_key": [
+      "cWorkflowLocationId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqProLicense",
+    "row_count": 24,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "MacAddress"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqOrderLine",
+    "row_count": 23,
+    "col_count": 28,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cOrderLineId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqOrderDiscrepancyItem"
+    ]
+  },
+  {
+    "table": "rxqPharmacyTransfer",
+    "row_count": 23,
+    "col_count": 20,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqCentralInterface",
+    "row_count": 20,
+    "col_count": 8,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id",
+      "StoreNumber"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "RxqWorkflowDevice",
+    "row_count": 20,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "DeviceKey"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqCategories",
+    "row_count": 19,
+    "col_count": 10,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cCategoryId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "Sequence",
+        "ref_table": "BillingEvents",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": [
+      "rxqDrugInventoryLogMaster"
+    ]
+  },
+  {
+    "table": "rxqWorkflowOptions",
+    "row_count": 19,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cWorkflowOptionsId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "WorkflowStage",
+        "ref_table": "rxqStorePrintOptions",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqQueue",
+    "row_count": 16,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": true,
+    "primary_key": [
+      "cQueueId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqScriptTransaction",
+      "rxqWorkFlowItem",
+      "rxqPatient",
+      "rxqPendingScript"
+    ]
+  },
+  {
+    "table": "rxqCustomFields",
+    "row_count": 14,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Type",
+      "TypeKey"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqNotes"
+    ]
+  },
+  {
+    "table": "rxqDrugInventoryLogOperation",
+    "row_count": 14,
+    "col_count": 2,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "operation",
+        "ref_table": "rxqAuditLogMasterOperation",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptTemplate",
+    "row_count": 14,
+    "col_count": 7,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cScriptTemplateId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "TemplateName",
+        "ref_table": "ReportFilterTemplates",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPriceFormula",
+    "row_count": 13,
+    "col_count": 110,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "StoreNumber",
+      "PriceFormulaCode"
+    ],
+    "inferred_edges": [
+      {
+        "column": "Code",
+        "ref_table": "rxqEcareCode",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAppointments",
+    "row_count": 12,
+    "col_count": 16,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "UniqueID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWebhookSubscription",
+    "row_count": 12,
+    "col_count": 8,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "StoreNumber",
+      "ApiUser",
+      "Event"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "InventoryEventLog",
+      "rxqCentralInterfaceHistory",
+      "WorkflowEventLog"
+    ]
+  },
+  {
+    "table": "RxqLabCategories",
+    "row_count": 10,
+    "col_count": 2,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "CatId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "RxqLabType"
+    ]
+  },
+  {
+    "table": "rxqRxAlertCustomSettings",
+    "row_count": 10,
+    "col_count": 10,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "CustomAlertTemplateId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPatientRanking",
+    "row_count": 9,
+    "col_count": 8,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cPatientRankingId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqTreatmentSchedule",
+    "row_count": 9,
+    "col_count": 26,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cTreatmentScheduleId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0.8889,
+        "confidence": "medium"
+      }
+    ],
+    "referenced_by": [
+      "rxqSigsTreatmentSchedule"
+    ]
+  },
+  {
+    "table": "rxqUserLicenses",
+    "row_count": 8,
+    "col_count": 8,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "RecordId",
+      "LicenseType",
+      "LicenseState"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqMultipleStatesLicense"
+    ]
+  },
+  {
+    "table": "rxqAutoRunItem",
+    "row_count": 7,
+    "col_count": 10,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cAutoRunItemId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScaleSetup",
+    "row_count": 7,
+    "col_count": 14,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cScaleSetupId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScheduleDrugReportNDC",
+    "row_count": 7,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "Bin",
+    "row_count": 6,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "RxqAgencyNcpdpFormat",
+    "row_count": 6,
+    "col_count": 232,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "AgencyCode",
+      "RecordType"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAuditLogMasterOperation",
+    "row_count": 6,
+    "col_count": 2,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id",
+      "operation"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqAuditLogMaster",
+      "rxqDrugInventoryLogMaster",
+      "rxqDrugInventoryLogOperation",
+      "rxqRuleFilter"
+    ]
+  },
+  {
+    "table": "ScannedPackage",
+    "row_count": 6,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAgencyStore",
+    "row_count": 5,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "StoreNumber",
+      "AgencyCode"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugSigs",
+    "row_count": 5,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "DrugKey"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugKey",
+        "ref_table": "rxqDrug",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqInternalMessagingUserMessage",
+    "row_count": 5,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cInternalMessagingUserMessageId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptNumbers",
+    "row_count": 5,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "StoreNumber"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqTasksRecurrence",
+    "row_count": 5,
+    "col_count": 20,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cTaskRecurrenceId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cTaskId",
+        "ref_table": "rxqTasks",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "ScriptTransactionPackageLink",
+    "row_count": 5,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber",
+      "PackageId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqMedicareEligibilityPayers",
+    "row_count": 4,
+    "col_count": 13,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "GroupId",
+        "ref_table": "rxqAgencyGroup",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqNcpdpOnlineHistory",
+    "row_count": 4,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "TransactionID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqNHHom",
+    "row_count": 4,
+    "col_count": 236,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqSecurityGroup",
+    "row_count": 4,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqWorkflowCustomStage"
+    ]
+  },
+  {
+    "table": "rxqUserDrugClass",
+    "row_count": 4,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "DrugKey",
+      "ClassIdCode"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugKey",
+        "ref_table": "rxqDrug",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAutoReport",
+    "row_count": 3,
+    "col_count": 10,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cAutoReport"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqAutoReportAudit"
+    ]
+  },
+  {
+    "table": "rxqEcarePlan",
+    "row_count": 3,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PlanId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "SubmissionId",
+        "ref_table": "rxqImmunizationSubmission",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqInternalMessaging",
+    "row_count": 3,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cInternalMessagingId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqMedicareEligibility",
+    "row_count": 3,
+    "col_count": 18,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PatientId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "ZipCode",
+        "ref_table": "rxqZCode",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPriceUpdateSettings",
+    "row_count": 3,
+    "col_count": 111,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugGenerics",
+    "row_count": 2,
+    "col_count": 12,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "DrugKey"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugKey",
+        "ref_table": "rxqDrug",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqEScriptResponseTime",
+    "row_count": 2,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cEScriptResponseTimeId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "LookUpId",
+        "ref_table": "rxqPatientPreferences",
+        "match_rate": 0.5,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqInternalMessagingGroup",
+    "row_count": 2,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cInternalMessagingGroupId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqNHPat",
+    "row_count": 2,
+    "col_count": 69,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NH",
+      "PatientLastName",
+      "PatientFirstName",
+      "PatientMiddleI",
+      "PatientId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": [
+      "rxqAuditLogMaster",
+      "rxqMTMAlert"
+    ]
+  },
+  {
+    "table": "rxqPatientThirdParty",
+    "row_count": 2,
+    "col_count": 46,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PatientId",
+      "AgencyCode",
+      "AgencySequence"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": [
+      "rxqAuditLogMaster",
+      "rxqScriptTransaction",
+      "rxqInsuranceCard",
+      "rxqInsuranceCardsImages",
+      "rxqOnlineHistory",
+      "rxqScriptPayments"
+    ]
+  },
+  {
+    "table": "rxqProfileOnlyScripts",
+    "row_count": 2,
+    "col_count": 14,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "KeyId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "DrugKey",
+        "ref_table": "rxqDrug",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "DoctorId",
+        "ref_table": "rxqDoctor",
+        "match_rate": 1,
+        "confidence": "high"
+      },
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0.5,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqStorePrintOptions",
+    "row_count": 2,
+    "col_count": 15,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "StoreNumber",
+      "WorkflowStage"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqWorkflowOptions",
+      "rxqWorkflowStages"
+    ]
+  },
+  {
+    "table": "rxqTimeClockShift",
+    "row_count": 2,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "sync_config",
+    "row_count": 2,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "sync_ScopeConfig",
+    "row_count": 2,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScopeId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "AutoPilotSchedule",
+    "row_count": 1,
+    "col_count": 2,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "StoreNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "Value",
+        "ref_table": "DiscountCard",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "DB_VERSION",
+    "row_count": 1,
+    "col_count": 12,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugImmunizationDose",
+    "row_count": 1,
+    "col_count": 7,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "DrugImmunizationDoseId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqEcareTemplate",
+    "row_count": 1,
+    "col_count": 14,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ceCareTemplateId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "TemplateName",
+        "ref_table": "ReportFilterTemplates",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqFaxCenter",
+    "row_count": 1,
+    "col_count": 13,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cFaxCenterId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ImageKeyType",
+        "ref_table": "rxqImageControl",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqMessages",
+    "row_count": 1,
+    "col_count": 12,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cMessageId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqMultipleStatesLicense",
+    "row_count": 1,
+    "col_count": 6,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cMultipleStatesLicenseId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "LicenseType",
+        "ref_table": "rxqUserLicenses",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqOrderDefaults",
+    "row_count": 1,
+    "col_count": 11,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqParameterGeneral",
+    "row_count": 1,
+    "col_count": 26,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cParameterGeneralId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 0,
+        "confidence": "low"
+      },
+      {
+        "column": "DrugKey",
+        "ref_table": "rxqDrug",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqParameterImage",
+    "row_count": 1,
+    "col_count": 3,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "StoreNumber",
+      "ImageKey"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqParameterStore",
+    "row_count": 1,
+    "col_count": 72,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cParameterStoreId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cAccountReceivablePrintCodeId",
+        "ref_table": "rxqAccountReceivablePrintCode",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPatientConsultation",
+    "row_count": 1,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "patientId",
+        "ref_table": "rxqPatient",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPendingStockReturn",
+    "row_count": 1,
+    "col_count": 4,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqRxAlertSettings",
+    "row_count": 1,
+    "col_count": 103,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptCounsel",
+    "row_count": 1,
+    "col_count": 9,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 1,
+        "confidence": "high"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptReconcile",
+    "row_count": 1,
+    "col_count": 16,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": 0,
+        "confidence": "low"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "sync_ColumnUpdates",
+    "row_count": 1,
+    "col_count": 5,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "updateId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "tableName",
+        "ref_table": "sync_ScopeTables",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "SYNC_ID",
+    "row_count": 1,
+    "col_count": 1,
+    "is_empty": false,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "CLIENTID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "AcceptInventoryDetailPackageLink",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "AcceptInventoryDetailId",
+      "PackageId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "AppointmentBase",
+    "row_count": 0,
+    "col_count": 17,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "AppointmentDay",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "AppointmentItem",
+    "row_count": 0,
+    "col_count": 12,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "AppointmentSetting",
+    "row_count": 0,
+    "col_count": 18,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "BillingEvents",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber",
+      "Sequence",
+      "PayerOrder"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "LookUpId",
+        "ref_table": "rxqPatientPreferences",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": [
+      "rxqCategories",
+      "rxqDispenser"
+    ]
+  },
+  {
+    "table": "BillingStatus",
+    "row_count": 0,
+    "col_count": 11,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber",
+      "PayerOrder"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "BinAssignmentHistory",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "BulkInventoryEvent",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "CentralFillCompletedOrders",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "CentralFillDeliveryAudit",
+    "row_count": 0,
+    "col_count": 10,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "CentralFillSchedule",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "DeliveryNumber",
+      "ServiceId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "CentralFillScheduleException",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id",
+      "DeliveryNumber",
+      "ServiceId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "CentralFillScriptDetails",
+    "row_count": 0,
+    "col_count": 18,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "CentralFillService",
+    "row_count": 0,
+    "col_count": 19,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "CompoundMonographNotes",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugID",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "CustomViewsPickedUp",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "CustomViewsWaitingBin",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "DeliveryRoutes",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "DiscountCard",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "DiscountType",
+      "FieldType",
+      "Value"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "AutoPilotSchedule",
+      "DrugUnitMultiplier",
+      "QuestionnaireCondition",
+      "rxqAlternateBarcode"
+    ]
+  },
+  {
+    "table": "DocumentGenerated",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "DrugEquivalentNotes",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "DrugNotes",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugID",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "DrugPreference",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientID",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "DrugID",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "DscsaSharing",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "dsmAttachment",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "AttachmentId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "dsmContact",
+    "row_count": 0,
+    "col_count": 12,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ContactId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "dsmFax",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "FaxId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "dsmMessage",
+    "row_count": 0,
+    "col_count": 15,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "MessageId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "dsmPractice",
+    "row_count": 0,
+    "col_count": 3,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PracticeId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "dsmUser",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "UserId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "ECRSSubmission",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "TransactionCode",
+      "ScriptNumber",
+      "RefillNumber",
+      "PartialNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": [
+      "rxqOnlineHistory",
+      "rxqResubmit",
+      "rxqWorkflowNDCScanHistory"
+    ]
+  },
+  {
+    "table": "EPCISData",
+    "row_count": 0,
+    "col_count": 3,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "EPCISPackage",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "OrderLineId",
+        "ref_table": "OrderLinePackageLink",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "GerGroup",
+    "row_count": 0,
+    "col_count": 3,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "HistoricalAppointment",
+    "row_count": 0,
+    "col_count": 25,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "DoctorId",
+        "ref_table": "rxqDoctor",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "InsuranceNotes",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "InventoryEventLog",
+    "row_count": 0,
+    "col_count": 9,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "Event",
+        "ref_table": "rxqWebhookSubscription",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "InventoryOperations",
+    "row_count": 0,
+    "col_count": 10,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "cOrderId",
+        "ref_table": "rxqOrder",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      },
+      {
+        "column": "cAcceptInventoryId",
+        "ref_table": "rxqAcceptInventory",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "InventoryTransactions",
+    "row_count": 0,
+    "col_count": 9,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "InventoryTransferPackageLink",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "InventoryTransferHeaderId",
+      "InventoryTransferLineId",
+      "PackageId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "ItemNotes",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "LtcMessage",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "eScriptId",
+        "ref_table": "rxqEScript",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "LtcOutboundMessage",
+    "row_count": 0,
+    "col_count": 12,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "MasterNotes",
+    "row_count": 0,
+    "col_count": 11,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "MedSyncNotes",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientID",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "MedSyncPatientReview",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PatientId",
+      "ProgramDays"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "OrderLinePackageLink",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "OrderLineId",
+      "PackageId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "EPCISPackage",
+      "rxqOrderInvoiceLine"
+    ]
+  },
+  {
+    "table": "PatientAuxiliary",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PatientId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "PatientConsolidationHistory",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "PatientConsultationDefaultNotes",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "PatientConsultationNotes",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientID",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "PatientNotes",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientID",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "PickUpNotes",
+    "row_count": 0,
+    "col_count": 3,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "PrescriberNotes",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "PriorAuthorizationRequests",
+    "row_count": 0,
+    "col_count": 11,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "Question",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "Questionnaire",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "QuestionnaireCondition",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "Value",
+        "ref_table": "DiscountCard",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "QuestionnaireReview",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "ReportFilterTemplates",
+    "row_count": 0,
+    "col_count": 3,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "TemplateName",
+      "ReportCategory"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqEcareTemplate",
+      "rxqRefillRequestTemplate",
+      "rxqScriptTemplate",
+      "rxqUnitDoseTemplate"
+    ]
+  },
+  {
+    "table": "Rx365PatientAppendix",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PatientId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "RX365PatientLink",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PatientId",
+      "LinkedPatientId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": [
+      "rxqAuditLogMaster"
+    ]
+  },
+  {
+    "table": "Rx365PushNotification",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAcceptInventory",
+    "row_count": 0,
+    "col_count": 11,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cAcceptInventoryId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cVendorId",
+        "ref_table": "rxqVendor",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": [
+      "InventoryOperations",
+      "rxqAcceptInventoryDetail"
+    ]
+  },
+  {
+    "table": "rxqAcceptInventoryDetail",
+    "row_count": 0,
+    "col_count": 9,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cAcceptInventoryDetailId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cAcceptInventoryId",
+        "ref_table": "rxqAcceptInventory",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      },
+      {
+        "column": "NDCNumber",
+        "ref_table": "rxqClinicalLookup",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAccountReceivableHistory",
+    "row_count": 0,
+    "col_count": 28,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "AgingDate",
+      "Partition",
+      "ARBatch",
+      "AccountId",
+      "ARType",
+      "RecordNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAccountReceivablePrintCode",
+    "row_count": 0,
+    "col_count": 3,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cAccountReceivablePrintCodeId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqParameterStore",
+      "rxqPatientAccountReceivable",
+      "rxqPatientAccountReceivableHistory"
+    ]
+  },
+  {
+    "table": "rxqAgencyGroup",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "GroupId",
+      "AgencyId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqAwpResubmit",
+      "rxqMedicareEligibilityPayers"
+    ]
+  },
+  {
+    "table": "rxqALAAC",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAlternateBarcode",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "Value",
+        "ref_table": "DiscountCard",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAlternateBarcodeDetail",
+    "row_count": 0,
+    "col_count": 3,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Identifier",
+      "Type",
+      "AlternateBarcodeId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAudit835",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cAudit835Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAuditThirdPartyAccounting",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqAwpResubmit",
+    "row_count": 0,
+    "col_count": 27,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "GroupId",
+        "ref_table": "rxqAgencyGroup",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqBCell",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "StoreNumber",
+      "PollCode",
+      "CellNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugKey",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqBookmark",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cBookmarkId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqBulkMessage",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "BulkMessageId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqPatientBulkMessage"
+    ]
+  },
+  {
+    "table": "rxqBulkOrderHistory",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cBulkOrderHistoryId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqBulkOrderHistoryDetail"
+    ]
+  },
+  {
+    "table": "rxqBulkOrderHistoryDetail",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cBulkOrderHistoryDetailId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cBulkOrderHistoryId",
+        "ref_table": "rxqBulkOrderHistory",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqCentralInterfaceHistory",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "Event",
+        "ref_table": "rxqWebhookSubscription",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqClinicalOppAnswer",
+    "row_count": 0,
+    "col_count": 12,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cClinicalOppAnswerId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cClinicalOppSettingId",
+        "ref_table": "rxqClinicalOppSetting",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      },
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": [
+      "rxqClinicalOppAnswerHistory"
+    ]
+  },
+  {
+    "table": "rxqClinicalOppAnswerHistory",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cClinicalOppAnswerId",
+        "ref_table": "rxqClinicalOppAnswer",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqClinicalOppSetting",
+    "row_count": 0,
+    "col_count": 15,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cClinicalOppSettingId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqClinicalOppAnswer"
+    ]
+  },
+  {
+    "table": "rxqCopayPriceBreaks",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "StoreNumber",
+      "PriceFormulaCode",
+      "CopayType",
+      "PriceBreak"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqDrug"
+    ]
+  },
+  {
+    "table": "rxqCouponDrug",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "NdcNumber",
+        "ref_table": "rxqClinicalLookup",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqCouponEntry",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqCourier",
+    "row_count": 0,
+    "col_count": 12,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqCycleFillAuthorization",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "CycleFillAuthorizationId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDeletedDoctor",
+    "row_count": 0,
+    "col_count": 3,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "deletedDoctorID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDirFees",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id",
+      "DrugType"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqScriptTransaction"
+    ]
+  },
+  {
+    "table": "rxqDirFeesConditional",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cDirFeesConditionalId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDisease",
+    "row_count": 0,
+    "col_count": 9,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "DiseaseCode"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqIcd9CrossReference",
+      "rxqPatientDisease"
+    ]
+  },
+  {
+    "table": "rxqDispenser",
+    "row_count": 0,
+    "col_count": 16,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cDispenserId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "Sequence",
+        "ref_table": "BillingEvents",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugCatalog",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cDrugCatalogId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugHotList",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDrugXM",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "KeyType",
+      "DrugKey",
+      "AgencyCode"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugKey",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqDUR",
+    "row_count": 0,
+    "col_count": 11,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber",
+      "Ins_Type",
+      "SequenceNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqEScriptDoctor",
+    "row_count": 0,
+    "col_count": 59,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "SurescriptProviderId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqFaxModems",
+    "row_count": 0,
+    "col_count": 3,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "RxqHL7Interfaces",
+    "row_count": 0,
+    "col_count": 9,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "InterfaceId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqIcd9CrossReference",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cIcd9CrossReferenceId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "Icd9Prefix",
+        "ref_table": "rxqIcd9",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "Icd9Code",
+        "ref_table": "rxqIcd9",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "DiseaseCode",
+        "ref_table": "rxqDisease",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqImmunizationSubmission",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "SubmissionId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": [
+      "rxqEcarePlan"
+    ]
+  },
+  {
+    "table": "rxqInsuranceCard",
+    "row_count": 0,
+    "col_count": 12,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cInsuranceCardId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "AgencySequence",
+        "ref_table": "rxqPatientThirdParty",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqInsuranceCardsImages",
+    "row_count": 0,
+    "col_count": 14,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cInsuranceCardsImagesId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "AgencySequence",
+        "ref_table": "rxqPatientThirdParty",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqInterfaceOptions",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cInterfaceOptionsId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqInterfaceSubmission",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqInventoryTransferHeader",
+    "row_count": 0,
+    "col_count": 34,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cInventoryTransferHeaderId",
+      "StoreNumber"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqInventoryTransferLine",
+    "row_count": 0,
+    "col_count": 13,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cInventoryTransferLineId",
+      "cInventoryTransferHeaderId",
+      "StoreNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "NdcNumber",
+        "ref_table": "rxqClinicalLookup",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqMedicalInsurance",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqMTMAlert",
+    "row_count": 0,
+    "col_count": 47,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientFirstName",
+        "ref_table": "rxqNHPat",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "PatientLastName",
+        "ref_table": "rxqNHPat",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqMTMOutcomesUsers",
+    "row_count": 0,
+    "col_count": 9,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqNcpdpNarrative",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqNewRxRequest",
+    "row_count": 0,
+    "col_count": 13,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "MessageId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "eScriptId",
+        "ref_table": "rxqEScript",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "DoctorId",
+        "ref_table": "rxqDoctor",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqNHMedsheetReport",
+    "row_count": 0,
+    "col_count": 24,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqNHMedSheetReportDefaultOrdering",
+    "row_count": 0,
+    "col_count": 3,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PatientId",
+      "DefaultStandingOrderId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqNHOrd",
+    "row_count": 0,
+    "col_count": 18,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "m_keyvalue",
+      "Prefix",
+      "Suffix"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqNotifications",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cNotificationId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqOnlineHistory",
+    "row_count": 0,
+    "col_count": 202,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cOnlineHistoryId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "TransactionCode",
+        "ref_table": "ECRSSubmission",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      },
+      {
+        "column": "DrugKey",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "AgencySequence",
+        "ref_table": "rxqPatientThirdParty",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqOnlineNotifications",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NotificationsId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqOrder",
+    "row_count": 0,
+    "col_count": 21,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cOrderId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "InventoryOperations",
+      "rxqOrderConfirmation",
+      "rxqOrderDiscrepancy"
+    ]
+  },
+  {
+    "table": "rxqOrderConfirmation",
+    "row_count": 0,
+    "col_count": 10,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cOrderConfirmationId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cOrderId",
+        "ref_table": "rxqOrder",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      },
+      {
+        "column": "cOrderVendorSettingsId",
+        "ref_table": "rxqOrderVendorSettings",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqOrderDiscrepancy",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cOrderId",
+        "ref_table": "rxqOrder",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqOrderDiscrepancyItem",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cOrderLineId",
+        "ref_table": "rxqOrderLine",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqOrderInvoice",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cOrderInvoiceId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqOrderInvoiceLine",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cOrderInvoiceLineId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "OrderLineId",
+        "ref_table": "OrderLinePackageLink",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqOrderVendorSettings",
+    "row_count": 0,
+    "col_count": 118,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cOrderVendorSettingsId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqOrderConfirmation"
+    ]
+  },
+  {
+    "table": "rxqPatientAccountReceivableHistory",
+    "row_count": 0,
+    "col_count": 29,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "AgingDate",
+      "AccountId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cAccountReceivablePrintCodeId",
+        "ref_table": "rxqAccountReceivablePrintCode",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPatientAlias",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cPatientAliasId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPatientBulkMessage",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PatientBulkMessageId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "BulkMessageId",
+        "ref_table": "rxqBulkMessage",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      },
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "PatientMessageId",
+        "ref_table": "rxqPatientMessageScriptTransactions",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPatientCreditCard",
+    "row_count": 0,
+    "col_count": 10,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cPatientCreditCardId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "ZipCode",
+        "ref_table": "rxqZCode",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPatientMedicalInsurance",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPatientPickupDisplayImages",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPlugin",
+    "row_count": 0,
+    "col_count": 9,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PluginId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPriceFormulaClass",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "PriceFormulaPrimaryCode",
+      "PriceFormulaChildrenCode"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqPrintableAttachment",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cPrintableAttachmentId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "LookupId",
+        "ref_table": "rxqPatientPreferences",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      },
+      {
+        "column": "cImageControlId",
+        "ref_table": "rxqImageControl",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqQuotes",
+    "row_count": 0,
+    "col_count": 17,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "QuoteNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqRefillRequestTemplate",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cRefillRequestTemplateId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "TemplateName",
+        "ref_table": "ReportFilterTemplates",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqResubmit",
+    "row_count": 0,
+    "col_count": 198,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "TransactionCode",
+        "ref_table": "ECRSSubmission",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqRule",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cRuleId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqRuleFilter"
+    ]
+  },
+  {
+    "table": "rxqRuleFilter",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cFilterId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cRuleId",
+        "ref_table": "rxqRule",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      },
+      {
+        "column": "Operation",
+        "ref_table": "rxqAuditLogMasterOperation",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqRX365Chats",
+    "row_count": 0,
+    "col_count": 12,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cRX365ChatsId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqRX365PendingPatient",
+    "row_count": 0,
+    "col_count": 20,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqRX365TransferInItems",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cRX365TransferInItemsId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqRX365TransferIns",
+    "row_count": 0,
+    "col_count": 15,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cRX365TransferInsId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqRxAlertReadyWorkflowLocationSettings",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "SettingId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqRxAppointmentAlertSettings",
+    "row_count": 0,
+    "col_count": 13,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "RxAppointmentAlertSettingId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqRxChangeRequest",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "RequestEscriptId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScheduledDiscontinuation",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptDrugSplit",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cScriptDrugSplitId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptIOU",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cScriptIOUId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptLinks",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptLinkId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptPartial",
+    "row_count": 0,
+    "col_count": 20,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cScriptPartialId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqScriptPayments",
+    "row_count": 0,
+    "col_count": 62,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber",
+      "SequenceNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "AgencySequence",
+        "ref_table": "rxqPatientThirdParty",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqSecurityBadge",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "UserId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqSigsTreatmentSchedule",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cSigsTreatmentSchedule"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cTreatmentScheduleId",
+        "ref_table": "rxqTreatmentSchedule",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "SigLanguage",
+        "ref_table": "rxqSigsCodes",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqSpecialtySubmission",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqStoreContacts",
+    "row_count": 0,
+    "col_count": 9,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cStoreContactsId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqStoreHolidays",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cStoreHolidaysId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqSubmitOverride",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "TableId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqThirdPartyAccountingAmountExpected",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber",
+      "ClaimType",
+      "IsMFP"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqTimeClockEntry",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "UserId",
+      "ActionDate"
+    ],
+    "inferred_edges": [],
+    "referenced_by": [
+      "rxqAuditAutoRefill",
+      "rxqAuditMedSync"
+    ]
+  },
+  {
+    "table": "rxqUnitDose",
+    "row_count": 0,
+    "col_count": 14,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqUnitDoseIndividual",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqUnitDoseTemplate",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cUnitDoseTemplateId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "TemplateName",
+        "ref_table": "ReportFilterTemplates",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": [
+      "rxqSigsCodes"
+    ]
+  },
+  {
+    "table": "rxqUnitDoseTimesQtys",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqUserBiometric",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cUserId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqUserDictionary",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cUserDictionaryId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqVideoConference",
+    "row_count": 0,
+    "col_count": 10,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkComp",
+    "row_count": 0,
+    "col_count": 16,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkCompAgency",
+    "row_count": 0,
+    "col_count": 20,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "AgencyId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkCompEmployer",
+    "row_count": 0,
+    "col_count": 23,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cWorkCompEmployerId"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkCompLawyer",
+    "row_count": 0,
+    "col_count": 16,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "LawKey"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ZipCode",
+        "ref_table": "rxqZCode",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkCompPayment",
+    "row_count": 0,
+    "col_count": 10,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ScriptNumber",
+      "RefillNumber",
+      "SequenceNumber"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkCompPlan",
+    "row_count": 0,
+    "col_count": 19,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cWorkCompPlanId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkflowCustomStage",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "WorkflowCustomStageId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "cWorkflowStageId",
+        "ref_table": "rxqWorkflowStages",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "cSecurityGroupId",
+        "ref_table": "rxqSecurityGroup",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkFlowFaxHistory",
+    "row_count": 0,
+    "col_count": 7,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cWorkFlowFaxHistoryId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkFlowMedSyncCall",
+    "row_count": 0,
+    "col_count": 8,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cWorkFlowMedSyncCallId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PatientId",
+        "ref_table": "rxqPatient",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "rxqWorkflowNDCScanHistory",
+    "row_count": 0,
+    "col_count": 9,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "cWorkflowNDCScanHistoryId"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "PartialNumber",
+        "ref_table": "ECRSSubmission",
+        "match_rate": null,
+        "confidence": "unvalidated"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "ScriptNotes",
+    "row_count": 0,
+    "col_count": 4,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "ScriptOperations",
+    "row_count": 0,
+    "col_count": 15,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      },
+      {
+        "column": "DrugId",
+        "ref_table": "rxqDrug",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "SettingNotes",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "SupportedLanguages",
+    "row_count": 0,
+    "col_count": 6,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "ID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "Code",
+        "ref_table": "rxqEcareCode",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "TransferNotes",
+    "row_count": 0,
+    "col_count": 2,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [],
+    "referenced_by": []
+  },
+  {
+    "table": "UserPermissions",
+    "row_count": 0,
+    "col_count": 3,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "PrivilegeId",
+        "ref_table": "rxqPrivileges",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "WorkflowEventLog",
+    "row_count": 0,
+    "col_count": 9,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "Id"
+    ],
+    "inferred_edges": [
+      {
+        "column": "Event",
+        "ref_table": "rxqWebhookSubscription",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  },
+  {
+    "table": "WorkFlowNotes",
+    "row_count": 0,
+    "col_count": 5,
+    "is_empty": true,
+    "mirrored_by_etl": false,
+    "primary_key": [
+      "NoteID"
+    ],
+    "inferred_edges": [
+      {
+        "column": "ScriptNumber",
+        "ref_table": "rxqScriptBase",
+        "match_rate": null,
+        "confidence": "no-data"
+      }
+    ],
+    "referenced_by": []
+  }
+]

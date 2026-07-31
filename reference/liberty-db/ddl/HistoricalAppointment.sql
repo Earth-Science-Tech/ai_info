@@ -1,0 +1,30 @@
+-- HistoricalAppointment   (0 rows, 25 columns)
+-- Source: RXQRXCOMPOUNDSTORE (Liberty). Read-only reference DDL, synthesized from catalog metadata.
+CREATE TABLE [dbo].[HistoricalAppointment] (
+    [Id] uniqueidentifier NOT NULL,
+    [ScheduledDateTime] datetime NOT NULL,
+    [Questions] nvarchar(max) NULL,
+    [QuestionResponses] nvarchar(max) NULL,
+    [CampaignName] nvarchar(200) NOT NULL,
+    [Type] varchar(50) NOT NULL,
+    [CampaignOptionName] nvarchar(200) NOT NULL,
+    [PatientId] nvarchar(100) NULL,
+    [GuestLastName] nvarchar(max) NULL,
+    [GuestFirstName] nvarchar(max) NULL,
+    [GuestDOB] datetime NULL,
+    [GuestPhoneNum] varchar(50) NULL,
+    [GuestEmail] varchar(50) NULL,
+    [GuestStreetAddress] varchar(50) NULL,
+    [GuestCity] varchar(50) NULL,
+    [GuestState] varchar(50) NULL,
+    [GuestZip] varchar(50) NULL,
+    [Status] int NOT NULL,
+    [Notes] varchar(5000) NULL,
+    [InsuranceCardFrontImage] varbinary(max) NULL,
+    [InsuranceCardBackImage] varbinary(max) NULL,
+    [WasCancelled] bit NULL,
+    [GuestGender] int NULL,
+    [DoctorId] varchar(50) NULL,
+    [DrugId] varchar(50) NULL,
+    CONSTRAINT [PK_HistoricalAppointment] PRIMARY KEY ([Id])
+);

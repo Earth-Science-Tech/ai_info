@@ -1,0 +1,31 @@
+-- rxqParameterGeneral   (1 rows, 26 columns)
+-- Source: RXQRXCOMPOUNDSTORE (Liberty). Read-only reference DDL, synthesized from catalog metadata.
+CREATE TABLE [dbo].[rxqParameterGeneral] (
+    [cParameterGeneralId] int IDENTITY NOT NULL,
+    [PatientId] varchar(50) NULL,
+    [MinFinanceCharge1] float NULL,
+    [MinFinanceCharge2] float NULL,
+    [MinFinanceCharge3] float NULL,
+    [MinFinanceCharge4] float NULL,
+    [MinFinanceCharge5] float NULL,
+    [MinFinanceCharge6] float NULL,
+    [MinFinanceCharge7] float NULL,
+    [MinFinanceCharge8] float NULL,
+    [MinFinanceCharge9] float NULL,
+    [MinFinanceCharge10] float NULL,
+    [DrugKey] varchar(50) NULL,
+    [MsUpdateCount] int NULL,
+    [AccountNumber] int NULL,
+    [OperatingSystem] varchar(50) NULL,
+    [StoreNumber] varchar(50) NULL,
+    [LastModified] datetime NULL,
+    [IsValid] bit NULL,
+    [AllowDecimalQuantities] bit NULL,
+    [DoctorKey] varchar(50) NULL,
+    [AccountId] varchar(50) NULL,
+    [PendingScriptId] varchar(50) NULL,
+    [LibertyId] bigint NULL,
+    [PackingListKey] int NULL,
+    [TransferOrderKey] int NULL,
+    CONSTRAINT [PK_rxqParameterGeneral] PRIMARY KEY ([cParameterGeneralId])
+);

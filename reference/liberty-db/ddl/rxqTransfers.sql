@@ -1,0 +1,31 @@
+-- rxqTransfers   (319 rows, 26 columns)
+-- Source: RXQRXCOMPOUNDSTORE (Liberty). Read-only reference DDL, synthesized from catalog metadata.
+CREATE TABLE [dbo].[rxqTransfers] (
+    [TransferType] varchar(50) NOT NULL,
+    [ScriptNumber] int NOT NULL,
+    [OriginalDate] datetime NULL,
+    [LastDate] datetime NULL,
+    [LastModified] datetime NULL,
+    [IsValid] bit NULL,
+    [PharmacyId] varchar(50) NULL,
+    [TransferDate] datetime NULL,
+    [Contact] varchar(50) NULL,
+    [Comments] text NULL,
+    [RefillsAuth] int NULL,
+    [RefillsRemain] int NULL,
+    [OriginalRx] varchar(50) NULL,
+    [LastFill] datetime NULL,
+    [FirstFill] datetime NULL,
+    [Createdby] varchar(256) NULL,
+    [RphInitials] varchar(50) NULL,
+    [RecordNumber] int NOT NULL,
+    [Quantity] decimal(9,3) NOT NULL,
+    [RefillNumber] int NOT NULL,
+    [TransferMethod] int NULL,
+    [Status] int NULL,
+    [ActionType] int NULL,
+    [DirectionType] int NULL,
+    [QuantityRemaining] decimal(9,3) NULL,
+    [TransferOption] int NOT NULL,
+    CONSTRAINT [PK_rxqTransfers] PRIMARY KEY ([TransferType], [ScriptNumber], [RecordNumber], [RefillNumber])
+);

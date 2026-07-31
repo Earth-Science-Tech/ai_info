@@ -5,6 +5,7 @@
 - **Repo:** https://github.com/Earth-Science-Tech/emed_etl
 - **Branch:** `main`
 - **Schema:** lives in sibling `../emed_sql/` repo (no longer a submodule as of 2026-05-04)
+- **Liberty SOURCE schema:** the full read-only Liberty source database (`RXQRXCOMPOUNDSTORE`, 360 tables — the shared `rxcs`/`mmed`/`mdvo` ETL source) is documented in [`ai_info/reference/liberty-db/`](../../reference/liberty-db/README.md). **Read it before querying Liberty directly or adding a table to `liberty_etl_config.json`** — only 11 of 360 tables are currently mirrored into `liberty_link_stage`.
 
 ## Schema Changes
 

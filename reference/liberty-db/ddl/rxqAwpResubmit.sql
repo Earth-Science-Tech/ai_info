@@ -1,0 +1,32 @@
+-- rxqAwpResubmit   (0 rows, 27 columns)
+-- Source: RXQRXCOMPOUNDSTORE (Liberty). Read-only reference DDL, synthesized from catalog metadata.
+CREATE TABLE [dbo].[rxqAwpResubmit] (
+    [id] int IDENTITY NOT NULL,
+    [server_id] int NOT NULL,
+    [RxNumber] varchar(50) NULL,
+    [RefillNumber] int NULL,
+    [RxFillDate] datetime NULL,
+    [AwpEffectiveDate] datetime NULL,
+    [Bin] varchar(50) NULL,
+    [BinDescription] varchar(256) NULL,
+    [Pcn] varchar(50) NULL,
+    [GroupId] varchar(50) NULL,
+    [Ndc] varchar(50) NULL,
+    [DrugName] varchar(256) NULL,
+    [AwpPerUnitBefore] money NULL,
+    [AwpPerUnitAfter] money NULL,
+    [OriginalIngredientCostPaid] money NULL,
+    [Quantity] decimal(19,4) NULL,
+    [IngredientCostPaidPerUnit] money NULL,
+    [PercentOffOldAwp] decimal(19,4) NULL,
+    [PercentOffNewAwp] decimal(19,4) NULL,
+    [PatientPay] money NULL,
+    [PotentialOpportunity] money NULL,
+    [OpportunityDate] datetime NULL,
+    [OpportunityDeliveredDate] datetime NOT NULL,
+    [OpportunityFulfilled] smallint NOT NULL,
+    [BeforePaid] money NULL,
+    [AfterPaid] money NULL,
+    [ResubmitStatus] varchar(100) NULL,
+    CONSTRAINT [PK_rxqAwpResubmit] PRIMARY KEY ([id])
+);
