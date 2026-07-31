@@ -7,6 +7,10 @@ These conventions apply to all Earth Science Tech projects unless a project expl
 @branch-and-database-gates.md
 @../../team/roster.md
 
+## Key shared references
+
+- **Liberty source database schema** → [`reference/liberty-db/`](../../reference/liberty-db/README.md). The upstream Liberty/RxQ pharmacy DB (`RXQRXCOMPOUNDSTORE`) the ETL pulls from — schema shared across the `rxcs`/`mmed`/`mdvo` tenants — is fully documented there: 360 tables, deep per-table docs for the 173 populated ones, synthesized DDL, and a machine-readable JSON catalog. **Read it before querying Liberty directly or planning a new mirror table** (only 11 of 360 tables are mirrored into `liberty_link_stage`). Liberty declares no foreign keys, so relationships there are inferred from column naming and data-validated by referential match rate.
+
 ## Naming Conventions
 
 | Context | Convention | Examples |
