@@ -4,7 +4,7 @@
 
 ## What it does
 
-Self-service HMAC-signed POST notifications for clinics with API access, replacing polling against `/api/public/moct/visit/:VisitId`. Four event types:
+Self-service HMAC-signed POST notifications for clinics with API access, replacing polling against `/api/public/moct/visit/:VisitId`. Seven event types:
 
 | Event | Source | Trigger |
 |---|---|---|
@@ -12,6 +12,11 @@ Self-service HMAC-signed POST notifications for clinics with API access, replaci
 | `moct.visit.status_changed` | Node | `POST /api/moct/set-status` in `route_moct.js:418` (after audit log) |
 | `moct.script.status_changed` | ETL | `usp_etl_emed_script_webhook_events` diff on `view_emed_full_order.OrderStatus` |
 | `moct.script.tracking_added` | ETL | same proc, when `TrackingNumber` goes from empty to non-empty |
+| `moct.prescription.signed` | Node | `POST /api/moct/sign-prescriptions` in `route_moct.js`, **only for `pharmacy='Prescription Only'` visits**. Prescription-Only feature (2026-06-29): clinic gets the signed Rx back to route to its own / a 3rd-party pharmacy instead of our Liberty pharmacies. **Distinct `data` shape** — see below. |
+| `moct.prescription.held` | Node | Pre-Clarification gate in `emed.sign_prescriptions` (via `preclar_gate`) when a rule stops a script **before it reaches the pharmacy**. `change`: `{kind:'prescription_held', drug_rx_id, rule_id, rule_name, reason, channel}`. `data` is the standard visit object, annotated with a `PreClarification` block while anything is held. Lets a subscriber tell a held order from a merely-slow one (partner `POST /emed/order` returns "Processing" before the gate runs). |
+| `moct.prescription.released` | Node | `preclar.release_hold` when a held script is reviewed and released (or overridden) and submitted to the pharmacy. `change`: `{kind:'prescription_released', drug_rx_id, rule_id, overridden, released_by}`. |
+
+> **held/released documented + subscribable as of 2026-07-31** (emed_app PR #298, tag 1.0.170). Both were *emitted in code* since the Pre-Clarification Gate shipped (1.0.168) and accepted by the subscription validator, but were missing from the API docs and the **Add Webhook** UI checkboxes until #298 — so no integrator could actually subscribe. Existing subscribers must edit their webhook and tick the new boxes (new webhooks get all seven checked by default).
 
 Subscribers register endpoints at **API Portal → Webhooks** (`/moct/api-webhooks`). Permission: `Write_Webhooks` (granted to `API`, `Admin`, `SuperUser`).
 
@@ -33,6 +38,20 @@ The body mirrors `GET /api/public/moct/visit/:VisitId` so subscribers can drop p
 The `data` block is built **at delivery time** by the worker calling `emed.visit_status()` so it stays in sync with the polling endpoint forever. The `change` block is event-specific and is the only thing the emitter / detection-proc actually stores in the queue.
 
 **PHI is in the payload** (DrugName, ShippingAddress, ShippedPhone — same as polling). Each delivery is logged via `audit_logger.log_phi_access`.
+
+### `moct.prescription.signed` (different `data` shape)
+
+For this one event the worker builds `data` via `emed.signed_prescription_payload(visit_id, clinic)` instead of `visit_status()`. It carries full prescriber details + the **signed Rx PDF(s) as base64** so the clinic can hand the prescription to its own / a 3rd-party pharmacy:
+
+```json
+{ "VisitId": 42, "Clinic": "Helimeds", "Pharmacy": "Prescription Only",
+  "Prescriber": { "Name": "...", "NPI": "...", "DEA": "...", "Address": "...", "City": "...", "State": "...", "Zip": "..." },
+  "Patient":    { "FirstName": "...", "LastName": "...", "DateOfBirth": "...", ... },
+  "Prescriptions": [ { "RxId": 100, "DrugName": "...", "Sig": "...", "Quantity": "...", "Refills": 2,
+                       "Filename": "Rx[42-100].pdf", "SignedPdfBase64": "JVBERi0x..." } ] }
+```
+
+The same object is available via pull at `GET /api/public/moct/visit/:VisitId/prescriptions` (clinic-scoped, Prescription-Only visits only) for clinics that poll instead of receiving webhooks. Intake: `POST /api/public/moct/visit` with `"PrescriptionOnly": true` sets `moct_visit.pharmacy='Prescription Only'` + `pharmacy_locked=1` (staff can't reassign it to one of our pharmacies; `set-pharmacy` enforces). On sign, `emed.sign_prescriptions` skips Liberty for `Prescription Only` (and legacy `Other`) and still persists the PDF to `moct_pdf`.
 
 ## Headers
 
