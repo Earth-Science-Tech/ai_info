@@ -64,6 +64,6 @@ Credentials in `.env` and Prefect Secret blocks (manually synced with emed_app):
 
 - Rx Compound Store (table_prefix='rxcs')
 - Mister Meds (table_prefix='mmed')
-- Meduvo (table_prefix='mdvo') — pending job-server provisioning
+- Meduvo (table_prefix='mdvo') — live since 2026-08-03 (Run-All-ETL-MDVO every 15 min, rxqNotes-MDVO every 60 sec)
 - Liberty ETL: every 15–60 minutes per table (see `prefect.yaml`)
 - Warehouse clone: nightly 01:00 ET, dbt build at 02:00 ET
