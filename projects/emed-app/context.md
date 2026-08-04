@@ -54,6 +54,10 @@ Every `liberty.js` `api()` call gets a `(data, error)` callback. Liberty returns
 
 Admin tool to find eMed-signed prescriptions that never reached / were never linked at the pharmacy and reconcile them: **Tab 1** transmission failures (keyed off `emed_liberty_write_log`), **Tab 2** "not received" orphans (no `tag_rx`/`moct_order_tracking`/`moct_script_link`). Staff **link** an orphan to the fulfilling pharmacy script (writes `moct_script_link`; ETL applies the tag → tracking flows to the clinic) or **dismiss** a reviewed false-positive (`moct_orphan_dismissal`, soft/reversible), with bulk accelerators + fuzzy drug matching for both. Perms: `View_Menu_Missing_Scripts`, `Write_Redrive_Scripts`, `Write_Link_Scripts`. Full doc: [../emed/missing-scripts.md](../emed/missing-scripts.md).
 
+## Change Log (`/admin/change-log`)
+
+Admin-only page listing every production release — date, version, who pushed it, curated feature/enhancement/bugfix bullets, and the developers behind each feature. Data is the git-tracked `emed_app/data/changelog.json` (kept out of `public/`, read server-side behind `View_Menu_Admin`). Entries are drafted by `scripts/changelog.js scaffold` during **push prod** and Claude-curated (PHI/secrets scrubbed; author names kept, resolved via `team/roster.md`). Full doc: [change-log.md](change-log.md); release step in [../../skills/push-prod.md](../../skills/push-prod.md) (Step 0.5).
+
 ## Python Scripts (remaining in emed_app)
 
 ETL scripts in emed_etl. Schema-extraction scripts moved to `emed_sql/python/` (2026-05-04). What remains in emed_app:

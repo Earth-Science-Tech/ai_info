@@ -199,9 +199,44 @@ git push origin main
 
 The commit message should briefly list the migrations applied. Then proceed to Step 1 of the Node.js push.
 
+### Step 0.5 — Update the in-app Change Log (before committing)
+
+eMed has an Admin-only **Change Log** page (`/admin/change-log`) backed by the version-controlled file
+`emed_app/data/changelog.json`. Each production release gets one curated, PHI-safe entry. Because the
+entry is committed **with** the release, write it now — before the Step 1 commit — so it ships inside
+the tag.
+
+The next version is already known here: for a standard "push prod" it's `git describe --tags
+--abbrev=0` with the patch incremented; for "push prod x.x.x" it's the explicit version. Scaffold a
+draft from the commits in range, then curate it:
+
+```bash
+cd ../emed_app   # must run from emed_app/ so the repo + roster paths resolve
+node scripts/changelog.js scaffold <new-version>   # prepends a DRAFT entry to data/changelog.json
+```
+
+The script (git-only; no DB, no `.env`, never blocks a deploy):
+- Fills `version`, `date` (today), and `pushed_by` (`git config user.name`, resolved to a real name via
+  `ai_info/team/roster.md`).
+- Drafts `changes[]` from the commit subjects in `<last-tag>..HEAD`, grouped by type
+  (feat→feature, fix→bugfix, perf/refactor→enhancement, else other), each bullet pre-filled with its
+  commit author(s) — resolved through the roster (GitHub handle → real name), plus any
+  `Co-authored-by` trailers (bots filtered).
+
+Then **hand-edit the drafted entry** in `data/changelog.json` using your Phase 1 diff understanding:
+- Rewrite each bullet into plain, user-facing language (what changed and why it matters).
+- Set a one-line `summary`.
+- **Remove anything sensitive** — patient names/DOBs, patient↔drug links, SSNs, card/payment
+  identifiers, secrets/keys/connection strings, and internal specifics that don't belong in a
+  customer-safe log. Developer **names stay** (that's the point of the `authors` arrays — keep/merge
+  them as you consolidate commits into features).
+
+The entry is picked up by the normal Step 1 commit. (One-time history seed already done via
+`node scripts/changelog.js backfill`; you don't re-run it.)
+
 ### Standard: "push prod" (auto-increment patch)
 
-1. Stage and commit uncommitted changes with a descriptive commit message — informed by the Phase 1 investigation, not generic
+1. Stage and commit uncommitted changes — **including the `data/changelog.json` entry from Step 0.5** — with a descriptive commit message informed by the Phase 1 investigation, not generic
 2. Push to `main`
 3. Increment the patch version of `git describe --tags --abbrev=0` (e.g., `1.0.3` → `1.0.4`)
 4. Create an annotated tag with the new version (message summarizing release)
