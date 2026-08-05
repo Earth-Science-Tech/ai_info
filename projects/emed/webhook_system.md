@@ -4,17 +4,22 @@
 
 ## What it does
 
-Self-service HMAC-signed POST notifications for clinics with API access, replacing polling against `/api/public/moct/visit/:VisitId`. Seven event types:
+Self-service HMAC-signed POST notifications for clinics with API access, replacing polling against `/api/public/moct/visit/:VisitId` (and, for the `pharmacy.script.*` family, `/api/public/scripts`). Ten event types:
 
 | Event | Source | Trigger |
 |---|---|---|
-| `moct.visit.created` | Node | `POST /api/public/moct-visit` insert path in `route_public.js`. **Also fired by `POST /api/public/script-refill`** (rewritten 2026-05-29) when a refill MOCT visit is created — refills flow through the same subscriber pipeline as new orders. |
+| `moct.visit.created` | Node | `POST /api/public/moct-visit` insert path in `route_public.js`. **Also fired by `POST /api/public/script-refill`** (rewritten 2026-05-29) when a refill MOCT visit is created — refills flow through the same subscriber pipeline as new orders. **Also fires for External Prescription API orders** (`POST /emed/order` → `emed.create_external_prescription` → `emit_event('moct.visit.created')`, status "Externally Prescribed") — an external order IS a MOCT visit, so the whole `moct.*` family covers it. |
 | `moct.visit.status_changed` | Node | `POST /api/moct/set-status` in `route_moct.js:418` (after audit log) |
-| `moct.script.status_changed` | ETL | `usp_etl_emed_script_webhook_events` diff on `view_emed_full_order.OrderStatus` |
-| `moct.script.tracking_added` | ETL | same proc, when `TrackingNumber` goes from empty to non-empty |
+| `moct.script.status_changed` | ETL | `usp_etl_emed_script_webhook_events` diff on `view_emed_full_order.OrderStatus`. MOCT-linked scripts only (`MocTag IS NOT NULL`, exact clinic match) — includes externally-prescribed orders' scripts. |
+| `moct.script.tracking_added` | ETL | same proc, when `TrackingNumber` goes from empty to non-empty (MOCT-linked only) |
 | `moct.prescription.signed` | Node | `POST /api/moct/sign-prescriptions` in `route_moct.js`, **only for `pharmacy='Prescription Only'` visits**. Prescription-Only feature (2026-06-29): clinic gets the signed Rx back to route to its own / a 3rd-party pharmacy instead of our Liberty pharmacies. **Distinct `data` shape** — see below. |
 | `moct.prescription.held` | Node | Pre-Clarification gate in `emed.sign_prescriptions` (via `preclar_gate`) when a rule stops a script **before it reaches the pharmacy**. `change`: `{kind:'prescription_held', drug_rx_id, rule_id, rule_name, reason, channel}`. `data` is the standard visit object, annotated with a `PreClarification` block while anything is held. Lets a subscriber tell a held order from a merely-slow one (partner `POST /emed/order` returns "Processing" before the gate runs). |
 | `moct.prescription.released` | Node | `preclar.release_hold` when a held script is reviewed and released (or overridden) and submitted to the pharmacy. `change`: `{kind:'prescription_released', drug_rx_id, rule_id, overridden, released_by}`. |
+| `pharmacy.script.created` | ETL | **NEW 2026-08-04.** Same proc `usp_etl_emed_script_webhook_events`, second enqueue. Fires for **EVERY** script at a subscribed clinic (eMed + external Blaze/eScripts), when a `(pharmacy, script_number, fill)` key first appears **and** is recent (recency guard, see below). `change` kind `script_created`. **Distinct `data` shape** — script-centric, mirrors `GET /api/public/escript` (built by `emed.script_payload()`), NOT the visit object. |
+| `pharmacy.script.status_changed` | ETL | same proc, `OrderStatus` diff, for ALL scripts at the clinic (not just MOCT-linked). `change` kind `script_status`. |
+| `pharmacy.script.tracking_added` | ETL | same proc, tracking first-appears, for ALL scripts. `change` kind `tracking`. |
+
+**The `pharmacy.script.*` family (2026-08-04)** is polling-parity for `GET /api/public/scripts` (which already returns eMed + non-eMed scripts by `Clinic LIKE`), so it exposes no new data — poll → push. Clinic scoping mirrors that pull API's **substring** match (`e.Clinic COLLATE ... LIKE '%'+emed_user_clinic.clinic+'%'`, `LEN>=4` floor), NOT the exact match the `moct.*` path uses. `moct.script.*` semantics are unchanged (the enqueue is a separate INSERT). Subscribing to both families means eMed scripts notify twice — docs tell clinics to pick one.
 
 > **held/released documented + subscribable as of 2026-07-31** (emed_app PR #298, tag 1.0.170). Both were *emitted in code* since the Pre-Clarification Gate shipped (1.0.168) and accepted by the subscription validator, but were missing from the API docs and the **Add Webhook** UI checkboxes until #298 — so no integrator could actually subscribe. Existing subscribers must edit their webhook and tick the new boxes (new webhooks get all seven checked by default).
 
@@ -101,7 +106,13 @@ The same object is available via pull at `GET /api/public/moct/visit/:VisitId/pr
 - **Auto-disable**: a webhook flips to `is_active=0` after 20 consecutive `dead` deliveries. Surfaces as a red badge in the UI. Re-enable via Edit modal.
 - **Worker scope**: single Azure App Service instance assumed. The conditional UPDATE in `_claim_one()` is safe under future scale-out (loser hits `rowsAffected=0` and skips).
 - **Latency**: Node-emitted events deliver in <500ms (verified) thanks to `kick()`. ETL events arrive within ~5s of the proc completing.
-- **Non-MOCT scripts**: deliberately excluded from v1. They have no visit, so no polling-parity payload exists. v2 could add `moct.rx.status_changed` with a different shape if clinics ask.
+- **Non-MOCT scripts** were excluded from v1 (no visit → no visit-parity payload). **Shipped 2026-08-04 as the `pharmacy.script.*` family** instead: a script-centric `data` payload (mirrors `GET /api/public/escript`, built by `emed.script_payload()`), so no visit is needed. The detection proc `usp_etl_emed_script_webhook_events` was widened (one migration, no new tables) — see below.
+- **`pharmacy.script.*` rollout / blast control** (`emed_sql/migrations/.../2026-08-04_pharmacy_script_webhook_events.sql`):
+  - Proc gained `@created_lookback_days INT = 2` (default keeps ETL's arg-less `EXEC` working). `created` fires only for keys absent from the snapshot AND recent — anchor is `COALESCE(EffectiveDate, LastModified)`; **`EffectiveDate` is ~95% NULL on external rows** (measured on dev), so in practice the guard is "recently modified".
+  - **Onboarding a subscriber**: after they enable a `pharmacy.script.*` type, run once with `EXEC dbo.usp_etl_emed_script_webhook_events @created_lookback_days = 0` to baseline their clinic's existing scripts into `emed_script_status_snapshot` firing **zero** `created`. Normal cadence then takes over. "created" ⇒ "written since you subscribed."
+  - **R1 regression guard**: the `ROW_NUMBER()` dedup now prefers `MocTag IS NOT NULL` first, so a newly-in-scope MocTag-NULL sibling can never displace the `moct.*` winner (keeps `moct.script.*` byte-identical).
+  - **Clinic-name leak note**: substring match reaches multi-clinic on short/generic registered names (same as the `/scripts` pull API today — e.g. `test`→"Testosterone…", `Kendall`→5 practices, `Envy`→RENVY). These are staff-assigned `emed_user_clinic` values that already govern that account's `/scripts` pull reach, so webhooks grant no new access — but review such names before enabling `pharmacy.*` for the account. Audit query: any `emed_user_clinic.clinic` (LEN<6) that substring-matches >1 distinct `view_emed_full_order.Clinic`.
+  - Worker branch: `webhook_worker._deliver_one` routes `event_type` starting `pharmacy.script.` to `emed.script_payload(change.pharmacy, change.script_number, change.fill_number, row.clinic)` (defense-in-depth `can_view_rx` re-check inside). `visit_id` is NULL for these — the PHI audit line carries a `script=<pharmacy>/<num>:<fill>` ref instead.
 
 ## Verification
 
