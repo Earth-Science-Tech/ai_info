@@ -1,6 +1,7 @@
 -- rxqWorkflowLocation   (26 rows, 5 columns)
 -- Source: RXQRXCOMPOUNDSTORE (Liberty). Read-only reference DDL, synthesized from catalog metadata.
--- NOTE: mirrored into liberty_link_stage by the eMed ETL.
+-- NOTE: mirrored into liberty_link_stage by the eMed ETL (per-tenant: rxcs_/mmed_/mdvo_rxqWorkflowLocation).
+-- FULL RXCS row contents (cWorkflowLocationId -> Location mapping): ../data/rxcs-workflow-locations-and-stages.md
 CREATE TABLE [dbo].[rxqWorkflowLocation] (
     [cWorkflowLocationId] int IDENTITY NOT NULL,
     [Location] varchar(50) NULL,

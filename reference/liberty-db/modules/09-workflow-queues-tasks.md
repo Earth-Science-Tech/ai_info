@@ -144,18 +144,22 @@ These edges are inferred purely from column naming plus data-validated match rat
 
 Rows: 35 (RXCS) | Columns: 16 | PK: `cWorkflowStageId` | ETL-mirrored into liberty_link_stage: no
 
-**Purpose** — Defines the fixed set of named workflow stages (e.g. queue/bucket definitions) that a pharmacy's order/script processing pipeline moves items through (inferred). Each row is a configured stage with a display `Name`/`Description`, a `FilterString`/`FilterDate` (likely a query/filter expression used to select which items belong in the stage, inferred), flags controlling behavior (`LocationChange`, `InActive`, `IncludeOnHoldScripts`, `IncludeTransmitLater`), a `StageType` code, and an optional `StoreNumber`/`ImageId` for per-store or iconography customization. With only 35 rows and no ETL mirroring, this is a small, largely static configuration table rather than transactional data.
+> **Full RXCS contents — including every stage's `FilterString` — are in
+> [`../data/rxcs-workflow-locations-and-stages.md`](../data/rxcs-workflow-locations-and-stages.md).**
+> Not mirrored by the ETL, so this table lives only in the source Liberty DB.
+
+**Purpose** — Defines the named workbench stages/queues an order/script pipeline moves through. Captured in full 2026-08-05. Each row has a display `Name` (the pharmacy's label, e.g. "PrePay A", "Clarification A", "Auto Injector Ready"), a `WorkflowStage` (the built-in Liberty bucket it groups under), a `FilterString` (a **confirmed** grid-filter expression referencing `[WorkflowLocationId]`/`[ParentWorkflowLocationId]` (→ `rxqWorkflowLocation`), `[cQueueId]` (→ `rxqQueue`), and `[drugCustomField1..4]` (→ `rxqDrug.CustomField1..4`)), a `FilterDate` (serialized .NET-epoch date window; usually a min-date sentinel = no filter), behavior flags (`LocationChange`, `InActive`, `IncludeOnHoldScripts`, `IncludeTransmitLater`), a `StageType` code, and an `ImageId` icon. Small static config (35 rows, 7 inactive), no ETL mirror.
 
 **Columns**
 
 | Column | Type | Null | Key | Notes |
 |---|---|---|---|---|
 | cWorkflowStageId | int | NO | PK | identity |
-| Name | varchar(50) | YES | | display name of the stage |
-| WorkflowStage | varchar(50) | YES | → rxqStorePrintOptions (unconfirmed, see Relationships) | |
-| Description | varchar(250) | YES | | |
-| LastUpdatedText | varchar(50) | YES | | free-text audit note (inferred) |
-| FilterString | varchar(max) | YES | | likely a filter/query expression selecting items for this stage (inferred) |
+| Name | varchar(50) | YES | | display name of the stage (e.g. "PrePay A", "Clarification B", "RxCS RPh Check") |
+| WorkflowStage | varchar(50) | YES | | built-in Liberty stage bucket, NOT an FK; observed values: `RPhCheck`, `Count`, `Verify`, `Ready`, `NewFills`, `Refills`, `HasProblems`, `Rejection`, `All`, `Unknown` |
+| Description | varchar(250) | YES | | almost always empty (only stage 18 has "Script needs corrections") |
+| LastUpdatedText | varchar(50) | YES | | free-text audit note, e.g. "3/12/2025 4:09:27 PM by VL" |
+| FilterString | varchar(max) | YES | | **confirmed** grid-filter expression; references `[WorkflowLocationId]`/`[ParentWorkflowLocationId]`, `[cQueueId]`, `[drugCustomField1..4]`, etc. Empty for 11 stages (full text in the [data file](../data/rxcs-workflow-locations-and-stages.md)) |
 | LocationChange | bit | YES | | sampled: `false` (33), `true` (2) |
 | InActive | bit | YES | | sampled: `false` (28), `true` (7) |
 | IncludeOnHoldScripts | bit | YES | | sampled: `false` (34), `true` (1) |
@@ -179,7 +183,7 @@ Declared foreign keys: none (verified via sys.foreign_keys — Liberty declares 
 **Indexes** — none reported (indexes array empty in metadata).
 
 **Gotchas**
-- `WorkflowStage` (varchar) is distinct from the PK `cWorkflowStageId` (int) — despite the similar name, `WorkflowStage` is a separate string field whose inferred link to `rxqStorePrintOptions` shows a 0% match rate, so it is likely not a real reference to that table (or the join column guess is wrong).
+- `WorkflowStage` (varchar) is distinct from the PK `cWorkflowStageId` (int) — and, confirmed against the full contents, it is **not an FK** to `rxqStorePrintOptions` (the extractor's 0% match rate was correct). It is a fixed enum of built-in Liberty stage buckets (`RPhCheck`, `Count`, `Verify`, `Ready`, `NewFills`, `Refills`, `HasProblems`, `Rejection`, `All`, `Unknown`) that groups the custom stage.
 - `UnitDoseExport` is null for all 35 sampled rows — cannot infer its coded domain or purpose from data alone.
 - `FilterString`/`FilterDate` are unbounded/long varchar fields that likely hold query or expression logic rather than plain values — worth inspecting actual contents before relying on them programmatically.
 - No indexes exist on this table per the extract; joins against it (e.g. from `rxqWorkflowCustomStage`) would rely on the PK's implicit clustered index only.
@@ -190,35 +194,40 @@ Declared foreign keys: none (verified via sys.foreign_keys — Liberty declares 
 
 Rows (RXCS): 26 | Columns: 5 | PK: `cWorkflowLocationId` | ETL-mirrored: yes (into liberty_link_stage; all 5 columns mirrored)
 
+> **Full RXCS contents (the `cWorkflowLocationId` → `Location` mapping) are captured in
+> [`../data/rxcs-workflow-locations-and-stages.md`](../data/rxcs-workflow-locations-and-stages.md).**
+> IDs are per-tenant `IDENTITY` values — the RXCS list does **not** carry over to `mmed`/`mdvo`.
+
 **Purpose**
-Small reference/lookup table enumerating the discrete "workflow locations" (stations/queues) that a prescription order or task can be sitting at in the pharmacy's production workflow (e.g. data entry, verification, will-call, etc.) (inferred — table has no descriptive columns beyond `Location` and no sample values were captured, so exact station names are not confirmed here). `ParentWorkflowLocationId` establishes a self-referential hierarchy among locations, letting locations be grouped under a parent location (inferred, based on column name and the fact that most values match sibling `cWorkflowLocationId` values in the sampled data — see Gotchas). `ShowInDropdown` and `Intervention` are boolean flags controlling UI presentation (whether the location appears in a location-picker dropdown) and whether the location represents an "intervention" step in workflow (inferred from column names; no sample values captured to confirm semantics).
+Small reference/lookup table enumerating the discrete "workflow locations" (stations/bins) a prescription order or task can be parked at in the pharmacy's production workflow. The full RXCS set was captured 2026-08-05 — actual labels include `Will Call`, `Pharmacy Use`, `Clarifications`, `PRE PAY`, `Ready`, `Infinipharm Rejected`, `Refrigerator`, and more (see the data file). `ParentWorkflowLocationId` establishes a **confirmed self-referential hierarchy** (`-1` = no parent / top-level): only two locations have children — `50 Will Call` (→ Refrigerator/Reconstitute/Oversized Area) and `1019 Clarifications` (→ RTS/Verified Clarification/In Progress/JPV/Billing). `ShowInDropdown` toggles whether the location appears in the manual location-picker (false only for `60 Auto Assign Bin`), and `Intervention` flags an attention/intervention step (true for RTS, Olympia/IV, ETST In Progress, MA/LOT).
 
 **Columns**
 
 | Column | Type | Null | Key | Notes |
 |---|---|---|---|---|
-| `cWorkflowLocationId` | int | NO | PK | identity; sampled values include 10, 50, 60, 1000–1038 (sparse, non-contiguous IDs) |
-| `Location` | varchar(50) | YES | | free-text/label column (no sample values captured — excluded from lookups, likely treated as sensitive/free text or simply not in the small-coded-column sample set) |
-| `ParentWorkflowLocationId` | int | YES | | no declared/inferred FK; sampled values: -1 (18 rows), 1019 (5 rows), 50 (3 rows) — see Gotchas |
-| `ShowInDropdown` | bit | YES | | boolean flag; no sample values captured |
-| `Intervention` | bit | YES | | boolean flag; no sample values captured |
+| `cWorkflowLocationId` | int | NO | PK | identity; values 10, 50, 60, then the 1000-block up to 1038 (sparse, non-contiguous) |
+| `Location` | varchar(50) | YES | | station/bin label; 26 distinct values (full list in the [data file](../data/rxcs-workflow-locations-and-stages.md)). NB: `1017` is `"Pending "` with a trailing space |
+| `ParentWorkflowLocationId` | int | YES | | self-reference → `cWorkflowLocationId`; `-1` = top-level (18 rows). Children: 3 under `50` Will Call, 5 under `1019` Clarifications |
+| `ShowInDropdown` | bit | YES | | show in manual location-picker; `true` for 25/26 rows, `false` only for `60` Auto Assign Bin |
+| `Intervention` | bit | YES | | intervention/attention step; `true` for 4 rows (1027 RTS, 1032 Olympia/IV, 1035 ETST In Progress, 1037 MA/LOT) |
 
 **Relationships**
 
 Declared foreign keys: none (verified via sys.foreign_keys — Liberty declares no FK constraints).
 
-- **Outbound (inferred):** none — the extractor recorded no inferred_relationships for this table. Note `ParentWorkflowLocationId` is a strong naming/data candidate for a self-referential link to this table's own `cWorkflowLocationId` (values -1, 50, 1019 all either match sampled `cWorkflowLocationId` values or use -1 as a sentinel for "no parent"), but this was **not** validated/reported by the extractor as an edge — treat it as an unconfirmed guess only.
-- **Inbound (inferred):** none reported by the extractor for this table.
+- **Outbound (self-referential, data-confirmed):** `ParentWorkflowLocationId` → this table's own `cWorkflowLocationId`. Every non-`-1` parent value (`50`, `1019`) resolves to a real row; `-1` is the "no parent / top-level" sentinel. This was verified against the full 26-row contents (2026-08-05), not just the extractor's inference pass.
+- **Inbound (inferred):** `rxqScriptTransaction.WorkflowLocation` (int) → `cWorkflowLocationId` — the join eMed uses to decode where a script sits (naming + type consistent). In `liberty_link_stage` this is a **same-prefix** join, e.g. `rxcs_rxqScriptTransaction.WorkflowLocation → rxcs_rxqWorkflowLocation.cWorkflowLocationId`. Stage `FilterString`s in `rxqWorkflowStages` also reference these IDs via `[WorkflowLocationId]` / `[ParentWorkflowLocationId]`.
 
 **Indexes**
 
 None reported (empty index list — no explicit indexes beyond the PK constraint were captured).
 
 **Gotchas**
-- `ParentWorkflowLocationId` uses `-1` as an apparent "no parent" sentinel (18 of 26 rows) rather than NULL, despite the column being nullable — don't assume NULL means top-level and -1 means something else; both patterns may need to be treated as "root" nodes.
-- The extractor found no `inferred_relationships`/`inferred_referenced_by` edges at all for this table, even though `ParentWorkflowLocationId` is naming-suggestive of self-reference — likely because self-referential FKs to the same table's own PK weren't in scope for the inference pass. Don't read the empty edge lists as proof no relationship exists.
-- `Location` (the human-readable name) has no captured sample values in this extract, so the actual set of workflow-location names (data entry, verification, will-call, etc.) is unknown from this metadata alone.
-- IDs are sparse/non-contiguous (10, 50, 60, then 1000s), suggesting historical additions/deletions or reserved ID ranges rather than a simple sequential list.
+- **Per-tenant IDs — do NOT reuse the RXCS mapping for `mmed`/`mdvo`.** `cWorkflowLocationId` is an `IDENTITY` and each tenant runs its own Liberty DB, so the same numeric ID means different things across `rxcs`/`mmed`/`mdvo`, and new locations drift independently. The captured mapping is RXCS-only — query the tenant's own `{pfx}_rxqWorkflowLocation` for the others.
+- `ParentWorkflowLocationId` uses `-1` (not NULL) as the "no parent" sentinel (18 of 26 rows) despite being nullable — treat `-1` as root, same as NULL.
+- `Location` values include trailing whitespace in at least one row (`1017` = `"Pending "`) and duplicate-ish labels across the hierarchy (`1031` "In Progress" vs `1035` "ETST In Progress") — `RTRIM` and don't match on label alone.
+- The prod mirror can lag the source on label renames (full-reload hourly ETL) — see the freshness note in the data file (`1035` differed at capture).
+- IDs are sparse/non-contiguous (10, 50, 60, then 1000s) — historical additions/reserved ranges, not a dense sequence.
 
 ---
 

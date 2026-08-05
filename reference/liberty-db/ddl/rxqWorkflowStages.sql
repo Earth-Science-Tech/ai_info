@@ -1,5 +1,7 @@
 -- rxqWorkflowStages   (35 rows, 16 columns)
 -- Source: RXQRXCOMPOUNDSTORE (Liberty). Read-only reference DDL, synthesized from catalog metadata.
+-- NOT mirrored into liberty_link_stage (source-only).
+-- FULL RXCS row contents (incl. each stage's FilterString): ../data/rxcs-workflow-locations-and-stages.md
 CREATE TABLE [dbo].[rxqWorkflowStages] (
     [cWorkflowStageId] int IDENTITY NOT NULL,
     [Name] varchar(50) NULL,

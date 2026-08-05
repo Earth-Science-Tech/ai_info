@@ -65,6 +65,7 @@ Everything else exists in Liberty but is **not** in `liberty_link_stage`. A feat
 - **Need the exact DDL?** [ddl/&lt;Table&gt;.sql](ddl/) — synthesized `CREATE TABLE` + indexes per table.
 - **Understanding a domain?** Read the relevant `modules/*.md`.
 - **Row counts / relationship graph at a glance?** [catalog/catalog_summary.json](catalog/catalog_summary.json).
+- **Need the actual rows of a small config/lookup table** (e.g. an ID → label mapping)? [`data/`](data/) — full contents of selected **non-PHI** config tables, captured from a specific tenant. Currently: [`data/rxcs-workflow-locations-and-stages.md`](data/rxcs-workflow-locations-and-stages.md) (RXCS `rxqWorkflowLocation` + `rxqWorkflowStages`). ⚠️ These IDs are per-tenant `IDENTITY` values — an RXCS mapping does not carry over to `mmed`/`mdvo`.
 
 ---
 
