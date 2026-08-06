@@ -29,11 +29,16 @@ UPDATE moct_order_tracking SET tracking_sent=1, tracking_sent_date=GETDATE()
 
 ## Where it runs
 
-It is **not** a standalone deployment. It's step 6 (a subflow) of
-`run_all_etl` (`flows/emed_etl/run_all_etl_flow.py`), which is deployed as
-**Run-All-ETL-RXCS** (hourly) and **Run-All-ETL-MMED** (every 15 min). The
-subflow `peaks_update_ast` does 3 things in order: ready-for-pickup emails →
+Standalone deployments since 2026-08-06: **Peaks-Update-AST-RXCS / -MMED / -MDVO**
+(one per pharmacy, every 10 min, anchors staggered 3 min so the tenants don't hit
+the WordPress site simultaneously). Decoupled from `run_all_etl` because the send
+is an idempotent queue over `moct_order_tracking.tracking_sent=0` — it needs no
+in-flow ordering, and its external-API latency (WooCommerce/AST/Graph) used to
+inflate the main ETL's runtime (0.5–2 min typical, 41 min in the 2026-06 flood).
+The flow `peaks_update_ast` does 3 things in order: ready-for-pickup emails →
 mark picked-up orders complete → **push tracking** (the last step).
+(Before 2026-08-06 it ran as step 6 of `run_all_etl` inside the Run-All-ETL-*
+deployments — the coupling that caused the 2026-05/06 outage below.)
 
 **Why an email step here (two fulfillment paths):** steps 1–2 handle **in-store
 pickup** orders (`OrderStatus='Ready'`, no shipping address, `shipping_total=0`).

@@ -37,7 +37,13 @@ emed_etl runs four pipeline families on Prefect (`prefect.yaml`):
 **Key flows:**
 - `flows/emed_etl/liberty_run_etl_flow.py` — Transfer a single configured table
 - `flows/emed_etl/liberty_etl_config.json` — Table transfer configuration
-- `flows/emed_etl/run_all_etl_flow.py` — Combined Liberty + Peaks runner per tenant
+- `flows/emed_etl/run_all_etl_flow.py` — Per-tenant orchestrator: syncs → FullOrder proc → metadata proc → hardcopy tags → order tracking (the hard-dependency spine only)
+
+**Decoupled satellites (own deployments since 2026-08-06, no hard dependency on the spine):**
+- `Peaks-Update-AST-{RXCS,MMED,MDVO}` — AST shipment tracking / pickup push (every 10 min)
+- `Tag-Fallback-{RXCS,MMED,MDVO}` — Blaze disambiguation + note-fallback tagging (every 10 min)
+- `Vial-Extraction-{RXCS,MMED,MDVO}` — vial sizes from Receipt notes (every 15 min)
+- `Webhook-Events-ETL` — webhook diff + revive procs, tenant-agnostic (every 5 min)
 
 ## 3. Stage → Warehouse Clone
 - **Source:** `liberty_link_stage`
