@@ -73,6 +73,13 @@ emed_etl runs four pipeline families on Prefect (`prefect.yaml`):
 
 See [emed-etl/warehouse.md](../emed-etl/warehouse.md) for the full warehouse reference.
 
+## Nightly Dev-DB Clone (utility, separate from the pipeline families)
+- **Source:** `liberty_link_stage` → **Target:** `liberty_link_dev`
+- **Schedule:** Nightly 00:00 ET (`Clone-Prod-to-Dev-Database`)
+- **Mechanism:** Same elastic-query machinery as the warehouse clone (`flows/utilities/db_clone.py`); data-only — never creates, drops, or alters dev tables
+- **Behavior:** DELETE + reload every table that exists in both DBs. Dev-only tables are preserved untouched; exclusions in `clone_prod_to_dev_database_exclusions.json` (blob/log tables)
+- **Empty-source guard (added 2026-08-10):** a table that is **empty in prod but has rows on dev** is skipped, not wiped — protects seeded dev data on tables whose prod counterpart shipped ahead of the feature. Skips show in the run summary. Two edges to know: a prod table with even 1 row still fully overwrites dev, and a table legitimately emptied in prod stops syncing to dev until dev is emptied too (or the table is handled manually)
+
 ## SMS Integration (separate from the ETL families)
 - `flows/sms/sms_fetch_message_history.py` — RingCentral message history (every 5 min)
 - `flows/sms/sms_send_pending.py` — Send pending SMS messages (every 1 min)

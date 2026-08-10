@@ -38,7 +38,7 @@ The raw clone tables and dbt staging views live side-by-side in `stg`. The custo
 - Tables in `clone_prod_to_warehouse_stage_exclusions.json` are skipped.
 - Collisions (two source schemas with the same table name) are skipped — operator must rename in the warehouse or exclude one source schema.
 - Concurrency: 4 tables in parallel by default (`DEFAULT_CONCURRENCY = 4`).
-- Shares the underlying clone primitives with `clone_prod_to_dev_database.py` via `flows/utilities/db_clone.py`.
+- Shares the underlying clone primitives with `clone_prod_to_dev_database.py` via `flows/utilities/db_clone.py`. Unlike the dev clone, this flow does **not** enable the empty-source guard (`preserve_dest_on_empty_source`) — `stg` mirrors prod exactly, so a table emptied in prod also empties in the warehouse.
 
 ### DDL generator
 `flows/utilities/generate_warehouse_stg_ddl.py` emits a migration for warehouse `stg` tables based on live source metadata. Run this when a new source table needs to be added to the warehouse; commit the generated migration to `emed_sql`.

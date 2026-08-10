@@ -42,6 +42,8 @@ emed_etl/
    not go in SQL. RingSense AI insights were removed 2026-07-24 (not licensed). Permission
    model, the 90-day cliff, PHI rules + gotchas in [ringcentral-calls.md](ringcentral-calls.md).
 
+7. **Prod → Dev DB clone** — `flows/emed_etl/clone_prod_to_dev_database.py` reloads `liberty_link_dev` nightly (00:00 ET) from `liberty_link_stage` via the same elastic-query machinery as #3. Data-only (never DDL); dev-only and excluded tables untouched. **Empty-source guard** (2026-08-10): a table empty in prod but with rows on dev is skipped rather than wiped, so seeded dev data survives a prod table that shipped ahead of its feature; skips surface in the run summary.
+
 See [warehouse.md](warehouse.md) for the warehouse layer in detail.
 
 ## Key Integration Points
