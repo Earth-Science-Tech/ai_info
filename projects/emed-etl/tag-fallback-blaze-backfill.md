@@ -1,4 +1,18 @@
-# Tag-Fallback: Blaze backfill incident (2026-08-07..10) and fix
+# Tag-Fallback: Blaze backfill incident (2026-08-07..11) and fix
+
+> **2026-08-11 ROOT CAUSE (supersedes the share theory below):** the hangs were
+> **catastrophic regex backtracking**, not the image share. RXCS script 377546's
+> hardcopy (`124179.pdf`) is a 4-drug Blaze batch whose 4th META tag is truncated
+> by the signature block (`{[META][MOC:][BLAZE:174058]` — no closing `}`).
+> `meta_tag._META_TAG_RAW`'s ambiguous `(?:[^{}]|\s)*?` went exponential on the
+> unclosed opener → `find_meta_blocks` CPU-pinned for hours, deterministically, on
+> that one batch (confirmed with `faulthandler` on the job server). Fixed in
+> emed_etl PR #62 (`\{\[META\][^{}]*\}` + regression test). Share reads and pypdf
+> parses were verified fast. Lessons: never put an ambiguous alternation under a
+> quantifier (ReDoS); a hang is invisible to failure-count bail-outs; a spinning
+> regex holds the GIL, so only subprocess isolation can timeout-guard it; and
+> Prefect's deployment concurrency limit leaks under hung runs (45 concurrent
+> despite limit=1 + CANCEL_NEW).
 
 ## What happened
 
