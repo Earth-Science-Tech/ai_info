@@ -52,13 +52,15 @@ deactivated on the Prefect server as an emergency stop.
 - Yield remains crosswalk-bound (~356 genuine `emed_drug_liberty_xref` rows for
   RXCS): the fix makes the backfill *finish*; it does not raise the match rate.
 
-## Rollout state (as of 2026-08-10)
+## Rollout state (SHIPPED 2026-08-11 ~02:30Z)
 
-- emed_sql migration: applied to `liberty_link_dev`, **pending for prod** (next
-  push prod). Code is column-existence guarded, so ordering is safe.
-- emed_etl PR #61: open, awaiting review. After merge: `prefect deploy -n
-  Tag-Fallback-RXCS -n Tag-Fallback-MMED -n Tag-Fallback-MDVO` (this re-activates
-  the RXCS schedule), then supervise one run.
+- emed_sql migration: applied to **both** `liberty_link_dev` and
+  `liberty_link_stage` (`apply_migration.py --db both`, emed_sql commits 7cb2f05 +
+  151115a; file now in `migrations/applied/`).
+- emed_etl PR #61: **merged** to main (merge commit 6ae59e7).
+- `prefect deploy` run for all three Tag-Fallback deployments: concurrency_limit=1
+  + CANCEL_NEW confirmed on the server, schedules active again (RXCS had been
+  manually deactivated during the incident; the deploy re-activated it).
 - `emed_etl_flag` at incident time: `blaze_disambiguation_enabled=1`,
   `max_batches=200`, `lookback_days=3650`. With the fix, `max_batches` can go back
   up once a supervised run confirms sane per-batch cost.
