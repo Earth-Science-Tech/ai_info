@@ -64,8 +64,9 @@ Credentials in `.env` and Prefect Secret blocks (manually synced with emed_app):
 
 ## Job Servers
 
-- Rx Compound Store (table_prefix='rxcs')
+- Rx Compound Store (table_prefix='rxcs') — two workers since 2026-08-11 (`rxcs-jobserver-worker`, `rxcs-jobserver-worker2`)
 - Mister Meds (table_prefix='mmed')
 - Meduvo (table_prefix='mdvo') — live since 2026-08-03 (Run-All-ETL-MDVO every 15 min, rxqNotes-MDVO every 60 sec)
 - Liberty ETL: every 15–60 minutes per table (see `prefect.yaml`)
 - Warehouse clone: nightly 01:00 ET, dbt build at 02:00 ET
+- **Bringing up a new worker host:** see [worker-provisioning.md](worker-provisioning.md) — git + ODBC Driver 17 are hard prerequisites; a half-provisioned worker steals and fails runs from healthy workers on the same queue. All flow credentials come from Prefect Secret blocks (no host env vars) since 2026-08-11.
