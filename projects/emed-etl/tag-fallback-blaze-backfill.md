@@ -66,6 +66,20 @@ deactivated on the Prefect server as an emergency stop.
 - Yield remains crosswalk-bound (~356 genuine `emed_drug_liberty_xref` rows for
   RXCS): the fix makes the backfill *finish*; it does not raise the match rate.
 
+## Resolution (2026-08-11 12:53Z — incident closed)
+
+PR #62 (regex fix) merged 12:49Z, `blaze_disambiguation_enabled` back to `1` at
+12:50Z. First post-fix run (`tall-wildcat`, 12:51Z): **200 batches in 2.2 min,
+0 failures, 128 batches fully resolved, 292 scripts auto tag_blaze-stamped** —
+the backfill's first real yield ever (all prior runs wrote 0). It sailed past the
+poison batch (ScriptNumber 377546) in under a second. Backlog ~12.6k eligible
+batches drains at 200/10-min run (~10.5 h); raise `blaze_disambiguation_max_batches`
+(flag) to drain faster — at the measured ~0.6 s/batch, 400 ≈ 4 min/run is safe.
+Open follow-ups: subprocess-isolated PDF parse w/ timeout (guards future
+pathological inputs; thread timeouts can't — regex holds the GIL); Prefect
+deployment-concurrency leak under hung runs; ETL session observed logging in as
+`liberty_link_dev_admin` instead of `emed_etl` (least-privilege violation).
+
 ## Rollout state (SHIPPED 2026-08-11 ~02:30Z)
 
 - emed_sql migration: applied to **both** `liberty_link_dev` and
