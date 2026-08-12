@@ -7,7 +7,8 @@ branches:
   - emed_app: feat/per-page-permissions
 developers:
   - nicholas-cardell
-prs: []
+prs:
+  - "emed_app#397 (feat/per-page-permissions -> main, open for review)"
 tags: []
 created: 2026-08-08
 updated: 2026-08-12
