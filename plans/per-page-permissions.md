@@ -20,7 +20,10 @@ related: []
 - 2026-08-08 — Not Started → In-Progress (nicholas-cardell) — framework + registry built.
 - 2026-08-12 — In-Progress → Completed in Dev (nicholas-cardell) — full system on `feat/per-page-permissions`,
   merged to `dev` (live on the Azure dev slot); enforcement default flipped to **fail-closed**; CI gate +
-  release-skill checks added. Pending: developer review/test, then `feat/* → main` promotion + prod rollout.
+  release-skill checks added. A 4-lens adversarial review then caught two route-level breaks under enforce
+  (EO participant detail = BLOCKER, `/issues/new` = MED) — both fixed with a `page_gate` carve-out; the
+  `View_App` backfill was scoped to page-driven roles. Pending: developer review/test, then
+  `feat/* → main` promotion + prod rollout.
 
 ## Summary
 
@@ -77,15 +80,35 @@ empty-heading suppression · access-gate keys off the Read flag, edit-gate off `
 
 ## Safety verification (default → enforce)
 
+Verified deterministically **and** by a 4-lens adversarial workflow (lockout / public-machine-surface /
+View_App-invariant / login-only-tightening):
+
 - **0 built-in-role lockouts:** all 19 built-in roles resolve `View_App=1`; every page a role derives is
-  reachable under enforce. Deterministic check over `Get_Roles() × PAGES`.
-- **Custom-role lockout closed** by the `View_App` invariant above.
-- **Full unit suite green** (2126 tests) with the enforce default; the per-page subset (write_gate,
-  permission_catalog, custom_roles, page_catalog, page_requires, page_registry, permissions, role_preview,
-  impersonation, auth) is 334/334.
-- **Known intentional tightening (R3):** enforce closes direct-URL access to registered pages whose route
-  guard is weaker than their readGate (login-only GETs). This is the point of per-page access control; it
-  does not remove any built-in role's *sidebar* pages. Validate per env in `report` mode first.
+  reachable under enforce. Deterministic check over `Get_Roles() × PAGES`, independently re-derived by the
+  lockout lens.
+- **Public / machine surface SAFE:** both gates skip any request with no `session.user`, so
+  unauthenticated, public-render, webhook, and Basic-auth API routes are untouched; `/api-documentation`
+  (the one registered public page) is excluded.
+- **Custom-role lockout closed** by the `View_App` invariant — **scoped to page-DRIVEN roles** (an admin
+  who ticked a page), so it does NOT silently re-activate a legacy capability role that was disabled by
+  clearing `View_App`.
+- **Two route-level breaks found by the workflow and FIXED** (a new `page_gate` `excludePaths` carve-out —
+  a sub-route whose own guard is authoritative is exempted without un-gating its parent list page):
+  - **HIGH (BLOCKER, fixed):** `/eo/orders/:id` — EO **participants** (assigned a subtask, no
+    `View_Menu_EO`) view an order via `page_order_scope` + template gate; enforce would 401 them because
+    page_gate prefix-matched the detail to the `/eo/orders` list (`View_Menu_EO`). Now exempted (`/eo/orders/`).
+  - **MED (fixed):** `/issues/new` (guard `Submit_Issue`) was prefix-swept under `/issues`
+    (`View_Menu_Issues`). Now exempted. (The topbar report-issue modal was already unaffected.)
+- **LOW (validate in report):** `/billing/invoice/:id` tightens from login-only to `View_Menu_Billing`;
+  confirm no non-Billing role deep-links to it during report-mode validation.
+- **Full unit suite green** with the enforce default; per-page + gate + EO subset is 342/342. (One
+  unrelated pre-existing test, `api_users_test_mode.test.js`, fails only until `origin/main` is merged
+  forward — main already allowlists `rx_resubmit.js`.)
+- **Known intentional tightening (R3):** enforce otherwise closes direct-URL access to registered pages
+  whose route guard is weaker than their readGate (login-only GETs). This is the point of per-page access
+  control; it removes no built-in role's *sidebar* pages (readGate is verbatim). It **improves** security
+  in places — e.g. `/database` and `/users` were reachable by any logged-in user by direct URL and are now
+  gated. Full tightening enumeration is in the PR. Validate per env in `report` mode first.
 
 ## Guardrails so new pages stay modular (no manual audits)
 
