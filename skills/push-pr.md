@@ -350,6 +350,13 @@ node scripts/close_resolved_issues.js <prev-tag>..HEAD    # closes emed_issue ro
 
 If it errors, surface it but don't treat the release as failed.
 
+### 5.5 Update shared plan records (if any)
+
+For each shipped PR that maps to a feature tracked in [`ai_info/plans/`](../plans/README.md), set its
+`ai_info/plans/<slug>.md` **status → `Completed in Production`**, add the release tag, append a history
+line, and update the index — then commit to `ai_info` `main` (staging only those files). See
+[plan-tracking.md](plan-tracking.md).
+
 ---
 
 ## Phase 6 — Report

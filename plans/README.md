@@ -1,0 +1,15 @@
+# eMed Plans & Features — Index
+
+The team-shared record of every feature/project and **where it is in the pipeline**. Any engineer's
+Claude reads this to see what's in flight and to **take over** work. One file per feature in this folder
+(`<slug>.md`, named for its `feat/<slug>` branch). Add/maintain a row here whenever you create a plan or
+change its status. Full rules: [`skills/plan-tracking.md`](../skills/plan-tracking.md).
+
+**Status legend:** `Not Started` → `In-Progress` → `Completed in Dev` → `Completed in Production`
+(plus `On Hold`, `Abandoned` when needed).
+
+| Status | Plan | Project | Branch | Developers | Updated |
+|--------|------|---------|--------|------------|---------|
+| Completed in Dev | [Per-Page Read/Write Permissions](per-page-permissions.md) | emed_app | `feat/per-page-permissions` | Nicholas Cardell | 2026-08-12 |
+
+<!-- Add newest/most-active plans near the top. Keep each row to one line. -->

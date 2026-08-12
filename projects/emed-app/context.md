@@ -6,6 +6,9 @@
 - **Repo:** https://github.com/Earth-Science-Tech/eMed
 - **Branch:** `main` (default branch; `dev` is the integration branch for feature work)
 - **Deploy:** Azure App Service via git tag CI/CD
+- **In-flight features / plans:** [`ai_info/plans/`](../../plans/README.md) — the shared, status-tracked
+  record of every feature and where it is in the pipeline (Not Started → In-Progress → Completed in Dev →
+  Completed in Production). Read it before starting or taking over work; see [`skills/plan-tracking.md`](../../skills/plan-tracking.md).
 
 ## Server Architecture
 

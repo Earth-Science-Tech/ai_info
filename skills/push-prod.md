@@ -248,6 +248,14 @@ Then **hand-edit the drafted entry** in `data/changelog.json` using your Phase 1
 The entry is picked up by the normal Step 1 commit. (One-time history seed already done via
 `node scripts/changelog.js backfill`; you don't re-run it.)
 
+### Step 0.6 — Update the feature's shared plan record (if one exists)
+
+If this release ships a feature tracked in [`ai_info/plans/`](../plans/README.md), set its
+`ai_info/plans/<slug>.md` **status → `Completed in Production`**, add the release tag to `tags:`, append a
+`Status & history` line, and update the index row (`plans/README.md`). Commit to `ai_info` `main`
+(staging only those files). See [plan-tracking.md](plan-tracking.md). Skip if the release maps to no
+tracked plan.
+
 **This is ENFORCED, not optional.** The production deploy (`.github/workflows/deploy-azure.yml`) runs
 `node scripts/check_changelog_entry.js <tag>` before it deploys and **hard-fails the deploy if
 `data/changelog.json` has no entry for the version being released**. So a tag literally cannot reach
