@@ -70,6 +70,16 @@ ETL scripts in emed_etl. Schema-extraction scripts moved to `emed_sql/python/` (
 
 **Roles** (`server/permissions.js`): `Admin`, `SuperUser`, `MOCT`, `Peaks`, `Prescriber`, `Clarifications`, `ExternalRep`, `Billing`, `BillingPeaks`, `BillingMOCT`, `API`, `ClinicUser`, `Shipping`, `API_POP`, `ITSupport`.
 
+**Per-page permissions (`View_Page_*` / `Write_Page_*`):** eMed is fully modular by page — every sidebar
+page has its own Read + Write permission, so admins build custom roles page-by-page (User Management →
+Roles); built-in roles *derive* their per-page flags from their code perms (zero behavior change). Registry
+is `server/page_catalog.js` (PAGES / REQUIRES / WRITE_CAP / WRITE_ROUTES); enforcement is two additive,
+dark-by-default middlewares (`auth.page_gate` read + `auth.write_gate` write, `PAGE_GATING_MODE` /
+`WRITE_GATING_MODE` = off|report|enforce). **When you add a new sidebar page you MUST register it** or it's
+invisible to the role system and custom roles 500 on it. Full model + add-a-page checklist +
+gotchas (read-completeness, money/PHI granularity, single-capability pages, empty-heading suppression):
+[per-page-permissions.md](per-page-permissions.md) — also surfaced as the `add-page` skill.
+
 **Finance/audit roles:**
 - `BillingPeaks` — read-only finance role with Billing + Peaks sidebars visible (Peaks tagged `(read-only)`). No `Write_*` flags except `Write_Liberty` for the "Move to Paid" workflow.
 - `BillingMOCT` — read-only finance/audit role for CFO + assistant. Same shape as `BillingPeaks` but additionally exposes the **MOCT** sidebar section so all three systems (Billing, Peaks, MOCT) can be reviewed end-to-end. Both Peaks and MOCT headers are tagged `(read-only)`. SMS Messages link is hidden (matches the `BillingPeaks` pattern); `View_SMS=1` is still granted so embedded SMS modals on visit/script pages keep working.
