@@ -299,6 +299,17 @@ git push origin main
 
 Run from **`emed_app/`**. `main` is now clean and carries the merged PRs.
 
+### 5.0 — Per-page permission registry check (before tagging)
+
+Any of the merged PRs may have added a sidebar page. eMed is fully modular by permission — every sidebar page needs its own `View_Page_*`/`Write_Page_*` in `server/page_catalog.js`, or custom roles 500 / "no permission" on it. Verify the merged-together `main` state is still complete + neutral before cutting the tag:
+
+```bash
+cd emed_app
+node scripts/check_page_registry.js     # git-only, DB-free; exits non-zero if incomplete/non-neutral
+```
+
+CI already ran this per-PR (`tests/unit/server/page_registry.test.js`), so it's normally green — but re-run on the merged `main` to catch an interaction between two PRs (e.g. one adds a sidebar link, another edits the registry). **If it FAILS**, follow the **add-page skill** (`ai_info/skills/add-page.md`) to register the missing page (commit the fix to `main` before tagging), or HOLD the offending PR out of the batch. Do not tag while it's red.
+
 ### 5.1 Determine the version
 
 Explicit `as x.x.x` if given; else `git describe --tags --abbrev=0` with the patch bumped. **No `v` prefix** —

@@ -61,6 +61,19 @@ Reject the push if:
 - A new table/view/procedure exists without a corresponding `GRANT`
 - `check_migration_drift.py` reports **UNCOVERED** drift (dev-ahead schema that no `pending/` or `wip/` migration covers — it exits non-zero). This is the "missing migration" case. **HARD STOP: do not proceed, and do NOT reverse-engineer the DDL by hand.** Recover it deterministically instead: run `python python/check_migration_drift.py --scaffold`, review each generated draft in `migrations/pending/`, confirm it's idempotent by applying to dev (`python python/apply_migration.py migrations/pending/<file>.sql`), commit the migration to emed_sql, then re-run push prod. (Drift the tool classifies as `wip`-parked or prod-ahead is NOT a reject — that's intentional on-hold work / a prod change not yet backported to dev.)
 
+### Step 1.6 — Per-page permission registry check (always run if `emed_app/` changed)
+
+eMed is **fully modular by permission**: every sidebar page has its own `View_Page_*` (Read) and, unless read-only, `Write_Page_*` (Write) flag, all defined in `emed_app/server/page_catalog.js`. A page that ships in the sidebar **without** being registered is invisible to the role system and makes custom roles 500 / "no permission" on it. This check is the safety net that catches exactly that.
+
+```bash
+cd ../emed_app                          # adjust path as needed
+node scripts/check_page_registry.js     # exits non-zero if the registry is incomplete or non-neutral
+```
+
+It is git-only + DB-free (uses code-defined roles), so it never blocks a deploy for infra reasons. It verifies: (1) every sidebar nav-link points at a registered page; (2) **write-gate neutrality** — no built-in role is newly denied a write it can do today; (3) no `WRITE_ROUTES` entry references a non-existent / read-only page; (4) every flag has a tooltip. The same invariants run in CI on every PR (`tests/unit/server/page_registry.test.js`), so this is normally already green — but re-run it here because push-prod can ship a `dev`-batch or hotfix that never went through a PR.
+
+**If it FAILS:** a new page needs registering. Do **not** hand-wave it — follow the **add-page skill** (`ai_info/skills/add-page.md`): register the page in `page_catalog.js` (PAGES + REQUIRES + WRITE_CAP + WRITE_ROUTES) and gate its sidebar link on `pg('Key')`. If a flagged link is genuinely not a page (auth/self-service), add it to `SIDEBAR_EXCLUDE` in the checker with a one-line reason. Re-run until green. Set the Step 3 finding to `[FAIL]` and **do not push** until it passes. If `emed_app/` has no page/sidebar/permission changes, it still passes in ~1s — set the finding to `[PASS]`.
+
 ### Step 2 — Run the ETST checklist on the diff
 
 Apply the same categories used in `skills/review-pr.md`, but to the local working state vs. last released tag.
@@ -122,6 +135,7 @@ Use exactly this format:
 - [PASS|WARN|FAIL] Security — <one-line note>
 - [PASS|WARN|FAIL] SQL Safety — <note or "N/A — no SQL changes">
 - [PASS|WARN|FAIL] SQL Drift — <files in dev/ not in prod/, pending migrations, or "N/A">
+- [PASS|WARN|FAIL] Per-page perms — <registry check result: N pages/routes neutral, or "N/A — no page/sidebar/permission change">
 - [PASS|WARN|FAIL] Naming — <note>
 - [PASS|WARN|FAIL] Code Quality — <note>
 - [PASS|WARN|FAIL] Documentation — <note>
