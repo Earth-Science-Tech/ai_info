@@ -43,6 +43,15 @@ Do ALL of these in `emed_app`, then verify.
    `fetch('/api/…')` and read each endpoint's `auth.perm(...)`. If a needed flag is a **broad
    `View_Menu_<other-section>` flag**, DON'T add it here (it would light up that other section) — instead
    **relax the shared endpoint** to `auth.perm_any([...])` to also accept your page's flag (additive).
+   - ⚠ **Clinic-filtered data → `View_All_Clinics` (the gotcha that bit eMed Orders, fixed 1.0.202).**
+     If a read endpoint runs its rows through **`auth.filter_by_clinic(...)`** (grep the endpoint), add
+     **`View_All_Clinics`** to REQUIRES. `filter_by_clinic` returns `[]` for a role that is *neither*
+     clinic-scoped *nor* holds `View_All_Clinics` — its own comment assumes "global roles carry
+     View_All_Clinics," which every built-in global role does, but a **custom** role built by ticking just
+     the page's Read does NOT. Symptom: the page shows a **global count but ZERO rows** ("No … match").
+     Built-in roles are unaffected (they derive from `readGate`), so this only ever bites custom roles.
+     Endpoints that clinic-scope via **SQL `is_clinic_scoped` only** (no `filter_by_clinic`) do NOT need
+     this — a non-scoped role gets no SQL narrowing and sees all rows.
 
 4. **`WRITE_CAP[YourPage]`** — `['<WriteCap>']` if the page has a general Write toggle (skip for read-only
    / money-only pages).
