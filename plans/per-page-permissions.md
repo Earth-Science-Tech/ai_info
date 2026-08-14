@@ -134,10 +134,13 @@ fix-forward any reported page — cheaper than manually testing every page. feat
 Forward-merged `origin/main` into feat (feat is now current with prod; PR #397 is a clean promotion; the
 old rx_resubmit tripwire cleared). The merge revealed **3 features that shipped to prod while this branch
 was in dev, all unregistered**: CRM Scheduling (1), Ops (8), Zoolzy (11). **Registered all 19:** Ops +
-Scheduling brought from the dev registration; **Zoolzy registered READ-ONLY** (reads gate
-`View_Menu_Zoolzy`, settings `Admin_Zoolzy` — verbatim from the route guards; Zoolzy already has a clean
-read/write flag split so its `Write_Zoolzy`/`Write_Zoolzy_Billing`/`Admin_Zoolzy` stay first-class — per-page
-Zoolzy *write* is a follow-up for the Zoolzy author). `/ops/my-forms` → `SIDEBAR_EXCLUDE`. Also **hid 3 dead
+Scheduling brought from the dev registration; **Zoolzy fully registered** (reads gate `View_Menu_Zoolzy`,
+settings `Admin_Zoolzy` — verbatim from the route guards). **Per-page Zoolzy WRITE done** (2026-08-14):
+write blocks + `WRITE_CAP` on the 9 writable pages (`Write_Zoolzy` for Vendors/Customers/Applications/PO/
+Inventory/Counts; `Write_Zoolzy_Billing` for Products/PriceLists/Invoices) + 54 `WRITE_ROUTES`. The 5
+`Admin_Zoolzy` actions (config, app/invoice templates, invoice void, invoice-design) stay UNMAPPED/granular
+like money-PHI actions. Compliance + Settings read-only. Adversarial review of the write map: both lenses
+SAFE, 0 findings (every guard == route guard, no matcher collision, no missed/stale entry). `/ops/my-forms` → `SIDEBAR_EXCLUDE`. Also **hid 3 dead
 flags** (`View_Users`/`Write_POP`/`Write_Inventory` — no enforcement anywhere) from the editor's Advanced group.
 **112 pages, 286 write routes, 19 roles neutral, 0 lockouts; full suite 3405/3405; 4-lens adversarial review
 all SAFE** (registration-parity: every readGate == its route guard exactly; zoolzy read can't leak write;
