@@ -11,7 +11,7 @@ prs:
   - "emed_app#397 (feat/per-page-permissions -> main, open for review)"
 tags: []
 created: 2026-08-08
-updated: 2026-08-12
+updated: 2026-08-13
 related: []
 ---
 
@@ -129,15 +129,20 @@ ahead of the gates) re-resolves any stale session in place first, so **enforce-o
 an active session** (no re-login). Decision: **ship straight to prod with enforce** (the default) and
 fix-forward any reported page — cheaper than manually testing every page. feat `9cc493d`, on dev + #397.
 
-## Landmine — Zoolzy pages unregistered (found by the CI checker 2026-08-13)
+## Prod-parity + registration RESOLVED (2026-08-13)
 
-The registry checker caught that **Zoolzy** (12 sidebar pages, `/zoolzy/*`, on `main`) shipped without
-per-page registration, plus `/ops/my-forms` (self-service, belongs in `SIDEBAR_EXCLUDE`). **Not a
-functional go-live blocker** — unregistered pages fall through to their own `View_Menu_Zoolzy` guard under
-enforce (safe, neutral). But once #397 lands the checker on `main`, `main`'s unit-test CI goes red until
-Zoolzy is registered (advisory check, does not block deploy). Zoolzy is cleanly gated
-(`View_Menu_Zoolzy` reads, `Admin_Zoolzy` settings) so registration is mechanical — do it in #397 (so it
-lands with the checker) or as a fast follow-up.
+Forward-merged `origin/main` into feat (feat is now current with prod; PR #397 is a clean promotion; the
+old rx_resubmit tripwire cleared). The merge revealed **3 features that shipped to prod while this branch
+was in dev, all unregistered**: CRM Scheduling (1), Ops (8), Zoolzy (11). **Registered all 19:** Ops +
+Scheduling brought from the dev registration; **Zoolzy registered READ-ONLY** (reads gate
+`View_Menu_Zoolzy`, settings `Admin_Zoolzy` — verbatim from the route guards; Zoolzy already has a clean
+read/write flag split so its `Write_Zoolzy`/`Write_Zoolzy_Billing`/`Admin_Zoolzy` stay first-class — per-page
+Zoolzy *write* is a follow-up for the Zoolzy author). `/ops/my-forms` → `SIDEBAR_EXCLUDE`. Also **hid 3 dead
+flags** (`View_Users`/`Write_POP`/`Write_Inventory` — no enforcement anywhere) from the editor's Advanced group.
+**112 pages, 286 write routes, 19 roles neutral, 0 lockouts; full suite 3405/3405; 4-lens adversarial review
+all SAFE** (registration-parity: every readGate == its route guard exactly; zoolzy read can't leak write;
+merge-neutrality: security files byte-identical/clean). Non-blocking notes: SuperUser reaches CRM-Scheduling
+admin (pre-existing on main, neutral — eyeball intent); per-page Zoolzy write is a follow-up.
 
 ## Rollout / remaining
 
