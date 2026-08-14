@@ -1,23 +1,29 @@
 ---
 title: Per-Page Read/Write Permissions (View_Page_* / Write_Page_*)
 slug: per-page-permissions
-status: Completed in Dev
+status: Completed in Production
 project: emed_app
 branches:
   - emed_app: feat/per-page-permissions
 developers:
   - nicholas-cardell
 prs:
-  - "emed_app#397 (feat/per-page-permissions -> main, open for review)"
-tags: []
+  - "emed_app#397 (feat/per-page-permissions -> main, MERGED)"
+tags:
+  - "1.0.201"
 created: 2026-08-08
-updated: 2026-08-13
+updated: 2026-08-14
 related: []
 ---
 
 # Per-Page Read/Write Permissions
 
 ## Status & history
+- 2026-08-14 — Completed in Dev → **Completed in Production** (nicholas-cardell) — **SHIPPED PROD as
+  1.0.201** (PR #397 merged to main + tagged; Azure deploy green). Added per-page Zoolzy WRITE (54 routes),
+  hid 3 dead flags, forward-merged main. Final go-live audit: **0 neutrality violations** across all 19
+  built-in roles (identical read+write access under enforce); custom roles lockout-safe. Code-only, no
+  schema. Enforce is the default; `auth.refresh_stale_perms` upgrades active sessions on deploy.
 - 2026-08-08 — Not Started → In-Progress (nicholas-cardell) — framework + registry built.
 - 2026-08-12 — In-Progress → Completed in Dev (nicholas-cardell) — full system on `feat/per-page-permissions`,
   merged to `dev` (live on the Azure dev slot); enforcement default flipped to **fail-closed**; CI gate +

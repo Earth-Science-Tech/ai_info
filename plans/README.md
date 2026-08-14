@@ -11,6 +11,6 @@ change its status. Full rules: [`skills/plan-tracking.md`](../skills/plan-tracki
 | Status | Plan | Project | Branch | Developers | Updated |
 |--------|------|---------|--------|------------|---------|
 | Completed in Production | [eMed Orders Pharmacy Filter + Task Date-Sort Fix](emed-orders-pharmacy-and-task-sort.md) | multi | `feat/emed-orders-pharmacy-and-task-sort` | Nicholas Cardell | 2026-08-12 |
-| Completed in Dev | [Per-Page Read/Write Permissions](per-page-permissions.md) | emed_app | `feat/per-page-permissions` | Nicholas Cardell | 2026-08-12 |
+| Completed in Production | [Per-Page Read/Write Permissions](per-page-permissions.md) | emed_app | `feat/per-page-permissions` (1.0.201) | Nicholas Cardell | 2026-08-14 |
 
 <!-- Add newest/most-active plans near the top. Keep each row to one line. -->
