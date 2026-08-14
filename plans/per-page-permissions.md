@@ -120,6 +120,25 @@ View_App-invariant / login-only-tightening):
 - **Release gate:** wired into `push-prod` (Step 1.6) and `push-pr` (Phase 5.0) pre-flight.
 - **Author guidance:** `ai_info/skills/add-page.md` + `ai_info/projects/emed-app/per-page-permissions.md`.
 
+## Deploy-safety hardening (Step A, 2026-08-13)
+
+The gates are mounted globally and read the session perm **before** the per-route `auth.login`
+rebuild — so a session created before the `PERM_SCHEMA_VERSION` bump would, under enforce, be
+401/403'd on its first post-deploy request. `auth.refresh_stale_perms` (a global middleware mounted
+ahead of the gates) re-resolves any stale session in place first, so **enforce-on-deploy never locks out
+an active session** (no re-login). Decision: **ship straight to prod with enforce** (the default) and
+fix-forward any reported page — cheaper than manually testing every page. feat `9cc493d`, on dev + #397.
+
+## Landmine — Zoolzy pages unregistered (found by the CI checker 2026-08-13)
+
+The registry checker caught that **Zoolzy** (12 sidebar pages, `/zoolzy/*`, on `main`) shipped without
+per-page registration, plus `/ops/my-forms` (self-service, belongs in `SIDEBAR_EXCLUDE`). **Not a
+functional go-live blocker** — unregistered pages fall through to their own `View_Menu_Zoolzy` guard under
+enforce (safe, neutral). But once #397 lands the checker on `main`, `main`'s unit-test CI goes red until
+Zoolzy is registered (advisory check, does not block deploy). Zoolzy is cleanly gated
+(`View_Menu_Zoolzy` reads, `Admin_Zoolzy` settings) so registration is mechanical — do it in #397 (so it
+lands with the checker) or as a fast follow-up.
+
 ## Rollout / remaining
 
 1. **Developer review + test** on the dev slot (this PR). Enforce is now the default there, so the reviewer
