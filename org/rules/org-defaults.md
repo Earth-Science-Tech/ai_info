@@ -6,6 +6,9 @@ These conventions apply to all Earth Science Tech projects unless a project expl
      Every project's CLAUDE.md imports this file, so these nested @imports propagate to all. -->
 @branch-and-database-gates.md
 @../../team/roster.md
+<!-- The "share plan with <name>" skill — nested here so it loads for every developer's Claude in
+     all three repos (its emails come from the roster imported just above). -->
+@../../skills/share-plan.md
 
 ## Key shared references
 

@@ -110,5 +110,8 @@ the history survives.
 ## Applies to
 
 - All eMed repos. The plan record is repo-agnostic (`project: multi` when it spans repos).
+- To email a plan to a specific teammate (hand-off / review), use [share-plan.md](share-plan.md)
+  ("share plan with &lt;name&gt;").
 - Related: [push-prod.md](push-prod.md), [push-pr.md](push-pr.md) (status → Completed in Production),
-  [open-pr.md](open-pr.md), [`org/rules/branch-and-database-gates.md`](../org/rules/branch-and-database-gates.md).
+  [open-pr.md](open-pr.md), [share-plan.md](share-plan.md),
+  [`org/rules/branch-and-database-gates.md`](../org/rules/branch-and-database-gates.md).
