@@ -115,3 +115,7 @@ The only things that change are where scope is **edited** and a `recompute_user_
 ## Status & history
 - 2026-08-15 — Not Started → In-Progress (nicholas-cardell). Phase 1 built + applied to dev.
 - 2026-08-15 — Phase 1.5 safe cleanup applied to dev (5 merges + 2 variants); MERGE 5→0, FACILITY 40→45.
+- 2026-08-15 — Phase 1.5 round 2 applied to dev (Apprize/TRIM FITT variants + "Apprize TRIM FITT" group
+  + 2 new facilities). **All 60 clinic-scoped users now scoped (47 facility, 13 group); 0 unmapped, no
+  gap.** Remaining curation = renaming the other 11 provisional groups + confirming the 4 small
+  auto-`affiliated` groups → Phase 3 UI.
