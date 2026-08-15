@@ -106,9 +106,21 @@ The only things that change are where scope is **edited** and a `recompute_user_
 - **Phase 2 — resolver + recompute + shadow:** `recompute_user_scope()` regenerates `emed_user.clinics`
   (+ `emed_user_clinic`) from the effective facility set; shadow-diff the derived vs current `clinics`
   per user until clean. Still no read-path change.
-- **Phase 3 — flip the editing UI:** a Groups manager on the Facilities page + a facility/group **scope
-  picker** replacing the pipe-delimited inputs on all 4 editors above; writes hit `scope_*` and trigger
-  recompute. Move API `clinic_source` 'name' → derived clinics. Move migration `wip/ → pending/` at PR.
+- **Phase 3 — flip the editing UI.** Built on `feat/patient-portal-secure-messaging` (consolidated there
+  because that branch holds the facilities.ejs Users card + editor cards; `feat/facility-scope-groups`
+  was merged in).
+  - **Part 1 — Groups manager. DONE on dev 2026-08-15.** `facilities.js` group CRUD + `set_user_scope` +
+    `recompute_user_scope` (regenerates `emed_user.clinics`, syncs `emed_user_clinic`) + `recompute_group`;
+    `/api/facilities/groups*` routes (Write_Facilities; read also Write_API_Users). "Facility Groups"
+    button on `/admin/facilities` → two-pane manager (list w/ type + member/user counts, create/rename/
+    retype/describe, add/remove members via typeahead, delete-blocked-while-scoped, scoped-users list).
+    Editing membership recomputes scoped users' clinics immediately (verified on the Valhalla account).
+    **This is the surface for renaming the 11 remaining provisional groups + confirming the small ones.**
+  - **Part 2 — scope picker (TODO):** replace the pipe/chip/datalist clinic inputs on the 4 editors
+    (`emed/users.ejs`, `moct/api-users.ejs`, `prescriber/manage-prescribers.ejs`, the facilities Users
+    card) with a facility XOR group picker; wire `scope_*` into `POST /api/users` `/api/api-users`
+    `/api/prescriber-users` → `set_user_scope`. Move API `clinic_source` 'name' → derived clinics. Move
+    migration `wip/ → pending/` at PR.
 - **Phase 4 (optional) — tighten matching:** substring `.includes()` / `LIKE '%c%'` → exact-variant-set
   once coverage is proven (closes the "Valhalla" ⊂ "Valhalla Vitality Texas" hazard). Behind a flag.
 
