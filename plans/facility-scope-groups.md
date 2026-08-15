@@ -116,11 +116,16 @@ The only things that change are where scope is **edited** and a `recompute_user_
     retype/describe, add/remove members via typeahead, delete-blocked-while-scoped, scoped-users list).
     Editing membership recomputes scoped users' clinics immediately (verified on the Valhalla account).
     **This is the surface for renaming the 11 remaining provisional groups + confirming the small ones.**
-  - **Part 2 — scope picker (TODO):** replace the pipe/chip/datalist clinic inputs on the 4 editors
-    (`emed/users.ejs`, `moct/api-users.ejs`, `prescriber/manage-prescribers.ejs`, the facilities Users
-    card) with a facility XOR group picker; wire `scope_*` into `POST /api/users` `/api/api-users`
-    `/api/prescriber-users` → `set_user_scope`. Move API `clinic_source` 'name' → derived clinics. Move
-    migration `wip/ → pending/` at PR.
+  - **Part 2 — scope picker (IN PROGRESS).** Reusable `public/js/scope-picker.js` (facility-typeahead
+    XOR group-select). Backend `set_user_scope` derives `emed_user.clinics` from the chosen scope; legacy
+    `clinics` still honored when scope fields are absent (additive/back-compat). `attach_scope_labels`
+    enriches user GETs for prefill; `/api/facilities/list` opened to `Write_API_Users`.
+    - **Slice 1 DONE on dev 2026-08-15:** Groups modal restyled; `POST`/`GET /api/api-users` wired; the
+      **facilities Users card** scopes new/edited accounts to that facility (`scope_facility_id`).
+    - **TODO (slices 2–3):** wire the ScopePicker into `moct/api-users.ejs` (reuses the done
+      `/api/api-users`), `emed/users.ejs` + `POST/GET /api/users` (**ExternalRep territories → groups**),
+      `prescriber/manage-prescribers.ejs` + `/api/prescriber-users`. Then move API `clinic_source`
+      'name' → derived clinics, and migration `wip/ → pending/` at PR.
 - **Phase 4 (optional) — tighten matching:** substring `.includes()` / `LIKE '%c%'` → exact-variant-set
   once coverage is proven (closes the "Valhalla" ⊂ "Valhalla Vitality Texas" hazard). Behind a flag.
 
