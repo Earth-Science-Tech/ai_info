@@ -1,0 +1,3 @@
+# Keep shell scripts checked out with LF so they run under Git Bash on Windows
+# regardless of a machine's core.autocrlf setting (a CRLF .sh breaks bash).
+*.sh text eol=lf

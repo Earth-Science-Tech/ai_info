@@ -9,6 +9,9 @@ These conventions apply to all Earth Science Tech projects unless a project expl
 <!-- The "share plan with <name>" skill — nested here so it loads for every developer's Claude in
      all three repos (its emails come from the roster imported just above). -->
 @../../skills/share-plan.md
+<!-- The "sync everything" skill — pulls all repos + reloads skills/plans mid-session. Nested here so
+     every developer's Claude in all three repos knows it. -->
+@../../skills/sync-everything.md
 
 ## Key shared references
 
