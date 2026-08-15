@@ -1,5 +1,10 @@
 # emed_app - Node.js Application Context
 
+<!-- Auto-load the org frontend standards (data-table sort/filter/date-sort rules) into every
+     emed_app session. Only emed_app imports this context.md, so it scopes to the app that has
+     HTML tables. -->
+@../../org/standards/frontend-standards.md
+
 ## Overview
 - **Tech:** Node.js / Express / EJS / Azure SQL (mssql)
 - **Entry point:** `app.js`
@@ -35,6 +40,14 @@
 
 ### Views (`views/**/*.ejs` — 31 templates)
 Organized by feature: `billing/`, `clinic/`, `admin/`, `partials/`
+
+### UI data tables (house standard)
+
+Every HTML data table must be **fully sortable**, have **filter funnels with per-value counts** on
+categorical columns, and **sort date columns chronologically** (not alphanumerically). Build via
+`gen_datatable` (`public/js/main.js`). Full rules, reference implementations, and the date-sort
+U+202F gotcha: [`org/standards/frontend-standards.md`](../../org/standards/frontend-standards.md)
+(auto-imported at the top of this file).
 
 ## Context Files (info.claude)
 

@@ -26,7 +26,7 @@ Other projects (emed_app, emed_etl, emed_sql) import files from this repo using 
 
 | Directory | Purpose | Audience |
 |-----------|---------|----------|
-| `org/standards/` | Coding conventions, commit format, SQL rules | All projects |
+| `org/standards/` | Coding conventions, commit format, SQL rules, frontend/UI standards | All projects |
 | `org/security/` | Env handling, SQL permissions, secrets | All projects |
 | `org/infrastructure/` | Azure, CI/CD, deployment patterns | All projects |
 | `org/rules/` | Auto-loaded rule files for `.claude/rules/` | Claude Code |

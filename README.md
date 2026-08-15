@@ -7,7 +7,7 @@
 
 This repo is the shared brain for our team's Claude Code instances. It contains:
 
-- **Standards** — Coding conventions, SQL rules, security protocols
+- **Standards** — Coding conventions, SQL rules, frontend/UI standards, security protocols
 - **Skills** — Reusable task instructions (e.g., "push prod", "create table")
 - **Project Knowledge** — Architecture, patterns, and context for each project
 - **Company Info** — Subsidiary company details and integration points

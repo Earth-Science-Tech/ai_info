@@ -17,6 +17,10 @@ be granted per-page, its read/write routes aren't per-page-enforceable, and cust
 Full model + rationale: [`projects/emed-app/per-page-permissions.md`](../projects/emed-app/per-page-permissions.md).
 Read it if anything below is unclear — especially the **read-completeness rule** and the money/PHI rule.
 
+**If the page has a data table**, it must follow the house data-table standard — all columns
+sortable, filter funnels with per-value counts on categorical columns, and chronological (not
+alphanumeric) date sorting: [`org/standards/frontend-standards.md`](../org/standards/frontend-standards.md).
+
 ## What to do (the checklist)
 
 Do ALL of these in `emed_app`, then verify.
