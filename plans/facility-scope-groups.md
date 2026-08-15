@@ -95,10 +95,14 @@ The only things that change are where scope is **edited** and a `recompute_user_
     with a base-name heuristic to distinguish duplicate registrations from genuine affiliated groups.
     Refuses to write prod without `--allow-prod`. Applied on dev: single-facility scopes set, provisional
     groups created (sales for reps, affiliated for multi), MERGE + UNMAPPED left for registry cleanup.
-- **Phase 1.5 — registry cleanup (dev then prod):** merge the ~5 duplicate-facility pairs the audit
-  flagged (`facilities.merge_facility`); register/create the ~7 unmapped strings; human-rename the
-  provisional groups (→ "JPV", "Valhalla") and confirm/split the small auto-`affiliated` ones. Re-run
-  the backfill so cleaned accounts collapse to `scope_facility_id`.
+- **Phase 1.5 — registry cleanup (dev). Safe part DONE 2026-08-15** via
+  `emed_app/scripts/facility_scope_cleanup.js` (name-guarded, dry-run default, prod-refusing): merged the
+  5 duplicate pairs (Balanced Aesthetics, Drip Vitals, Fifty 410, Modern RX, Trust Clinic Rx) + registered
+  2 obvious variants (Hoedebecke Clinic → #641, RejuvaMeds → #1253); re-ran backfill → MERGE 5→0,
+  FACILITY 40→45, unmapped strings 7→5. **Remaining (needs human judgment / Phase 3 UI):** the Apprize /
+  TRIM FITT joined-clinic artifact (#124) + real "TRIM FITT LLC" (#1536); "Bloom Restorative Wellness" vs
+  #1902 "In Bloom Restorative Wellness"; new "Ocean Bloom Wellness"; renaming the 12 provisional groups
+  (→ "JPV", "Valhalla") and confirming/splitting the 4 small auto-`affiliated` groups.
 - **Phase 2 — resolver + recompute + shadow:** `recompute_user_scope()` regenerates `emed_user.clinics`
   (+ `emed_user_clinic`) from the effective facility set; shadow-diff the derived vs current `clinics`
   per user until clean. Still no read-path change.
@@ -110,3 +114,4 @@ The only things that change are where scope is **edited** and a `recompute_user_
 
 ## Status & history
 - 2026-08-15 — Not Started → In-Progress (nicholas-cardell). Phase 1 built + applied to dev.
+- 2026-08-15 — Phase 1.5 safe cleanup applied to dev (5 merges + 2 variants); MERGE 5→0, FACILITY 40→45.
