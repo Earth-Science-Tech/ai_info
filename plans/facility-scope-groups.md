@@ -1,0 +1,112 @@
+---
+title: Facility Scope Unification (FacilityGroups)
+slug: facility-scope-groups
+status: In-Progress
+project: multi
+branches:
+  - emed_app: feat/facility-scope-groups
+  - emed_sql: migrations/wip/2026-08-15_add_facility_groups_and_user_scope.sql (on main)
+developers:
+  - nicholas-cardell
+prs: []
+tags: []
+created: 2026-08-15
+updated: 2026-08-15
+related: []
+---
+
+# Facility Scope Unification (FacilityGroups)
+
+## Summary
+
+Clinic access for the four clinic-scoped roles (**API, ClinicUser, ExternalPrescriber, ExternalRep**)
+is stored as free-text clinic **name strings** — `emed_user.name` for API accounts and the
+pipe-delimited `emed_user.clinics` for the rest. This is unmaintainable (one ExternalRep,
+`giano.saumat`, has an **891-entry** `clinics` field) and it never consulted the Facilities registry,
+so a clinic's name variants were only covered if someone hand-typed every spelling. The API `clinics`
+field had even been overloaded as a per-account name-variant list **and** as a partner grouping
+(Valhalla's account = `Valhalla Vitality | Valhalla Vitality Texas | Ironsail Pharma`, three distinct
+facilities).
+
+The fix makes the **Facilities registry the single source of truth** and expresses a user's scope as a
+set of facilities, via **one typed grouping mechanism**:
+
+- `emed_user.scope_facility_id` — a single facility (the common single-clinic case), **XOR**
+- `emed_user.scope_group_id` — one `emed_facility_group`, a **named, typed** collection of DISTINCT
+  facilities. `group_type` is descriptive, not behavioural: `'sales'` (a rep's territory, e.g. "JPV")
+  or `'affiliated'` (partner/sister companies, e.g. "Valhalla" = Valhalla Vitality + Texas + Ironsail).
+  A facility may belong to several groups (overlap is expected).
+
+**Derived-cache design (keeps the blast radius from exploding):** `emed_user.clinics` (and the webhook
+`emed_user_clinic` rows) become an **auto-regenerated projection** of the effective facility set →
+every active `name_variant` of every scoped facility. So the ~31 read consumers (`filter_by_clinic`,
+the `LIKE '%c%'` SQL sites), the webhook matcher, and ETL (which only sends `emed_user.name` as the
+`customer` header) all keep working **unchanged** — they just start reading a complete, correct list.
+The only things that change are where scope is **edited** and a `recompute_user_scope()` step.
+
+## Design / approach
+
+- **Atoms:** a facility owns its name variants (`emed_facility_name`, globally-unique variant string).
+- **Grouping:** `emed_facility_group` + `emed_facility_group_member` (typed, reusable, DISTINCT
+  facilities). One mechanism for both a rep's 100-clinic territory and a 2-3 company affiliated set —
+  the `type` just labels why. No group-of-groups; a facility in two groups is fine.
+- **Scope:** `emed_user.scope_facility_id` XOR `emed_user.scope_group_id`. Both NULL during transition =
+  fall back to legacy `clinics`/`name` (behaviour-neutral).
+- **Effective set → derived clinics:** `scope_facility_id → {that facility}`; `scope_group_id → {all
+  active members}`; expand to the union of all name variants; recompute `emed_user.clinics` +
+  `emed_user_clinic` on any scope/membership/variant change.
+- **One behavioural change (later phase):** API scope moves off `clinic_source:'name'` onto the derived
+  `clinics` set (Valhalla's account name resolves to no operational row; only the derived variant set
+  scopes it). `emed_user.name` + the ETL `customer` header stay as an **identity** cross-check only —
+  **ETL needs zero changes.** This also fixes a latent bug where API scope differed between the session
+  path (`name` only) and the public-API path (`clinics` via `get_clinic_list`).
+- **Deliberately NOT a CHECK constraint on `group_type`** (app-validated free vocab) — avoids the
+  widen-constraint-before-deploy landmine.
+- **Rejected:** re-keying operational tables (`moct_visit`/scripts/orders) to `facility_id` — huge,
+  high-risk migration on the Rx path; the derived-cache gets ~95% of the benefit with near-zero risk.
+
+## Investigation findings (live prod = dev, 2026-08-15)
+
+- **Only 3 roles ever populate `clinics`:** API (28 users), ClinicUser (25), ExternalRep (7). Every
+  other role: 0. No unaccounted user type; no multi-role user mixes a clinic-scoped role into a
+  non-scoped primary. So scoping stays simple.
+- **ExternalRep is the pain:** `giano.saumat` 906 pipe entries (891 distinct facilities), `julien.orbea`
+  209, `clinicalhealthllc`/Jill 207, `christy.bermudez` 65, `gcconsulting` 55.
+- **Coverage is high:** of 1,253 distinct clinic strings, only ~7 don't resolve to a facility variant.
+- **The audit exposed facility-registry DUPLICATES** — the same clinic registered as two facilities
+  (e.g. #170 "Balanced Aesthetics Medspa" vs #173 "balancedaestheticsmedspa"; "Drip Vitals" vs "Drip
+  Vitals LLC"). These need **merging** (existing `facilities.merge_facility`), not grouping.
+- **GUI editors that write user scope (all must convert in Phase 3):** `views/emed/users.ejs` (chip
+  editor, all roles — only place ExternalRep is set) → `POST /api/users`; `views/moct/api-users.ejs`
+  (pipe textbox, API+ClinicUser) → `POST /api/api-users`; `views/prescriber/manage-prescribers.ejs`
+  (single datalist, ExternalPrescriber) → `POST /api/prescriber-users`; and the new **Users card** on
+  `views/admin/facilities.ejs` → `POST /api/api-users`. Every other "clinics" mention (35+ files) only
+  reads/filters and stays untouched.
+
+## Rollout / remaining
+
+- **Phase 1 — additive schema + backfill/audit (dev). DONE 2026-08-15.**
+  - Migration `emed_sql/migrations/wip/2026-08-15_add_facility_groups_and_user_scope.sql`
+    (`emed_facility_group`, `emed_facility_group_member`, `emed_user.scope_facility_id` +
+    `scope_group_id`; GRANTs; unique/supporting indexes). Applied to `liberty_link_dev` only; file in
+    `wip/`. Zero runtime behaviour change (nothing reads the new columns yet).
+  - `emed_app/scripts/facility_scope_backfill.js` — dry-run/audit + `--apply` (+ `--reset` for dev).
+    Classifies each user FACILITY / GROUP / **MERGE** (duplicate facilities of one clinic) / UNMAPPED,
+    with a base-name heuristic to distinguish duplicate registrations from genuine affiliated groups.
+    Refuses to write prod without `--allow-prod`. Applied on dev: single-facility scopes set, provisional
+    groups created (sales for reps, affiliated for multi), MERGE + UNMAPPED left for registry cleanup.
+- **Phase 1.5 — registry cleanup (dev then prod):** merge the ~5 duplicate-facility pairs the audit
+  flagged (`facilities.merge_facility`); register/create the ~7 unmapped strings; human-rename the
+  provisional groups (→ "JPV", "Valhalla") and confirm/split the small auto-`affiliated` ones. Re-run
+  the backfill so cleaned accounts collapse to `scope_facility_id`.
+- **Phase 2 — resolver + recompute + shadow:** `recompute_user_scope()` regenerates `emed_user.clinics`
+  (+ `emed_user_clinic`) from the effective facility set; shadow-diff the derived vs current `clinics`
+  per user until clean. Still no read-path change.
+- **Phase 3 — flip the editing UI:** a Groups manager on the Facilities page + a facility/group **scope
+  picker** replacing the pipe-delimited inputs on all 4 editors above; writes hit `scope_*` and trigger
+  recompute. Move API `clinic_source` 'name' → derived clinics. Move migration `wip/ → pending/` at PR.
+- **Phase 4 (optional) — tighten matching:** substring `.includes()` / `LIKE '%c%'` → exact-variant-set
+  once coverage is proven (closes the "Valhalla" ⊂ "Valhalla Vitality Texas" hazard). Behind a flag.
+
+## Status & history
+- 2026-08-15 — Not Started → In-Progress (nicholas-cardell). Phase 1 built + applied to dev.

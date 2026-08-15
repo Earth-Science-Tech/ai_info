@@ -10,6 +10,7 @@ change its status. Full rules: [`skills/plan-tracking.md`](../skills/plan-tracki
 
 | Status | Plan | Project | Branch | Developers | Updated |
 |--------|------|---------|--------|------------|---------|
+| In-Progress | [Facility Scope Unification (FacilityGroups)](facility-scope-groups.md) | multi | `feat/facility-scope-groups` | Nicholas Cardell | 2026-08-15 |
 | Completed in Production | [Sync Everything skill (pull all repos + reload)](sync-everything-skill.md) | ai_info | `main` (direct) | Nicholas Cardell | 2026-08-15 |
 | Completed in Production | [Share Plan skill (email a plan to a teammate)](share-plan-skill.md) | ai_info | `main` (direct) | Nicholas Cardell | 2026-08-15 |
 | Completed in Production | [eMed Orders Pharmacy Filter + Task Date-Sort Fix](emed-orders-pharmacy-and-task-sort.md) | multi | `feat/emed-orders-pharmacy-and-task-sort` | Nicholas Cardell | 2026-08-12 |
