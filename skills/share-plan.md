@@ -1,4 +1,4 @@
-# Skill: Share Plan (email a plan .md to a teammate)
+# Skill: Share Plan (email a plan to a teammate as PDF + .md)
 
 ## Trigger
 
@@ -7,9 +7,10 @@ to &lt;name&gt;"**, **"share plan &lt;slug&gt; with &lt;name&gt;"**, or similar 
 (e.g. "share plan with Mario", "share plan with Nick").
 
 This lets any developer's Claude instance email the plan they're working on to another developer, so
-work-in-progress can be handed off or reviewed. It complements [plan-tracking.md](plan-tracking.md):
-plan-tracking keeps the shared **record** in `ai_info/plans/`; this skill **pushes** a copy to a
-specific teammate's inbox.
+work-in-progress can be handed off or reviewed. The email carries **two attachments**: a **formatted
+PDF** (for human reading) and the **`.md` source** (to hand back to a Claude instance). It complements
+[plan-tracking.md](plan-tracking.md): plan-tracking keeps the shared **record** in `ai_info/plans/`;
+this skill **pushes** a copy to a specific teammate's inbox.
 
 ## What to do
 
@@ -28,7 +29,7 @@ parse the table). Match `<name>` to a row by full name, first name, GitHub handl
   **If it is the placeholder `_(confirm)_` or blank, STOP** — that teammate's email is not on file.
   Tell the user, and offer to add it to `roster.md` if they provide it (then commit that roster edit to
   `ai_info` `main`). **Never derive an email from the name pattern** — the roster warns the pattern has
-  exceptions (e.g. Jose is `Jose.Gonzalez@rxcs.net`, not `jose.garcia@...`).
+  exceptions (e.g. Jose is `Jose.Gonzalez@rxcs.net`; Chris Rose is on `etst.com`, not `rxcs.net`).
 - **Recipients must be roster teammates.** This skill is for internal plan hand-off only — never email a
   plan to an address that isn't in the roster.
 
@@ -47,101 +48,74 @@ In priority order:
    and ask which one.
 
 If no plan file exists and the user just wants to send an ad-hoc plan from the conversation, write it to a
-`.md` first (prefer creating a real tracked plan; otherwise a temp file in the scratchpad) and attach that.
+`.md` first (prefer creating a real tracked plan; otherwise a temp file in the scratchpad) and share that.
 
 ### 3. Preview and confirm, then send
 
 Show a one-line preview and get a yes before sending (email is outbound and can't be unsent):
 
 ```
-Share plan "<title>" (plans/<slug>.md) → <Full Name> <<email>>, from <your name>. Send? (y/n)
+Share plan "<title>" (plans/<slug>.md, as PDF + .md) → <Full Name> <<email>>, from <your name>. Send? (y/n)
 ```
 
 If the user's request already said to just send it (e.g. "share plan with Mario, send it" / "no confirm"),
 skip the prompt.
 
-### 4. Send via Microsoft Graph (self-contained — do NOT use `email_azure.js`)
+### 4. Render the PDF + send (self-contained; do NOT use `email_azure.js`)
 
-Send from the **emed_app** directory so the shared Azure app-registration creds
-(`AZURE_TENANT_ID` / `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET`, in `emed_app/.env`) and node deps
-resolve. Pass all dynamic values as **environment variables** (avoids quoting/escaping bugs), and run the
-script below via the **Bash tool**:
+The sender is a version-controlled script in this folder: **[`share_plan_send.js`](share_plan_send.js)**.
+It reads the plan `.md`, renders it to a formatted **PDF** (`emed_app/server/pdf_html.js` →
+`to_base64_pdf`), and emails **both the PDF and the `.md`** via MS Graph — from the dev's own mailbox,
+auto-falling back to the system mailbox. PDF is best-effort: on any failure it still sends the `.md`.
+
+Run it **from the `emed_app` directory** (so `.env`, `pdf_html`, and node deps resolve), with `NODE_PATH`
+pointing at emed_app's `node_modules`, and inputs passed as **environment variables**. Use the **Bash
+tool**:
 
 ```bash
 cd "<path-to>/emed_app"
+NODE_PATH="$PWD/node_modules" \
 TO_EMAIL="mario.tabraue@rxcs.net" TO_NAME="Mario Tabraue" \
 FROM_EMAIL="$(git config user.email)" FROM_NAME="$(git config user.name)" REPLY_TO="$(git config user.email)" \
 PLAN_FILE="../ai_info/plans/<slug>.md" PLAN_TITLE="<plan title>" NOTE="" \
-node - <<'NODE'
-require('dotenv').config();               // loads emed_app/.env for AZURE_* creds
-require('isomorphic-fetch');
-const fs = require('fs');
-const { ClientSecretCredential } = require('@azure/identity');
-const { Client } = require('@microsoft/microsoft-graph-client');
-(async () => {
-  const e = process.env;
-  if (!e.AZURE_TENANT_ID || !e.AZURE_CLIENT_ID || !e.AZURE_CLIENT_SECRET) {
-    console.error('MISSING_AZURE_CREDS: set AZURE_TENANT_ID/CLIENT_ID/CLIENT_SECRET in emed_app/.env'); process.exit(2); }
-  if (!e.TO_EMAIL || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.TO_EMAIL)) { console.error('BAD_RECIPIENT: '+e.TO_EMAIL); process.exit(2); }
-  const md = fs.readFileSync(e.PLAN_FILE, 'utf8');
-  const fname = e.PLAN_FILE.split(/[\\/]/).pop();
-  const b64 = Buffer.from(md, 'utf8').toString('base64');
-  const esc = x => String(x == null ? '' : x).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-  const html = `<div style="font-family:Arial,sans-serif;font-size:14px;color:#222">
-    <p><strong>${esc(e.FROM_NAME || 'A teammate')}</strong> shared an eMed plan with you via Claude Code.</p>
-    ${e.NOTE ? `<p style="white-space:pre-wrap">${esc(e.NOTE)}</p>` : ''}
-    <p><strong>Plan:</strong> ${esc(e.PLAN_TITLE || fname)} &nbsp;(also attached as <code>${esc(fname)}</code>)</p>
-    <hr>
-    <pre style="white-space:pre-wrap;font-family:Consolas,monospace;font-size:12px;background:#f6f6f6;padding:12px;border-radius:6px">${esc(md)}</pre>
-    <p style="color:#888;font-size:12px">Sent by the eMed &quot;share plan&quot; skill. Reply goes to ${esc(e.REPLY_TO || e.FROM_NAME || 'the sender')}.</p></div>`;
-  const cred = new ClientSecretCredential(e.AZURE_TENANT_ID, e.AZURE_CLIENT_ID, e.AZURE_CLIENT_SECRET);
-  const client = Client.initWithMiddleware({ authProvider: { getAccessToken: async () =>
-    (await cred.getToken('https://graph.microsoft.com/.default')).token } });
-  const msg = (sender) => ({ message: {
-    subject: `[eMed Plan] ${e.PLAN_TITLE || fname} — shared by ${e.FROM_NAME || 'a teammate'}`,
-    body: { contentType: 'HTML', content: html },
-    toRecipients: [{ emailAddress: { address: e.TO_EMAIL, name: e.TO_NAME || undefined } }],
-    from: { emailAddress: { address: sender } },
-    replyTo: e.REPLY_TO ? [{ emailAddress: { address: e.REPLY_TO, name: e.FROM_NAME || undefined } }] : undefined,
-    attachments: [{ '@odata.type':'#microsoft.graph.fileAttachment', name: fname, contentType:'text/markdown', contentBytes: b64 }]
-  }, saveToSentItems: 'true' });
-  const SYSTEM = 'noreply@rxcompoundstore.com';
-  const primary = e.FROM_EMAIL || SYSTEM;   // send from the dev's own mailbox when the tenant allows it
-  try {
-    await client.api(`/users/${primary}/sendMail`).post(msg(primary));
-    console.log(JSON.stringify({ success:true, from: primary, to: e.TO_EMAIL }));
-  } catch (err) {
-    const denied = err.statusCode === 403 || /access|denied|ErrorAccessDenied/i.test(err.message || '');
-    if (denied && primary !== SYSTEM) {           // no send-as rights → fall back to the proven system mailbox
-      try { await client.api(`/users/${SYSTEM}/sendMail`).post(msg(SYSTEM));
-        console.log(JSON.stringify({ success:true, from: SYSTEM, to: e.TO_EMAIL, note:'fell back to system sender (no send-as for '+primary+')' })); }
-      catch (err2) { console.error('SEND_FAILED_FALLBACK: '+(err2.message||err2)); process.exit(1); }
-    } else { console.error('SEND_FAILED: '+(err.message||err)); process.exit(1); }
-  }
-})();
-NODE
+node ../ai_info/skills/share_plan_send.js
 ```
 
-Report the result JSON to the user (who it went to, and whether it fell back to the system sender).
+- `FROM_EMAIL`/`FROM_NAME`/`REPLY_TO` come from the **sending** dev's git identity (as above), so the
+  mail is from them and replies reach them.
+- `PLAN_FILE` is relative to `emed_app/` (the cwd). `NOTE` is an optional one-line message.
+- The script prints a result JSON — **report it to the user**: recipient, the attachment names
+  (`<slug>.pdf`, `<slug>.md`), any `pdfNote` (PDF fell back to md-only), and any system-sender fallback.
+- **Run the script file, not a big inline `node -e`/heredoc** — piping the ~100-line program over stdin
+  proved unreliable.
 
 ## Why it's built this way (do not "simplify" these)
 
 - **Self-contained Graph send, NOT `emed_app/server/email_azure.js`.** `email_azure` computes
   `test_mode = is_local_host()` **at module load**, and on any machine with `IS_LOCAL_HOST=1` its `send()`
   **silently redirects the recipient to `DEV_EMAIL`/`nicholas.cardell@rxcs.net`** — so a teammate would
-  never receive the plan. It also `require`s `./sql` (a DB connection side-effect). This inline sender
-  avoids both while reusing the same app registration and attachment shape.
+  never receive the plan. It also `require`s `./sql` (a DB side-effect). This script avoids both while
+  reusing the same app registration and attachment shape.
+- **PDF via `server/pdf_html.js` (`to_base64_pdf`, html-pdf/PhantomJS).** It returns base64 directly (the
+  exact shape a Graph `fileAttachment` needs) and is already used in prod. **PDF is best-effort**: if it
+  throws, the script still sends the `.md` (the essential artifact) and notes the failure — never let a PDF
+  hiccup block the hand-off.
+- **Inline markdown→HTML converter (no markdown lib is installed).** `marked`/`markdown-it` aren't deps, so
+  a compact converter handles the plan-template subset (frontmatter, headings, lists, tables, code, links,
+  quotes) for both the PDF and the inline email body. If a real markdown lib is ever added to `emed_app`,
+  swap it in.
 - **From the dev's own mailbox, auto-falling back to `noreply@rxcompoundstore.com`.** The shared app
-  registration can send as tenant mailboxes; if it lacks send-as rights for a specific dev, the script
-  retries from the proven system mailbox. `replyTo` is always the sending dev, so replies reach them
-  regardless of which mailbox sent it.
+  registration can send as tenant user mailboxes (verified — a self-send went out `from` the dev with no
+  fallback); if it ever lacks send-as rights for a dev, the script retries from the system mailbox.
+  `replyTo` is always the sending dev.
 - **Recipient always from the roster; never guessed.** Wrong emails "drive alert delivery" (roster's own
   warning). A `_(confirm)_` cell means STOP, not improvise.
 
 ## Applies to
 
 - All eMed repos, all developer Claude instances (propagated via the nested import in
-  `org/rules/org-defaults.md`).
-- Requires `emed_app/.env` with the `AZURE_*` creds (present for anyone who runs emed_app locally) and
-  `emed_app`'s node deps installed.
+  `org/rules/org-defaults.md`). The sender script `share_plan_send.js` ships alongside this skill in
+  `ai_info/skills/`.
+- Requires `emed_app/.env` with the `AZURE_*` creds and `emed_app`'s node deps (`@azure/identity`,
+  `@microsoft/microsoft-graph-client`, `html-pdf`) — all present for anyone who runs emed_app locally.
 - Related: [plan-tracking.md](plan-tracking.md), [`team/roster.md`](../team/roster.md).

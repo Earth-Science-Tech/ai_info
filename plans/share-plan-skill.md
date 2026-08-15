@@ -22,12 +22,16 @@ related: []
 - 2026-08-15 — Not Started → **Completed in Production** (nicholas-cardell). Built `skills/share-plan.md`,
   propagated to all three repos via a nested `@import` in `org/rules/org-defaults.md`, pushed to ai_info
   `main`. Same day: filled the four missing roster emails and ran a self-send end-to-end test.
+- 2026-08-15 — Enhancement (nicholas-cardell): the email now attaches **both a formatted PDF** (human
+  readability) **and the `.md`** (for Claude). PDF via `emed_app/server/pdf_html.js` `to_base64_pdf` +
+  an inline markdown→HTML renderer (no markdown lib is installed); PDF is best-effort (falls back to
+  md-only). Re-tested with a self-send — both attachments delivered.
 
 ## Summary
 A skill so any developer's Claude can email the plan they're working on to a teammate — for hand-off or
 review. `"share plan with <name>"`. Complements `skills/plan-tracking.md`: plan-tracking keeps the shared
-**record** in `ai_info/plans/`; share-plan **pushes a copy** to a teammate's inbox (with the `.md`
-attached). Requested by Nicholas 2026-08-15.
+**record** in `ai_info/plans/`; share-plan **pushes a copy** to a teammate's inbox as a formatted
+**PDF** (to read) plus the **`.md`** source (to hand to Claude). Requested by Nicholas 2026-08-15.
 
 ## Design / approach
 - **Recipient** resolved from `team/roster.md` (markdown table; no JSON source). Never guess an email —
@@ -41,6 +45,11 @@ attached). Requested by Nicholas 2026-08-15.
   silently redirects the recipient to `DEV_EMAIL`/Nick — a teammate would never receive the plan. Sends
   from the dev's own mailbox, auto-falling back to `noreply@rxcompoundstore.com` if the tenant lacks
   send-as rights; `replyTo` is always the sending dev.
+- **Attachments: PDF + `.md`.** The `.md` is rendered to HTML by a compact inline converter (no markdown
+  lib in emed_app deps) and turned into a PDF via `server/pdf_html.js` `to_base64_pdf` (html-pdf/PhantomJS,
+  already used in prod); the same HTML is shown inline in the email body. PDF is best-effort — on any
+  failure the script still sends the `.md` and notes it. Runs via a script file with
+  `NODE_PATH="$PWD/node_modules"` (a large inline heredoc proved unreliable to pipe).
 - **Preview + confirm before send** by default (email is outbound/irreversible); skipped when the user
   says to just send.
 - **Propagation:** nested `@../../skills/share-plan.md` in `org/rules/org-defaults.md` (imported by all
