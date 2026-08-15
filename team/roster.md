@@ -33,7 +33,26 @@ branch/database gates.
 
 When someone says "Carlos" in the context of production, database, or merge approval, it means
 **Carlos Cueto (`carcuet`)**. Do not confuse the two, and never grant `Obregon1993`
-production access on the assumption that "Carlos" = the gatekeeper.
+production access on the assumption that "Carlos" = the gatekeeper. We also disambiguate them verbally
+as **Carlos 1** (= Carlos Cueto) and **Carlos 2** (= Carlos Obregon) — see Nicknames & aliases below.
+
+## Nicknames & aliases
+
+Resolve these when a teammate is referred to by a nickname (used by skills like `share-plan` and
+`plan-tracking`, and for author attribution). Match case-insensitively; the canonical person +
+GitHub handle is what to act on.
+
+| Goes by / alias | Person (canonical) | GitHub |
+|-----------------|--------------------|--------|
+| Nick | Nicholas Cardell | `nicholas-cardell` |
+| Daniel | Jose Daniel Garcia Gonzalez (goes by his middle name) | `etst-josegonzalez` |
+| Carlos 1 / Carlos1 | Carlos Cueto | `carcuet` |
+| Carlos 2 / Carlos2 | Carlos Obregon | `Obregon1993` |
+
+- **"Carlos" alone is ambiguous.** It defaults to **Carlos Cueto** only in a production/DB/merge
+  context (per the gotcha above); anywhere else, **ask which Carlos** or use the Carlos 1 / Carlos 2
+  aliases. Never guess.
+- Add new aliases here as they come up, rather than hard-coding them into a skill.
 
 ## Related
 

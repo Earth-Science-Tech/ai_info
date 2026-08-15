@@ -16,11 +16,14 @@ specific teammate's inbox.
 ### 1. Resolve the recipient → a real email (NEVER guess)
 
 The team roster is [`team/roster.md`](../team/roster.md) (a markdown table; there is no JSON source —
-parse the table). Match `<name>` to a row by full name, first name, or GitHub handle.
+parse the table). Match `<name>` to a row by full name, first name, GitHub handle, or **nickname/alias**
+(the roster's **Nicknames & aliases** section — match case-insensitively).
 
-- **"Nick" / "Nicholas" → Nicholas Cardell.** "Mario" → Mario Tabraue. "Jose" → Jose. "Jorge" → Jorge.
-- **⚠ Two people named Carlos** — `carcuet` = **Carlos Cueto**, `Obregon1993` = **Carlos Obregon**. If the
-  user says just "Carlos", **ask which one** — never assume.
+- **"Nick" → Nicholas Cardell.** "Mario" → Mario Tabraue. "Jorge" → Jorge. "Jose" **or "Daniel"** → Jose
+  Daniel Garcia Gonzalez (he goes by his middle name).
+- **⚠ Two people named Carlos** — `carcuet` = **Carlos Cueto**, `Obregon1993` = **Carlos Obregon**.
+  **"Carlos 1"/"Carlos1" → Cueto; "Carlos 2"/"Carlos2" → Obregon** (deterministic). If the user says just
+  "Carlos", **ask which one** — never assume.
 - **Read the email cell literally.** If it is a real address (e.g. `nicholas.cardell@rxcs.net`), use it.
   **If it is the placeholder `_(confirm)_` or blank, STOP** — that teammate's email is not on file.
   Tell the user, and offer to add it to `roster.md` if they provide it (then commit that roster edit to
