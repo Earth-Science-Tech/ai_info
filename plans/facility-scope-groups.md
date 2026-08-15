@@ -120,12 +120,16 @@ The only things that change are where scope is **edited** and a `recompute_user_
     XOR group-select). Backend `set_user_scope` derives `emed_user.clinics` from the chosen scope; legacy
     `clinics` still honored when scope fields are absent (additive/back-compat). `attach_scope_labels`
     enriches user GETs for prefill; `/api/facilities/list` opened to `Write_API_Users`.
-    - **Slice 1 DONE on dev 2026-08-15:** Groups modal restyled; `POST`/`GET /api/api-users` wired; the
-      **facilities Users card** scopes new/edited accounts to that facility (`scope_facility_id`).
-    - **TODO (slices 2–3):** wire the ScopePicker into `moct/api-users.ejs` (reuses the done
-      `/api/api-users`), `emed/users.ejs` + `POST/GET /api/users` (**ExternalRep territories → groups**),
-      `prescriber/manage-prescribers.ejs` + `/api/prescriber-users`. Then move API `clinic_source`
-      'name' → derived clinics, and migration `wip/ → pending/` at PR.
+    - **Slices 1–3a DONE on dev 2026-08-15 — covers 100% of actually-scoped users** (API 28, ClinicUser
+      25, ExternalRep 7). Groups modal restyled. ScopePicker wired into: the **facilities Users card**
+      (scopes to that facility), **`emed/users.ejs`** + `POST/GET /api/users` (the only ExternalRep editor
+      → rep territories become Sales groups), and **`moct/api-users.ejs`** (reuses the wired
+      `/api/api-users`). Backend `set_user_scope` derives `clinics`; legacy `clinics` kept as fallback so a
+      no-scope edit never wipes access; `attach_scope_labels` prefills.
+    - **Remaining (small, low-risk to defer):** `prescriber/manage-prescribers.ejs` + `/api/prescriber-users`
+      (**0 active ExternalPrescriber users**); and flip API `clinic_source` 'name' → 'clinics' so API
+      *browser-session* scoping reads the derived clinics (the public vendor-API path already does, via
+      `get_clinic_list`) — pair with Phase 2's global recompute. Migration `wip/ → pending/` at PR.
 - **Phase 4 (optional) — tighten matching:** substring `.includes()` / `LIKE '%c%'` → exact-variant-set
   once coverage is proven (closes the "Valhalla" ⊂ "Valhalla Vitality Texas" hazard). Behind a flag.
 
