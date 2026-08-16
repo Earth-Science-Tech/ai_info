@@ -126,10 +126,21 @@ The only things that change are where scope is **edited** and a `recompute_user_
       → rep territories become Sales groups), and **`moct/api-users.ejs`** (reuses the wired
       `/api/api-users`). Backend `set_user_scope` derives `clinics`; legacy `clinics` kept as fallback so a
       no-scope edit never wipes access; `attach_scope_labels` prefills.
-    - **Remaining (small, low-risk to defer):** `prescriber/manage-prescribers.ejs` + `/api/prescriber-users`
-      (**0 active ExternalPrescriber users**); and flip API `clinic_source` 'name' → 'clinics' so API
-      *browser-session* scoping reads the derived clinics (the public vendor-API path already does, via
-      `get_clinic_list`) — pair with Phase 2's global recompute. Migration `wip/ → pending/` at PR.
+    - **Prescriber DONE on dev 2026-08-15:** `prescriber/manage-prescribers.ejs` single-clinic datalist →
+      ScopePicker; `POST/GET /api/prescriber-users` accept/return scope. **All four editors now use the
+      picker.**
+    - **API `clinic_source` flip — NOT DONE, deliberately.** Analysis showed it would BREAK API scoping:
+      API is Basic-Auth with no browser session, so `get_user_clinics`'s `'name'` branch (reads the
+      `customer` header) is correct; flipping to `'clinics'` would read `session.user.clinics`, which is
+      empty for Basic-Auth. The derived `clinics` is already used for the real API vendor path via
+      `get_clinic_list(name)`. So `clinic_source` stays `'name'`.
+- **Phase 2 — global recompute. DONE on dev 2026-08-15.** `scripts/facility_scope_recompute.js`
+  (shadow-diff then `--apply`). Diff caught ONE issue — Giano's sales group still referenced facility
+  #417 "Drip Vitals LLC" after it was merged into #416 in Phase 1.5, because `merge_facility` didn't
+  re-point group memberships. **Fixed:** hardened `merge_facility` to re-point `emed_facility_group_member`
+  (source→target, dedup) + recompute affected groups, and repaired the dangling row on dev. Re-ran:
+  **60/60 scoped users recomputed, 0 empty clinics, 0 access-loss.** ClinicUser/ExternalRep/ExternalPrescriber
+  pick up derived clinics at next login (session snapshot); the API vendor path already reads them live.
 - **Phase 4 (optional) — tighten matching:** substring `.includes()` / `LIKE '%c%'` → exact-variant-set
   once coverage is proven (closes the "Valhalla" ⊂ "Valhalla Vitality Texas" hazard). Behind a flag.
 
@@ -140,3 +151,10 @@ The only things that change are where scope is **edited** and a `recompute_user_
   + 2 new facilities). **All 60 clinic-scoped users now scoped (47 facility, 13 group); 0 unmapped, no
   gap.** Remaining curation = renaming the other 11 provisional groups + confirming the 4 small
   auto-`affiliated` groups → Phase 3 UI.
+- 2026-08-15 — Phase 3 Part 1 (Groups manager) + Part 2 (polished modal + ScopePicker in all 4 editors +
+  scope wiring on all 3 user endpoints) done on dev.
+- 2026-08-15 — Phase 2 global recompute done on dev (60/60, 0 access-loss); `merge_facility` hardened to
+  re-point group memberships. **Facility registry is now the source of truth for clinic scope on dev.**
+  NEXT: curation (rename provisional groups) via the Groups manager, then a `feat/* → main` promotion PR
+  (move migration `wip/ → pending/`) to ship — likely coordinated with the patient-portal branch since
+  they share `facilities.ejs`.
