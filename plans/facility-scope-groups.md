@@ -1,18 +1,18 @@
 ---
 title: Facility Scope Unification (FacilityGroups)
 slug: facility-scope-groups
-status: In-Progress
+status: Completed in Production
 project: multi
 branches:
-  - emed_app: feat/facility-scope-groups
-  - emed_sql: migrations/wip/2026-08-15_add_facility_groups_and_user_scope.sql (on main)
+  - emed_app: feat/patient-portal-secure-messaging (shipped 1.0.205); feat/facility-scope-fixes (1.0.206); feat/recompute-trigger-sync (1.0.207)
+  - emed_sql: migrations/applied/2026-08-15_add_facility_groups_and_user_scope.sql (prod+dev)
 developers:
   - nicholas-cardell
 prs: []
-tags: []
+tags: ["1.0.205", "1.0.206", "1.0.207"]
 created: 2026-08-15
-updated: 2026-08-15
-related: []
+updated: 2026-08-17
+related: [[patient-portal-secure-messaging]]
 ---
 
 # Facility Scope Unification (FacilityGroups)
@@ -158,3 +158,25 @@ The only things that change are where scope is **edited** and a `recompute_user_
   NEXT: curation (rename provisional groups) via the Groups manager, then a `feat/* → main` promotion PR
   (move migration `wip/ → pending/`) to ship — likely coordinated with the patient-portal branch since
   they share `facilities.ejs`.
+- 2026-08-17 — **SHIPPED TO PRODUCTION (1.0.205).** In-Progress → Completed in Production (nicholas-cardell).
+  Shipped together with Patient Portal Phase 1 (dark) off `feat/patient-portal-secure-messaging` (they
+  share `facilities.ejs`). Migration `2026-08-15_add_facility_groups_and_user_scope.sql` moved `wip/ →
+  pending/` and applied to prod+dev (`--db both`); now in `migrations/applied/`.
+  - **Prod data migration run (backfill → cleanup → settle → recompute, `--allow-prod`):** all **60
+    clinic-scoped accounts** now derive from the registry (47 facility, 13 group; 1,450 group memberships).
+    Cleanup applied on prod: 5 facility merges, 5 variant registrations, 2 new facilities (Bloom
+    Restorative Wellness #1904, Ocean Bloom Wellness #1905), group #4 renamed "Apprize TRIM FITT". Prod
+    recompute shadow-diff = **51 unchanged, 9 gained variants, 0 removed (0 access-loss)** — matched dev.
+- 2026-08-17 — **1.0.206:** fixed the ScopePicker group prefill/reset bug (the singleton picker only
+  applied the selected group on first load, so a 2nd ExternalRep never prefilled and showed the prior
+  user's group). `ensureGroups()` now re-syncs the dropdown every `setMode('group')`; `set()` clears the
+  opposite mode. Also deduped derived clinics.
+- 2026-08-17 — **1.0.207:** removed `recompute_user_scope`'s MANUAL `emed_user_clinic` maintenance. ⚠
+  **GOTCHA:** the DB trigger `trg_emed_user_clinic_sync` (on `emed_user`, AFTER INSERT/UPDATE) already
+  keeps `emed_user_clinic` in sync from `emed_user.clinics` (DISTINCT + NOT-EXISTS guarded). The manual
+  soft-delete-then-reinsert double-wrote, accumulating duplicate soft-deleted rows that later collided
+  (err 2601) with the trigger's reactivation step. Only ONE account had accumulated debris
+  (`giano.saumat`: 915 active + 2,737 soft-deleted); repaired via an admin hard-DELETE of his
+  `emed_user_clinic` rows + a no-op `clinics` UPDATE to let the trigger rebuild a clean 911-row mirror.
+  **Lesson: anything that writes `emed_user.clinics` must NOT also touch `emed_user_clinic` — the trigger
+  is the single writer.**
