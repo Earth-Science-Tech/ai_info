@@ -9,7 +9,7 @@ branches:
 developers:
   - nicholas-cardell
 prs: []
-tags: ["1.0.205"]
+tags: ["1.0.205", "1.0.208"]
 created: 2026-08-14
 updated: 2026-08-17
 related: [[facility-scope-groups]]
@@ -67,3 +67,12 @@ So the code + 6 tables are live and inert. Shipped alongside the facility-scope 
   renamed the session secret → `PATIENT_PORTAL_SESSION_SECRET`, promoted `feat/* → main`, migration to
   prod. Verified prod boots healthy with the secret set and no send path reachable. Enable via the
   checklist above once BAA/consent are in place.
+- 2026-08-17 — **⚠ 1.0.208 HOTFIX — P0 auth outage this shipped caused.** The staff session and
+  `patient_session` shared ONE `MSSQLStore` instance. `express-session`'s `session()` overwrites
+  `store.generate` with its own cookie config, so `patient_session` (created last) clobbered it and every
+  NEW **staff** login session inherited the patient cookie (`path:/api/portal`, 30m) — which browsers
+  never send back to `/api/auth/*`, so login died at "No pending MFA session". **Staff login was broken
+  app-wide from 1.0.205 until 1.0.208** (masked by overnight low traffic). Fix: a `make_session_store()`
+  helper gives each session its OWN `MSSQLStore` instance (same `sessions` table; sids never collide).
+  Reproduced + verified in isolation and on prod (fresh login now gets `Path=/`, 8h). **Lesson: never
+  share one express-session store instance across two session middlewares.**
