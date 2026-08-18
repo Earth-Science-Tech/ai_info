@@ -50,7 +50,7 @@ though the prescription had been sent, dispensed, and had refills authorized —
 `1038986` / `moct_drug_rx` `1044855` → Liberty script `576210`, dispensed, 11 refills authorized, 0
 used, but `script_number` NULL on the row.
 
-**Fix (2026-08-18, branch `feat/script-refill-option1-scriptnumber`):** match on `drug_requested`
+**Fix (2026-08-18, shipped PROD `1.0.214`, PR #440):** match on `drug_requested`
 only, then resolve each matched row's ScriptNumber via `view_emed_full_order` by `RxTag`
 (`moct_drug_rx.script_number` kept as a fast path). A matched row with no resolvable ScriptNumber
 now returns a distinct **`409 { reason: "script_number_not_yet_assigned", retryable: true }`** — the
