@@ -63,11 +63,11 @@ Three things that cost real time to discover. All three apply to any remote comm
 
 Two separate things, in this order:
 
-1. **Get onto the tailnet.** Ask for the Tailscale Gmail account credentials, then sign in to the
-   Tailscale client on your own machine with them. Hand them over per
-   [secrets-management.md](../security/secrets-management.md) — not in a chat message.
-2. **Get your key installed.** Generate your own SSH keypair and send Carlos the `.pub` file only.
-   He appends it to `administrators_authorized_keys` on each host you need.
+1. **Get onto the tailnet.** Sign in to the Tailscale client on your own machine using the shared
+   Gmail account credentials. Request them from the team lead; they should be distributed per
+   [secrets-management.md](../security/secrets-management.md), never in a chat message.
+2. **Get your key installed.** Generate your own SSH keypair and hand over the `.pub` file only. It
+   gets appended to `administrators_authorized_keys` on each host you need.
 
 Full step-by-step setup — including tailnet addresses and host key fingerprints for first-connect
 verification — is in the onboarding runbook:

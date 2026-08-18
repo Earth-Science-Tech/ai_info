@@ -21,7 +21,7 @@
 | Azure SQL | emed_app and emed_etl user credentials | Team lead |
 | WooCommerce API (Peaks) | Consumer key/secret | Team lead |
 | Cloudways SSH | SSH credentials (Peaks WordPress host) | Team lead |
-| Tailscale | Shared Tailscale Gmail credentials + your public key on the job servers | Carlos |
+| Tailscale | Shared Gmail account credentials + your public key on the job servers | Team lead |
 
 ## IDE Setup
 
