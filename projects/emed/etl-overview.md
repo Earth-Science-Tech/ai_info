@@ -86,9 +86,11 @@ See [emed-etl/warehouse.md](../emed-etl/warehouse.md) for the full warehouse ref
 - `flows/emed_etl/peaks_etl_sms_missing_intake_forms.py` — Daily intake-form reminders
 
 ## Job Servers
-- **Rx Compound Store server** (`rxcs-jobserver-workqueue`, table_prefix='rxcs')
-- **Mister Meds server** (`mmed-jobserver-workqueue`, table_prefix='mmed')
-- **Meduvo server** (`mdvo-jobserver-workqueue`, table_prefix='mdvo') — pending provisioning
+- **Rx Compound Store** (`rxcs-jobserver-workqueue`, table_prefix='rxcs') — **two machines**, `RXCS-JOBSERVER-1` and `RXCS-JOBSERVER-2`, both pulling the same queue
+- **Mister Meds** (`mmed-jobserver-workqueue`, table_prefix='mmed') — `MM-JOBSERVER-1`
+- **Meduvo** (`mdvo-jobserver-workqueue`, table_prefix='mdvo') — `MDSVR02`, live since 2026-08-03
+
+Shell access to all four hosts is over Tailscale — see [tailscale-ssh.md](../../org/infrastructure/tailscale-ssh.md) for aliases, login accounts, and remote-command gotchas.
 
 ## Gotchas
 

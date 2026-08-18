@@ -64,7 +64,7 @@ Credentials in `.env` and Prefect Secret blocks (manually synced with emed_app):
 
 ## Job Servers
 
-- Rx Compound Store (table_prefix='rxcs') — two workers since 2026-08-11 (`rxcs-jobserver-worker`, `rxcs-jobserver-worker2`)
+- Rx Compound Store (table_prefix='rxcs') — **two separate machines** since 2026-08-11: `RXCS-JOBSERVER-1` (`rxcs-jobserver-worker`) and `RXCS-JOBSERVER-2` (`rxcs-jobserver-worker2`), both pulling the same `rxcs-jobserver-workqueue`. A run can land on either, and `$env:COMPUTERNAME` cannot tell them apart — see [tailscale-ssh.md](../../org/infrastructure/tailscale-ssh.md)
 - Mister Meds (table_prefix='mmed')
 - Meduvo (table_prefix='mdvo') — live since 2026-08-03 (Run-All-ETL-MDVO every 15 min, rxqNotes-MDVO every 60 sec)
 - Liberty ETL: every 15–60 minutes per table (see `prefect.yaml`)

@@ -20,7 +20,8 @@
 | Azure Portal | Contributor on resource group | Azure admin |
 | Azure SQL | emed_app and emed_etl user credentials | Team lead |
 | WooCommerce API (Peaks) | Consumer key/secret | Team lead |
-| Cloudways SSH | SSH credentials | Team lead |
+| Cloudways SSH | SSH credentials (Peaks WordPress host) | Team lead |
+| Tailscale | Tailnet invite + your public key on the job servers | Carlos |
 
 ## IDE Setup
 
