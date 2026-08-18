@@ -13,7 +13,7 @@ finance dashboard. Sits alongside the Stripe and Propelr feeds.
 | Link helper (CLI) | `emed_etl/scripts/plaid_get_access_token.py` - Hosted Link -> access token -> Secret block + registry upsert |
 | Item registry | `etst_warehouse.etl.plaid_item` - one row per bank login; DDL in `emed_sql/warehouse/etl_plaid_item.sql` |
 | Warehouse DDL | `emed_sql/warehouse/stg_plaid_balances_transactions.sql` (hand-applied, idempotent) |
-| Deployment | `Plaid-Balances-Transactions` in `emed_etl/prefect.yaml`, daily 1:40 AM ET (before the 2 AM dbt build) |
+| Deployment | `Plaid-Balances-Transactions` in `emed_etl/prefect.yaml`, twice daily 7:10 AM/PM ET (before the 7:30 dbt build runs; nightly 1:40 AM until 2026-08-18) |
 | Feed tables | `stg.plaid_account_balances` (append-only snapshot per run), `stg.plaid_transactions` (kept in step via sync deltas) |
 
 The `etl` schema is the home for ETL state/config: NOT rebuildable like `stg`
@@ -30,7 +30,7 @@ block **name**, never the token. The alias lands in `account_alias`; the true Pl
 `boa` (Bank of America, ~18mo - institutions serve what they have), `truist`
 (Truist, ~24mo, added 2026-07-30).
 
-## How the nightly sync works
+## How the sync works
 
 - **Registry-driven fan-out**: the flow reads active rows (`sync_enabled=1`,
   `is_invalid=0`, matching environment) from `etl.plaid_item` - the
@@ -70,7 +70,7 @@ block **name**, never the token. The alias lands in `account_alias`; the true Pl
 cd emed_etl
 python -m scripts.plaid_get_access_token --register <alias>   # e.g. mmed-wells
 # open the printed Hosted Link URL, finish the bank OAuth; the script saves the
-# Secret block AND upserts the registry - the nightly flow picks it up, no deploy
+# Secret block AND upserts the registry - the scheduled flow picks it up, no deploy
 ```
 `--backfill <alias>` registers an already-linked Item (existing Secret block) into
 the registry without re-linking. Manual full re-pull:

@@ -5,7 +5,7 @@ emed_etl runs four pipeline families on Prefect (`prefect.yaml`):
 1. **Peaks Curative ETL** — operational, every 30 min
 2. **Liberty Pharmacy ETL** — operational, every 15–60 min per table
 3. **Stage → Warehouse Clone** — analytics load, nightly 01:00 ET
-4. **Warehouse dbt Build** — analytics transform, nightly 02:00 ET
+4. **Warehouse dbt Build** — analytics transform, 02:00 ET + 07:30/19:30 ET
 
 ## 1. Peaks Curative ETL
 - **Source:** peakscurative.com WordPress (WooCommerce + WPForms)
@@ -59,7 +59,7 @@ emed_etl runs four pipeline families on Prefect (`prefect.yaml`):
 
 ## 4. Warehouse dbt Build
 - **Project:** `dbt/` (`etst_warehouse`, dbt-sqlserver adapter)
-- **Schedule:** Nightly 02:00 ET (`Warehouse-DBT-Build`), runs after the clone
+- **Schedule:** 02:00 ET after the nightly clone, plus 07:30/19:30 ET after the twice-daily Stripe/Propelr/Plaid payment-feed runs (`Warehouse-DBT-Build`)
 - **Command:** `dbt deps && dbt build` via `prefect_dbt.PrefectDbtRunner`
 - **Output schemas:**
   - `stg.stg_*` — cleanup views over raw clones

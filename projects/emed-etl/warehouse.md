@@ -12,7 +12,7 @@ liberty_link_stage (operational, Azure SQL)
          ▼
 etst_warehouse.stg.*           ← raw clones (schemas flattened)
          │
-         │  Warehouse-DBT-Build  (Prefect, 02:00 ET nightly)
+         │  Warehouse-DBT-Build  (Prefect, 02:00 ET + 07:30/19:30 ET)
          │  flows/emed_etl/dbt_warehouse_build.py  →  `dbt deps && dbt build`
          ▼
 etst_warehouse.stg.stg_*       ← cleanup views (rename/cast/trim)

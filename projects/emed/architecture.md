@@ -66,7 +66,7 @@ Liberty RX Database
 liberty_link_stage ──► etst_warehouse.stg.*         (Clone-Prod-to-Warehouse-Stage, 01:00 ET)
                               │
                               └──► stg.stg_*, core.dim_*, core.fct_*, mart.*
-                                    via `dbt build`  (Warehouse-DBT-Build, 02:00 ET)
+                                    via `dbt build`  (Warehouse-DBT-Build, 02:00 ET + 07:30/19:30 ET)
 ```
 
 ## Key Integration Points
