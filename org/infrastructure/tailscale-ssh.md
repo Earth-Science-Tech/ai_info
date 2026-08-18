@@ -34,8 +34,9 @@ up, so "which server ran this?" is never answerable from the queue name alone.
   There is no password fallback — a missing key means no access.
 - **Each person uses their own keypair.** Never share a private key. Public keys go in
   `C:\ProgramData\ssh\administrators_authorized_keys`; revoking is deleting that one line, per host.
-- **Login accounts are shared** (`jobrunner`, `administrator`), so attribution comes from the key
-  fingerprint sshd logs on every connection, not from the username.
+- **Login accounts are shared** (`jobrunner`, `administrator`), and everyone signs in to Tailscale
+  as the same account, so neither the tailnet nor the username identifies a person. The key
+  fingerprint sshd logs on every connection is the only per-person signal.
 - **You get a full elevated token.** Windows OpenSSH does not apply UAC filtering to administrators,
   so an SSH session can edit protected paths and restart services. Treat it as a root shell.
 - Port 22 is firewalled to the tailnet range on every host and is not reachable from the internet.
@@ -60,8 +61,18 @@ Three things that cost real time to discover. All three apply to any remote comm
 
 ## Getting access
 
-Ask Carlos. You need a Tailscale invite to the tailnet plus your public key installed on each host
-you need. Step-by-step setup — including tailnet addresses and host key fingerprints for
-first-connect verification — is in the onboarding runbook; ask Carlos for the link.
+Two separate things, in this order:
 
-Server hostnames, queues, and gotchas live here; addresses and fingerprints deliberately do not.
+1. **Get onto the tailnet.** Ask for the Tailscale Gmail account credentials, then sign in to the
+   Tailscale client on your own machine with them. Hand them over per
+   [secrets-management.md](../security/secrets-management.md) — not in a chat message.
+2. **Get your key installed.** Generate your own SSH keypair and send Carlos the `.pub` file only.
+   He appends it to `administrators_authorized_keys` on each host you need.
+
+Full step-by-step setup — including tailnet addresses and host key fingerprints for first-connect
+verification — is in the onboarding runbook:
+
+**<https://claude.ai/code/artifact/44577c24-fa77-47d5-af30-1c3972c6aeac>**
+
+Server hostnames, queues, and gotchas live here; addresses and fingerprints live in the runbook and
+deliberately not in this repo.
