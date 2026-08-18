@@ -66,6 +66,10 @@ The app supports talking to Liberty's dev sandbox (`devapi.libertysoftware.com`)
 
 Every `liberty.js` `api()` call gets a `(data, error)` callback. Liberty returns an **empty body on success**, so `data===null` is ambiguous (success-with-empty-body OR timeout) — mutations MUST decide failure from `error`, not `data`. Ignoring `error` is what marked visits "Approved by Prescriber" while the Rx never sent (2026-07-15 incident). Full rule + audit status: [../emed/liberty-api-callback-contract.md](../emed/liberty-api-callback-contract.md).
 
+## `moct_drug_rx.script_number` is NOT a "sent to pharmacy" signal
+
+A direct consequence of the empty-body contract above: eMed never learns the Liberty ScriptNumber at send time — a pharmacy tech assigns it on queue approval, and it comes back only via the ETL mirror (`view_emed_full_order`, keyed by `RxTag = moct_drug_rx.id`). So `moct_drug_rx.script_number` is **NULL for ~88% of all scripts** (populated only for eMed-internal "Refill"-button rows). To find a sent script's ScriptNumber, resolve via the mirror by RxTag — never rely on `moct_drug_rx.script_number`. This bug broke `/api/public/script-refill` Option 1 (404'd valid, dispensed prescriptions). Full detail: [../emed/moct-drug-rx-script-number.md](../emed/moct-drug-rx-script-number.md).
+
 ## Possible Missing Scripts reconciliation (`/admin/missing-scripts`)
 
 Admin tool to find eMed-signed prescriptions that never reached / were never linked at the pharmacy and reconcile them: **Tab 1** transmission failures (keyed off `emed_liberty_write_log`), **Tab 2** "not received" orphans (no `tag_rx`/`moct_order_tracking`/`moct_script_link`). Staff **link** an orphan to the fulfilling pharmacy script (writes `moct_script_link`; ETL applies the tag → tracking flows to the clinic) or **dismiss** a reviewed false-positive (`moct_orphan_dismissal`, soft/reversible), with bulk accelerators + fuzzy drug matching for both. Perms: `View_Menu_Missing_Scripts`, `Write_Redrive_Scripts`, `Write_Link_Scripts`. Full doc: [../emed/missing-scripts.md](../emed/missing-scripts.md).
