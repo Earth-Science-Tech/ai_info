@@ -76,3 +76,13 @@ So the code + 6 tables are live and inert. Shipped alongside the facility-scope 
   helper gives each session its OWN `MSSQLStore` instance (same `sessions` table; sids never collide).
   Reproduced + verified in isolation and on prod (fresh login now gets `Path=/`, 8h). **Lesson: never
   share one express-session store instance across two session middlewares.**
+- 2026-08-19 — **Localhost testing enabled** for Phase-2 improvement work. Set `SECURE_MESSAGING_ENABLED=1`
+  in `emed_app/.env` (gitignored, local only). Off-prod (`is_prod()` = `IS_PROD==='1'`, false on
+  localhost) the secure-message SMS **never reaches a patient**: with `DEV_SMS_PHONE` set it routes a
+  `[DEV]`-prefixed SMS to that number, unset it's suppressed — and either way the magic-link URL prints to
+  the server console (`[PORTAL] secure-message link (dev): <url>`), which is the reliable local test path
+  (the dev `emed_sms` queue isn't drained — ETL targets prod). Remaining local prerequisite before a send
+  goes through: enable a facility's Messages page (default-deny; the only dev config row, facility #716,
+  is `visible_on_emed=false`) + a test patient with a phone + DOB in that clinic.
+- 2026-08-19 — Cross-team **as-built briefing** written for review:
+  [`projects/emed-app/patient-portal-and-facility-groups.md`](../projects/emed-app/patient-portal-and-facility-groups.md).

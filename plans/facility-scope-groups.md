@@ -180,3 +180,20 @@ The only things that change are where scope is **edited** and a `recompute_user_
   `emed_user_clinic` rows + a no-op `clinics` UPDATE to let the trigger rebuild a clean 911-row mirror.
   **Lesson: anything that writes `emed_user.clinics` must NOT also touch `emed_user_clinic` — the trigger
   is the single writer.**
+- 2026-08-18 — **`emed_user_clinic` debris purge (data-only, no code).** Editing any migrated account in
+  User Management started failing with "Failed to update user": the pre-1.0.207 recompute had left BOTH an
+  active AND a soft-deleted row per clinic for ~all migrated accounts (647 soft-deleted rows across 59
+  accounts), so the sync trigger's reactivate step collided (err 2601) on the next `emed_user` UPDATE.
+  Fixed with an admin `DELETE FROM emed_user_clinic WHERE is_invalid = 1` (active rows = the real mirror,
+  untouched; trigger rebuilds from `emed_user.clinics`). Collision-risk accounts 59 → 0. Generalizes the
+  single-account giano fix from 1.0.207. (Surfaced while re-scoping the `Jack.Jill` API account to the
+  merged "Jack & Jill Health" facility.)
+- 2026-08-18 — **1.0.211: Facilities page enhancements.** Facility Groups folded into the main Facilities
+  table (Type = "Group", name shows "Helimeds (3 Clinics)"), opening in the same right-hand detail pane as
+  a facility (groups modal removed). Added a sortable **Users** column (scoped-user count per facility/
+  group). The facility **Users** section now also lists the External Reps / Prescribers who can view that
+  clinic (read-only, "via group X" vs "scoped directly"), and an API account's **Display Name** (the
+  base64 `customer` header) is editable there. Plus UI polish (full "Names"/"Group" headers, greyed
+  `[inactive]` facilities, "Clinic Portal User" label). No schema change.
+- 2026-08-19 — Cross-team **as-built briefing** written for review:
+  [`projects/emed-app/patient-portal-and-facility-groups.md`](../projects/emed-app/patient-portal-and-facility-groups.md).
