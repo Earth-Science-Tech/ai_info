@@ -10,6 +10,7 @@ change its status. Full rules: [`skills/plan-tracking.md`](../skills/plan-tracki
 
 | Status | Plan | Project | Branch | Developers | Updated |
 |--------|------|---------|--------|------------|---------|
+| Completed in Production | [Sync Pharmacy Facilities](pharmacy-facility-sync.md) | emed_app | `feat/pharmacy-facility-sync` (1.0.224) | Nicholas Cardell | 2026-08-22 |
 | Completed in Production | [Facility Scope Unification (FacilityGroups)](facility-scope-groups.md) | multi | `feat/patient-portal-secure-messaging` (1.0.205–1.0.207, 1.0.211) | Nicholas Cardell | 2026-08-19 |
 | Completed in Production | [Patient Portal + Secure Messaging (Phase 1, ships DARK)](patient-portal-secure-messaging.md) | multi | `feat/patient-portal-secure-messaging` (1.0.205) | Nicholas Cardell | 2026-08-19 |
 | Completed in Production | [Sync Everything skill (pull all repos + reload)](sync-everything-skill.md) | ai_info | `main` (direct) | Nicholas Cardell | 2026-08-15 |
