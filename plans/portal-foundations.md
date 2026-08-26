@@ -21,6 +21,17 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Phase-2 review round 2 applied** (eMed 88966d7f + 243260c1): (1) impersonation
+  fix — team_ctx/require_portal_role resolved membership via auth.get_user (the REAL admin under
+  impersonation, by audit design), so "View as" a Portal Admin could never reach My Team; membership
+  RESOLUTION now follows the effective identity while write attribution stays the real admin
+  (verified E2E: impersonated org_admin added a Medical Assistant colleague, membership row
+  app_user = the real admin). (2) Facilities panel restructured to "Portal Settings" with
+  Prescriber Portal / Clinic Portal subsections (clinic-only facilities no longer configure inside
+  a prescriber-branded block); same ids, save round-trip verified. Plan v4 amended (Mario, plan
+  mode): clinic-portal-only completeness statement in Phase 5 — the clinic portal already OWNS
+  Payment Methods/Documents/Visits (the prescriber portal borrows FROM it), equal-service rule
+  generalized, clinic per-page grid + storage decision at Phase 5, MOC billing deferred to Phase 8.
 - 2026-08-26 — **Phase-2 review round 1 applied** (eMed c0973fbe, emed_sql 5484806):
   `emed_facility.clinic_portal_enabled` — independent per-facility clinic-portal master switch
   beside the prescriber one (panel checkbox; /clinic/* enforcement deferred to Phase 5);
