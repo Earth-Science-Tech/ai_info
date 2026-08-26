@@ -21,6 +21,12 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Shared-service rule (Mario):** Payment Methods / My Clinic / Documents /
+  My Team / Messages are FACILITY-relationship services — one canonical portal-aware page + one
+  sidebar entry each, never forked per portal (supersedes Phase 3's "dedicated prescriber
+  Documents/My-Clinic/Payments pages"). Sidebar dedupe guard committed (eMed) mirroring the
+  existing My Team guard. Clinic-portal per-page grid confirmed parity-by-Phase-5 (legacy live
+  pages can't take default-deny gating without a backfill; the rebuild replaces them anyway).
 - 2026-08-26 — **Directive (Mario): catalog-driven portal ordering.** Prescriber-portal drug
   picker = the Pricing module's facility-scoped effective list (active catalog + facility
   special/proprietary via finalized sheets; "upon request" shown unpriced); estimated per-line
