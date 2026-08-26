@@ -21,6 +21,15 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Phase 3 Slice D shipped** (eMed): /prescriber/patients — list w/ visit
+  aggregates, Add/Edit modal (edit reuses the stored external-id suffix so corrections update
+  rather than fork), history modal w/ portal-status badges + per-visit clone, start-order
+  prefill (?patient=). FIXED IN THE A5 SEAM: upsert_patient wrote non-existent moct_person
+  columns (app_user + clinical fields) — every portal patient save was a silent no-op; the seam
+  now whitelists real columns and fails loudly. moct_person = identity+contact ONLY; clinical
+  data stays per-visit. Also: tracking exports (masked CSV + filter-aware print, search term
+  never echoed). REMAINING Phase 3: Slice E (equal-service gating, portal-aware shared pages,
+  extras: facility logo / news / special product requests) + recurring orders (assess at review).
 - 2026-08-26 — **Phase 3 Slice C shipped** (eMed): /prescriber/tracking — Liberty-mirror order
   tracking (exship overlay, carrier links, variant-deduped clinic scoping) with the A8 two-tier
   read: full rows on-screen (PHI-audited) vs a SERVER-masked print tier (project_rows +
