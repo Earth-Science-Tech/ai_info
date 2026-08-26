@@ -21,6 +21,12 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Hotfix PR eMed#479 opened** (Mario's call): the ops staff import on main has
+  the SAME SheetJS raw:false day-shift found on the portal patient import — license
+  issue/expiration dates (the compliance-alert inputs) import silently off by one day. Fix
+  mirrors the portal one (raw:true + Excel-serial UTC conversion in ops.coerce_date); ops suite
+  90 green. billing.ejs audited: CSV path uses its own parser, unaffected. Nick gates the merge.
+  (Noted: main moved to 1.0.229 — the Clinic Info hotfix #476 already shipped.)
 - 2026-08-26 — **Patient bulk upload shipped** (eMed, Mario's spec): server dry-run validation
   -> preview -> commit; duplicate = name+DOB+contact match (rejected), review = name+DOB only
   (per-row approval = contact UPDATE of the existing patient); all pictured fields required
