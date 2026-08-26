@@ -21,6 +21,12 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Patient bulk upload shipped** (eMed, Mario's spec): server dry-run validation
+  -> preview -> commit; duplicate = name+DOB+contact match (rejected), review = name+DOB only
+  (per-row approval = contact UPDATE of the existing patient); all pictured fields required
+  (middle name excepted — flagged for Mario). BUG KILLED: SheetJS raw:false day-shifted ISO DOBs
+  ('1975-06-15' -> '6/14/75') — silent wrong DOBs on import; now raw:true + server-side Excel
+  serial conversion (UTC math) + numeric-zip leading-zero restore. 13-case unit suite.
 - 2026-08-26 — **Phase 3 Slice D shipped** (eMed): /prescriber/patients — list w/ visit
   aggregates, Add/Edit modal (edit reuses the stored external-id suffix so corrections update
   rather than fork), history modal w/ portal-status badges + per-visit clone, start-order
