@@ -26,8 +26,9 @@ related:
   for every SINGLE-facility portal user — the facility selector is only populated for
   multi-facility users, so `parseInt('')` = NaN and `FACILITIES[NaN]` discarded the loaded
   facility. Shipped with the June facility-registry release; affects prod today (nearly every
-  ClinicUser/ExternalPrescriber has one facility). Candidate for a main hotfix cherry-pick —
-  Nick's call. Verified through the real page for both test users. LESSON RECORDED: API-level
+  ClinicUser/ExternalPrescriber has one facility). Hotfix PR opened at Mario's direction: eMed#476
+  (branch hotfix/clinic-info-single-facility off origin/main, cherry-pick of 9dd4ef21) — merge is
+  Nick's call as gatekeeper. Verified through the real page for both test users. LESSON RECORDED: API-level
   verification is NOT page-level verification — every user-facing claim must be proven through
   the page in a browser before reporting it works.
 - 2026-08-26 — **Shared-service rule (Mario):** Payment Methods / My Clinic / Documents /
