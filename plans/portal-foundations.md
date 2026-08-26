@@ -21,6 +21,14 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Directive (Mario): catalog-driven portal ordering.** Prescriber-portal drug
+  picker = the Pricing module's facility-scoped effective list (active catalog + facility
+  special/proprietary via finalized sheets; "upon request" shown unpriced); estimated per-line
+  prices + order total at submission; quote SNAPSHOTTED per line at submit; order history shows
+  quoted amounts (all Phase 3). "Pending Billing" review section (quoted-vs-invoiced
+  reconciliation) deferred as v2 = first slice of Phase 8 cart/pay-as-you-go. Side benefit:
+  portal orders are born catalog-keyed — no reverse drug-mapping at invoicing, vial-size SKU
+  picked directly. Plan file Phase 3 amended.
 - 2026-08-26 — **Phase-2 review round 2 applied** (eMed 88966d7f + 243260c1): (1) impersonation
   fix — team_ctx/require_portal_role resolved membership via auth.get_user (the REAL admin under
   impersonation, by audit design), so "View as" a Portal Admin could never reach My Team; membership
