@@ -21,6 +21,17 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Phase 2 built** (Facilities-hub management + in-portal delegation) on
+  `feat/portal-foundations` @ 7d7b0a0b; **awaiting Mario's Phase-2 review**. The Facilities page
+  now carries the Prescriber Portal Settings panel (master/type/channel/enforcement + default-deny
+  page toggles, saved with the facility) and a tier-aware Users card: ExternalPrescriber accounts
+  create/edit through the structured-scope path (`POST /api-users` extended), portal capability
+  tiers + licensed states (moct_prescriber_license reuse via new set_state_list) + staff-side
+  attestation record/revoke. New `/prescriber/team` delegation page + `/api/prescriber/team` API:
+  can:manage_users tier gate, enforcement-aware attestation gate (ships dark), last-admin guard,
+  colleague creation via new `users.create_portal_account`. Group edits re-sync group-materialized
+  memberships. Page fully registered (page_catalog/REQUIRES/nav/sidebar; registry check green,
+  118 pages). +10 delegation-authz tests; suite 3,968 green. No schema change (rides Phase 1).
 - 2026-08-26 (later) — **Phase-1 review round 1** (Mario): four directives folded in, commits
   eMed 0ca5c29c + emed_sql df5cb1d (both dev-applied).
   (1) **Patient model DECIDED**: each facility owns its patient records; the same human exists
@@ -95,7 +106,7 @@ working prescriber portal.
 |---|---|---|
 | 0 | Corrections & de-risking (migration header, routing verify, signature accessor, docs) | **done, in review** |
 | 1 | **built, in review** — Foundations A1–A9: migrations (`emed_portal_membership`, `prescriber_portal_page_config`, `emed_portal_attestation`, facility columns) · `portal_role` tiers · per-facility config clone · attestation persistence · patient resolver seam · status mapper · messaging primitive (D21) · masking + `external_patient_ref` · EMR-ready conventions | in review |
-| 2 | ★ Facilities-hub user/prescriber management + in-portal delegation (Nick's core ask) | |
+| 2 | ★ Facilities-hub user/prescriber management + in-portal delegation (Nick's core ask) | built, in review |
 | 3 | Prescriber Portal to parity (order flow through preclar gate, clone/refill, patient mgmt, dedicated views, eScript equal-service) | |
 | 4 | Vet + Pharmacy-Transfer types + vet pricing line (catalog discriminator, Product-Map matching, Zoolzy toggle) | |
 | 5 | Clinic Portal (MOC pipeline; reuse Patient Portal magic-link for questionnaires) | |
