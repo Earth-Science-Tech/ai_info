@@ -21,6 +21,15 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Liberty mirror seeding shipped** (eMed + emed_sql wip migration
+  emed_portal_patient_link): Sync Facility Patients + Sync Facility Prescriptions, per-facility
+  (Portal Settings panel) AND all-facilities (toolbar; portal-enabled facilities only). Mirror
+  SQL only — zero Liberty REST. Patients ride the upload's dup rules (seed mode: identity
+  required, bad optionals dropped); prescriptions = READ-ONLY history via person<->PatientId
+  links (hard-match only; existing link checked first). Bugs killed live: VARCHAR PatientId vs
+  INT strict compare; link-existence after contact rule. E2E on real data: 282 seeded + 281
+  linked at facility 2; portal lists 286. TODO Phase-3 wrap: unit suite for portal_liberty_seed;
+  patient-history mirror section + refill-from-mirror prefill (the read-only Rx history surface).
 - 2026-08-26 — **Portal Admin pseudo-roles in User Management** (eMed, Mario): 'Prescriber
   Portal Admin' / 'Clinic Portal Admin' in the role picker = machine role + server-written
   org_admin membership across the user's scope (facility/group/legacy-clinics). NOT separate
