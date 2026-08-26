@@ -21,6 +21,18 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Phase 3 STARTED — Slice A shipped** (eMed 2df4ecf5 + emed_sql 6243c9c):
+  catalog-driven ordering per Mario's directive. pricing.get_portal_catalog (facility-scoped
+  effective list: final-sheet price replaces base, proprietary only when sheet-priced,
+  upon-request shown), GET /api/prescriber/catalog, server-side re-pricing + immutable per-line
+  quote snapshot (NEW TABLE emed_portal_order_quote, INSERT-only, dev-applied wip migration),
+  delivery destination (patient|facility|other|pickup), special instructions ->
+  moct_special_instructions, live estimated total in create-visit.ejs, clinic-variant dedupe.
+  Page-verified E2E: 885-product picker, $130 estimate, visit 1047338 with quote+instructions
+  rows. Portal UNITS field is the SKU count for the estimate (Rx Quantity stays free text —
+  Liberty container semantics don't apply to portal orders). REMAINING Phase-3 slices:
+  B orders split/status-mapper/clone/refill · C tracking+masked mass-print · D patients page ·
+  E equal-service gating + portal-aware shared pages + extras (logo, news, product requests).
 - 2026-08-26 — **PRE-EXISTING PROD BUG found by Mario's Phase-2 review, fixed on-branch
   (eMed 9dd4ef21):** `views/facility/info.ejs` (My Clinic) rendered "No facility profile found"
   for every SINGLE-facility portal user — the facility selector is only populated for
