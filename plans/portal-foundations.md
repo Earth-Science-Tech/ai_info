@@ -21,6 +21,12 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Phase 3 Slice C shipped** (eMed): /prescriber/tracking — Liberty-mirror order
+  tracking (exship overlay, carrier links, variant-deduped clinic scoping) with the A8 two-tier
+  read: full rows on-screen (PHI-audited) vs a SERVER-masked print tier (project_rows +
+  assert_masked; print fetches fresh, never reuses on-screen rows). Page-verified: 905 mirror
+  orders, masked print carries initials only. Also: list Actions column (View/Clone/Refill)
+  from Mario's mockup.
 - 2026-08-26 — **Phase 3 Slice B shipped** (eMed): portal-status mapper surfaced on list
   (Pending/Prescribed/All tabs) + detail (visit badge, per-rx badges via latest-hold OUTER
   APPLY), Clone Order + per-drug Refill -> create-visit prefill re-linked to TODAY's catalog
