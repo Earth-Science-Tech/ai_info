@@ -21,6 +21,29 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 (later) — **Phase-1 review round 1** (Mario): four directives folded in, commits
+  eMed 0ca5c29c + emed_sql df5cb1d (both dev-applied).
+  (1) **Patient model DECIDED**: each facility owns its patient records; the same human exists
+  as separate rows per facility BY DESIGN (already structural via clinic-namespaced
+  external_id); within one facility the clinic + prescriber portals share the same rows via the
+  A5 seam; cross-facility visibility NEVER surfaces provider-side; an INTERNAL-ONLY identity
+  link (Nick's patient_portal_person junction) serves pharmacy safety + the patient portal —
+  confirm junction privacy in the D14 conversation. Intra-facility dedup/merge (two channels
+  minting two rows for one person) lands in Phase 3 patient management.
+  (2) **Group memberships**: external prescribers may be granted facility GROUPS —
+  emed_portal_membership.source_group_id + assign_group_membership/recompute_group_memberships
+  (materialized per-facility rows, provenance-tagged, re-synced on group edits).
+  (3) **Licensed states**: REUSE the existing moct_prescriber_license store +
+  /admin/prescriber-licenses (works for external prescribers as-is — no new table). Onboarding
+  (Phase 6) and the Facilities hub (Phase 2) must capture states into it. New
+  portal_channel_suggest.js: patient state outside the prescriber's active unexpired Medical
+  states -> RECOMMEND the Clinic Portal (advisory, never a block; no rows yet -> no redirect).
+  (4) **Phase-5 scope change**: the email-the-patient questionnaire dispatch (+ patient-portal
+  link) is ON HOLD per Nick. INTERIM RULE: every clinic-portal submission REQUIRES a manually
+  uploaded Medical Questionnaire (MQ) attachment at creation until the dispatch feature rolls
+  out. D18 -> HELD.
+  Also: session re-anchored into the eMed project; both worktrees re-verified current with prod
+  (origin/main = 1.0.228, 0 behind, both repos). Suite: 3,957 green.
 - 2026-08-26 — Phase 1 (Foundations A1–A9) built on `feat/portal-foundations` @ 924df669 +
   `emed_sql feat/portal-foundations-schema` @ 136e15e; **awaiting Mario's Phase-1 review**.
   Decisions locked with Mario: D21 = NEW `emed_portal_thread`/`_message` (not
