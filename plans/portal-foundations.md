@@ -21,6 +21,15 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **PRE-EXISTING PROD BUG found by Mario's Phase-2 review, fixed on-branch
+  (eMed 9dd4ef21):** `views/facility/info.ejs` (My Clinic) rendered "No facility profile found"
+  for every SINGLE-facility portal user — the facility selector is only populated for
+  multi-facility users, so `parseInt('')` = NaN and `FACILITIES[NaN]` discarded the loaded
+  facility. Shipped with the June facility-registry release; affects prod today (nearly every
+  ClinicUser/ExternalPrescriber has one facility). Candidate for a main hotfix cherry-pick —
+  Nick's call. Verified through the real page for both test users. LESSON RECORDED: API-level
+  verification is NOT page-level verification — every user-facing claim must be proven through
+  the page in a browser before reporting it works.
 - 2026-08-26 — **Shared-service rule (Mario):** Payment Methods / My Clinic / Documents /
   My Team / Messages are FACILITY-relationship services — one canonical portal-aware page + one
   sidebar entry each, never forked per portal (supersedes Phase 3's "dedicated prescriber
