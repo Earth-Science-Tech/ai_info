@@ -21,6 +21,11 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Phase 3 Slice B shipped** (eMed): portal-status mapper surfaced on list
+  (Pending/Prescribed/All tabs) + detail (visit badge, per-rx badges via latest-hold OUTER
+  APPLY), Clone Order + per-drug Refill -> create-visit prefill re-linked to TODAY's catalog
+  (quote rows supply catalog_id/units; consent never cloned). Page-verified: dev preclar GLP-1
+  rules actually held the test visits -> 'In review' badges from real hold data.
 - 2026-08-26 — **Phase 3 STARTED — Slice A shipped** (eMed 2df4ecf5 + emed_sql 6243c9c):
   catalog-driven ordering per Mario's directive. pricing.get_portal_catalog (facility-scoped
   effective list: final-sheet price replaces base, proprietary only when sheet-priced,
