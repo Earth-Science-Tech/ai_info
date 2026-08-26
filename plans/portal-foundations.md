@@ -21,6 +21,12 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Portal Admin pseudo-roles in User Management** (eMed, Mario): 'Prescriber
+  Portal Admin' / 'Clinic Portal Admin' in the role picker = machine role + server-written
+  org_admin membership across the user's scope (facility/group/legacy-clinics). NOT separate
+  roles — membership stays the one tier source. GET /users annotates portal_admin; explicit
+  false demotes (prescriber -> primary_prescriber, clinic user -> removed). Page-verified E2E
+  incl. demotion.
 - 2026-08-26 — **My Clinic in-portal editing shipped** (eMed, Mario): can_edit per facility on
   GET /mine (manage-capable tier at that facility, impersonation-aware); PUT /mine/contact
   (CONTACT_FIELDS widened to 7 contact-class columns — still never type/billing/flags; leads
