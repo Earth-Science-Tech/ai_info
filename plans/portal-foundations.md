@@ -21,6 +21,12 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **My Clinic in-portal editing shipped** (eMed, Mario): can_edit per facility on
+  GET /mine (manage-capable tier at that facility, impersonation-aware); PUT /mine/contact
+  (CONTACT_FIELDS widened to 7 contact-class columns — still never type/billing/flags; leads
+  re-mirrored) + PUT /mine/address (save_address, ownership-checked, primary honored — feeds
+  ship-to-facility). Tier-gated server-side via require_portal_role(can:manage_users).
+  Page-verified incl. negative: medical_assistant gets no controls + 403 on direct PUT.
 - 2026-08-26 — **Hotfix PR eMed#479 opened** (Mario's call): the ops staff import on main has
   the SAME SheetJS raw:false day-shift found on the portal patient import — license
   issue/expiration dates (the compliance-alert inputs) import silently off by one day. Fix
