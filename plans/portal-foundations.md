@@ -21,6 +21,14 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Phase-2 review round 1 applied** (eMed c0973fbe, emed_sql 5484806):
+  `emed_facility.clinic_portal_enabled` — independent per-facility clinic-portal master switch
+  beside the prescriber one (panel checkbox; /clinic/* enforcement deferred to Phase 5);
+  `can_manage_users` extended to medical_director + primary_prescriber (solo practices);
+  attestation HMAC integrity fix (SQL DATETIME truncates ms — zero milliseconds before
+  hash+store; verified live on liberty_link_dev: record→verify integrity:true). Localhost
+  walkthrough state: facility 1466, prescriber 137 (primary_prescriber, FL/TX, attestations
+  complete), user 66 (org_admin, attestations pending). Still awaiting Mario's Phase-2 gate.
 - 2026-08-26 — **Phase 2 built** (Facilities-hub management + in-portal delegation) on
   `feat/portal-foundations` @ 7d7b0a0b; **awaiting Mario's Phase-2 review**. The Facilities page
   now carries the Prescriber Portal Settings panel (master/type/channel/enforcement + default-deny
