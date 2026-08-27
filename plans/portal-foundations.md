@@ -21,6 +21,34 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **Clinical autofill + Save Draft + the PDF-preview verdict.** (1) **CLINICAL
+  AUTOFILL** (Mario): clinical data is a per-VISIT snapshot on `moct_visit`, never on the
+  person, so "the last order" IS the right source — new PHI-audited
+  `GET /patients/:id/last-clinical` returns allergies/conditions/current-meds from the newest
+  visit carrying any of them; selecting an existing patient fills only fields left EMPTY (never
+  overwrites typing — regression-checked in-browser), shows "Auto-filled from the last order
+  (date)" with a clear link, stays editable, and is silent for patients with no history.
+  (2) **SAVE DRAFT** for orders in progress — deliberately DISTINCT from Save for Approval: a
+  DRAFT is unfinished work owned by its author, a PENDING order is finished work handed to a
+  prescriber. Same table, different status. Save Draft skips every field gate (incomplete by
+  definition) but refuses a totally empty form; `draft_id` makes a re-save UPDATE rather than
+  pile up copies; **drafts are PERSONAL** (listed only to their author — verified another user
+  sees zero) while the pending queue stays the facility's shared work; new **My Drafts** tab
+  with Resume (`?draft=<id>` rehydrates patient/clinical/delivery/transfer/drug rows through the
+  clone path so pricing re-runs) + Delete; Save for Approval on a resumed draft promotes it in
+  place (verified my-drafts 1→0, pending 2→3). (3) **⚠ PDF PREVIEW — MEASURED VERDICT:** pdf.js
+  is now served from OUR origin (`public/js/vendor`, library AND worker) because a CDN worker
+  needs both a CSP allowance and outbound reachability, and **when the worker fails pdf.js
+  silently parses on the MAIN THREAD and hangs the tab** (that is what "no preview" looked
+  like). Even same-origin, the uploaded infographic measured **parse 72 ms / render >20 s** —
+  browser rasterization is simply the wrong tool for graphics-heavy PDFs, so rendering is now
+  **TIME-BOXED at 12s** and reports "took longer than 12s" instead of spinning; the
+  auto-backfill logs and skips such files. RELIABLE PATHS: staff upload a preview image
+  (instant, always works) or accept the file icon. If automatic previews for heavy PDFs are
+  wanted, that needs SERVER-side rasterization = a new dependency (pdfjs-dist + a prebuilt
+  canvas binding) — a deployment-risk decision for Mario/Nick, deliberately NOT slipped in.
+  Also: the queue subtitle now reads "drafted by your team for your review and approval".
+  Commit 3cf7fa75; dev merge c2812b6a.
 - 2026-08-27 — **⚠ THE DATA-URL BUG (why "the test Article" wouldn't open or preview) + draft
   review popup.** `public/js/main.js` **`file_to_base64()` resolves the FULL data URL**
   (`data:application/pdf;base64,…`), and the news save stored it verbatim — so
