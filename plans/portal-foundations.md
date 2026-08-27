@@ -21,6 +21,60 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **REVIEW PASS over the day's ~3,500 lines: 15 confirmed defects fixed** (commit
+  a62dd244, dev merge 92309db3). Three adversarial reviewers (security / correctness /
+  front-end); everything verified against the running app. **Money/safety class:** (1) **double
+  -submitted prescriptions** — approve-batch was read-check-then-act around a seconds-long
+  replay, so two overseers each minted a visit AND a pharmacy submission for the same draft;
+  now **claim-first** (`claim_for_approval`, one conditional `pending->approving` UPDATE, the
+  loser told "already being approved"), with `mark_failed` RELEASING back to pending. Verified:
+  approve #1 → visit 1047513, #2 refused. (2) **second visit on a 502** — visit created + send
+  failed left the draft pending, and a retry replayed the whole handler; a 502 now consumes the
+  draft against that visit and reports `send_pending` (the outbox owns delivery). (3)
+  **cross-territory message read** — `GET /:id/threads` was widened to PM_READ without
+  inheriting `message_scope`. (4) **Transfer Order lost on Edit & Resend** — `rx_resubmit`
+  regenerated from a bare `get_visit`, so the corrected doc lost the banner, the pharmacist box
+  and **the embedded original prescription**; both regen paths now load the same persisted
+  context `redrive_unsent_scripts` uses. **Silent data loss:** news tiles were **unpublished by
+  merely opening the admin page** (the auto thumbnail backfill posts a partial body and the
+  UPDATE rewrote every column — now omitted-means-unchanged); the portal-config **scalars** were
+  still unsafe on a partial PUT (the grid hardening covered only the grids — a vet facility
+  could silently lose its intake rules); `import_catalog` **re-marketed vet/misc products to
+  human** on a plain price-refresh import (default now applies to INSERTS only — the existing
+  "merge only what the file carries" test asserted `category` and never `market`, so it passed
+  over the bug); **Resume Draft came back nearly empty** (passed `{drug}` to `apply_clone`,
+  which reads `c.drugs` and re-set every patient field from its own empty input; drug rows are
+  now one shared `fill_drug_rows()` and resume restores clinic → fields → destination →
+  shipping in dependency order). **Injection:** new **`misc.clean_base64`** (strip + charset
+  gate) on the logo, news doc/thumb and Rx attachments — those bytes are interpolated into HTML
+  (admin preview, Transfer Order, Rx); `fail_reason` sat inside `title="…"` and the house
+  `escape_html` does NOT escape quotes. **Attestation integrity:** the rapid-fire selection was
+  never pruned on reload, so a withdrawn draft stayed in the POSTED set while the signed list no
+  longer showed it. ⚠ **TEST DEBT FROM EARLIER TODAY — 16 unit tests were already red before
+  this pass, and one was a live crash: `permissions.js` `CustomerService()` had a TDZ throw**
+  because my Portal Messages flags were spliced ABOVE the `ret` declaration (and the union loop
+  would have discarded them anyway) — **every CustomerService permission lookup threw, already
+  merged to dev**. Also: the three new pages were never registered in `REQUIRES`/`WRITE_CAP` and
+  the sidebar's eMed heading/section-links lists never learned about them (a page-level grant
+  produced a page with no link); the Rx banner tests asserted the pre-logo `<div>`. **Suite now
+  4029 green (from 16 red), registry green.** New `tests/unit/server/portal_clinic_scope.test.js`
+  (9) pins the shared resolver. **LESSON: run the full unit suite before merging, not after a
+  day of merges** — the crash and the registry gaps were all catchable at commit time.
+- 2026-08-27 — **5C questionnaire coordination note SENT** to Nicholas Cardell + Carlos Obregon
+  (cc Mario) from the app mailbox, per Mario. Key finding that shaped it: **Mario's proposal —
+  a link to the patient's own portal — is ALREADY BUILT by Nick** (dev, 8/24–8/25 Peak Now
+  workstreams): `server/product_required_form.js` (product→form mapping + `recency_months`,
+  `resolve_required_forms`, `due_forms_for_person`), `/admin/clinic-products`, the **'Missing
+  Forms'** visit flag, a **PHI-free secure message pointing at the portal**, the patient-portal
+  **Intake Forms** page, and the iframe/SSO handoff (dark). **THE GAP: the trigger is wired only
+  into `wc_ingest`** (the Woo/PeakNow path) — Phase 5's two clinic channels
+  (`POST /api/clinic/create-visit`, `POST /api/public/moct/visit`) never call it. Proposal sent:
+  lift the trigger into one shared `trigger_for_visit()` called by all three channels; **add a
+  `catalog_id` mapping column** because the mapping is keyed on `wc_product_id`/`wc_sku` while a
+  clinic-portal order is catalog-keyed (name-matching across a vial ladder is where auto-pricing
+  got burned); and decide the fallback for clinic facilities **without** the patient portal (the
+  notifier requires its Messages page enabled and otherwise sends nothing). Blocked on their
+  answers before building 5C.
 - 2026-08-27 — **PHASE 5 DECISIONS ANSWERED (Mario) — and most of the phase turns out to be
   ALREADY BUILT.** D20 questionnaire delivery: **reuse the Patient Portal magic-link method —
   NICK IS BUILDING IT**, and the questionnaire↔drug/product MAPPING lives on a **"Clinic
