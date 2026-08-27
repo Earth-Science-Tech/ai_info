@@ -21,6 +21,31 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **CUSTOMER-PHARMACY REALM shipped (Mario): the facility IDENTITY drives the
+  transfer portal.** "Pharmacies that transfer should be type Pharmacy, with a primary
+  Fulfillment Pharmacy toggle — ON = the RxCS/MM/MEDV variety, OFF = a customer of the
+  pharmacies and MOC. All the special roles and transfer features live in this realm."
+  New BIT `emed_facility.is_fulfillment_pharmacy` (wip migration
+  `2026-08-27_add_facility_is_fulfillment_pharmacy.sql`, dev-applied; backfill verified EXACT —
+  the only type='Pharmacy' rows were rxcs/mmed/mdvo ids 1741-1743 — plus normalization of
+  transfer-portal facilities into the realm). **THE SEAM:** `prescriber_portal_config
+  .get_facility_config` derives the EFFECTIVE portal_type — type='Pharmacy' + fulfillment OFF
+  ⇒ 'pharmacy_transfer' whatever the stored column says — and EVERY consumer (pharmacy role
+  family, transfer intake, Transfer Order, all-market catalog, team page) already reads that
+  one function, so the identity became the single switch with zero consumer edits. Coherence
+  in set_facility_config (AFTER vocab validation — a pinned test caught the ordering): setting
+  portal_type='pharmacy_transfer' NORMALIZES the row to Pharmacy/fulfillment-off; switching a
+  customer pharmacy to another portal type is REFUSED ("change the facility Type first").
+  Facilities editor: Fulfillment switch w/ plain hints; Pharmacy Code field now only for
+  fulfillment pharmacies; flag in FACILITY_FIELDS + list select + `is_customer_pharmacy` on
+  the config UI payload. Verified live: stored portal_type NULLed → still derives
+  pharmacy_transfer; PIC (ZZ Pharmacist promoted to pharmacist_in_charge) sees the 3-tier team
+  page; catalog serves all markets; guard 400s; Clinic row normalized on panel save; UI both
+  ways (1st Aid Station = customer, RxCS = fulfillment + code). +5 config tests incl. the
+  partial-PUT no-blackout pin (101 green). Commits 327e57df + emed_sql 35917c6; dev merge
+  ff17bd30. NOTE: staff/portal team surfaces + role families were already portal_type-driven,
+  so they follow the identity automatically — the ONLY portal_type writers left are the
+  Portal Settings panel and this derivation.
 - 2026-08-27 — **⚠ DEV DATABASE WAS REFRESHED FROM PROD OVERNIGHT (~01:24-04:16) — what broke,
   what didn't, and what to re-do after the next one.** Mario hit it as "why is Misc empty?".
   Diagnosis (not a guess — evidenced): `emed_price_catalog.market`'s default constraint was
