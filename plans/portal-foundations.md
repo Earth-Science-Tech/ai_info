@@ -21,6 +21,35 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **PHASE 7 E1+E2 SHIPPED** (commit 9c84e1f6; dev merge 3a61f0e7; migration
+  `2026-08-27_add_group_sales_team_code.sql` = 2 additive columns on `emed_facility_group`,
+  dev-applied, **PENDING PROD**). **E1 lead-side territory:** `sales_team_code` (maps a sales
+  group to `emed_crm_lead.sales_team` — ONE territory, two sides, one source of truth) +
+  `company_email`, editable on the group modal. **`server/rep_territory.js`** resolves
+  FAIL-CLOSED (staff = View_Menu_CRM/Write_CRM pass-through; narrow-flag rep = their group's
+  code; no group/code/login/any error = NOTHING). New narrow flag **`Write_Rep_Leads`**
+  (ExternalRep; NEVER Write_CRM — the asymmetry is the point) accepted at the FOUR lead
+  handlers: list (forced WHERE + `territory_empty`), read (out-of-territory 404), create
+  (**sales_team STAMPED, client value never trusted**), update (404 fence + sales_team
+  immutable). The per-page WRITE framework holds too: RepLeads carries a write gate and the
+  two lead mutation routes map `[CRMLeads, RepLeads]` (the write gate passes on ANY mapped
+  page's flag). **E2 rep lead view + signup front door:** `/rep/leads` (section 'reptools',
+  top of the hub) — territory list, minimal detail, **Invite to Portal** = the Phase 6 invite
+  prefilled with facility/email/crm_lead_id (the locked rep-gated entry). ExternalRep gains
+  Write_Rep_Leads + Write_Portal_Signups in code; approve stays staff. ⚠ **TWO OF MY OWN BUGS
+  CAUGHT ONLY BY THE LIVE WALK:** (1) `rep_territory` read the RAW SESSION — under View-As
+  that's the ADMIN, so the admin's perm decided "staff" and the admin's login resolved the
+  territory (impersonated rep listed zero leads; a rep-created lead kept its client-chosen
+  team). Fixed with `auth.get_permissions`/`get_effective_user` — **any scope resolver MUST use
+  the impersonation-aware accessors.** (2) an edit batch ABORTED at a failed anchor assert
+  after its first section, silently leaving five later edits unapplied while `node --check`
+  passed on the UNMODIFIED files — **batch edit scripts are now per-section independent.**
+  Also: `GET /api/crm/leads` responds `{rows}` not `{leads}` (cost one false-negative fence
+  walk). Verified live as ExternalRep 58 (group 9 = GCC): 17 leads all GCC, own r/w 200,
+  territory move blocked, foreign read AND write 404, created lead stamped GCC despite
+  claiming ETST, page renders + invite returns the one-time link. Suite 4071; registry 126.
+  **REMAINING Phase 7: E3 My Facilities, E4 territory patients, E5 Order Sets, E6 order→lead
+  intelligence, E7 leads-slice extraction (slack-week item).**
 - 2026-08-27 — **PHASE 7 STARTED — E0 SHIPPED** (commit 6f4c2c9c; dev merge e4b6aa1a). **Q-HOUSE
   DECIDED (recommendation a):** the Rep Tools heading renders for HOUSE reps too — predicate
   `View_Menu_Rep_Tools && (is_clinic_scoped || !View_Menu_Admin)` (the compound route_clinic
