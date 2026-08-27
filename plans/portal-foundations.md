@@ -21,6 +21,37 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **PORTAL MESSAGES page (cross-facility queue) — reps first.** Mario: facility
+  messages were reachable only by expanding ONE facility at a time on the Facilities page,
+  gated on `Write_Facilities` (the facility-ADMIN permission), with **no cross-facility view and
+  no unread count anywhere** — the only real notification was the support@ mailbox. New page
+  **`/portal-messages` under EMED** (Mario's placement) following the Clarifications-SMS pattern:
+  every conversation in one queue + status/unread filters, reading pane, reply/close, and a red
+  **sidebar badge** polling the unread total. No schema change — threads + read tracking already
+  existed; `portal_threads` gained `list_threads_all()` / `unread_total()`. **ACCESS (Mario's
+  correction — "reps are the most important and should be first to see", then "sales reps should
+  see all… external reps have limitations"):** SalesRep sees ALL (exactly like their CRM access);
+  **ExternalRep sees ONLY assigned clinics** and another territory's thread **404s on read AND
+  reply** (404 not 403 — never confirm it exists); MOCT/Clarifications/CustomerService see all;
+  all of it split from `Write_Facilities` so message workers gain no facility-edit/portal-settings/
+  merge rights. ⚠ **The "sees everything" capability is its OWN flag `View_All_Portal_Messages`,
+  deliberately NOT `View_All_Clinics`** — SalesRep holds that for CRM, so reusing it would have
+  leaked every facility's conversations to any rep; without the flag the queue narrows to
+  assigned clinics and an UNASSIGNED user sees NOTHING (fail closed), never a silent fallback to
+  everything. ⚠⚠ **MAJOR FINDING — dev's built-in roles are MIGRATED to DB-defined custom roles**
+  (`emed_custom_role` holds MOCT, SalesRep, Clarifications, CustomerService, Billing, Peaks,
+  Pharmacy, Shipping, ITSupport, Prescriber, SuperUser, plus ACQ/CEODash/Operations/…). For those
+  roles **the stored permission list — not the code factory — is authoritative**, so a NEW code
+  flag grants NOTHING until it is added there: the first test showed SalesRep with zero access
+  while `permissions.SalesRep()` reported the grant, and `union_permissions` took the CUSTOM
+  branch. ExternalRep is still a code role, which is why ITS code grant worked immediately.
+  The four migrated roles were updated in place on dev — **any future permission flag must be
+  added to the migrated roles too (or ticked in the Roles UI), on every environment.** Also
+  fixed: `users` was never imported in route_facilities.js (the reply crashed with a
+  ReferenceError — same class of miss as `misc` earlier the same day). Verified per tier: admin
+  2/unscoped, SalesRep 2/unscoped, rep-with-territory 2/scoped, rep-without 0 + 404 on
+  cross-territory read and reply; reply persisted; badge=1; registry green (124 pages).
+  Commit c7958bd2; dev merge 3c4f34e5.
 - 2026-08-27 — **Clinical autofill + Save Draft + the PDF-preview verdict.** (1) **CLINICAL
   AUTOFILL** (Mario): clinical data is a per-VISIT snapshot on `moct_visit`, never on the
   person, so "the last order" IS the right source — new PHI-audited
