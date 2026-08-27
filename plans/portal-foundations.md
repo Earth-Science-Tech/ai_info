@@ -21,6 +21,29 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **PHASE 5 DECISIONS ANSWERED (Mario) — and most of the phase turns out to be
+  ALREADY BUILT.** D20 questionnaire delivery: **reuse the Patient Portal magic-link method —
+  NICK IS BUILDING IT**, and the questionnaire↔drug/product MAPPING lives on a **"Clinic
+  Products" page already in progress on another branch**. So the mapping + delivery are NOT
+  mine; do not build them (collision risk is `page_catalog.js` + `sidebar.ejs` when his branch
+  lands, both mergeable). D18 dispatch states: MOCT visits arrive **'Received'**, staff review
+  and move them to **'Pending Consultation'** for a prescriber — an EXISTING status vocabulary,
+  nothing new to model. D19 partner JSON: **Helemeds already uses `POST /api/public/moct/visit`
+  and its payload** — no new contract. **VERIFIED both intake channels already agree:**
+  route_clinic's manual `POST /api/clinic/create-visit` sets `status = 'Received'` + a
+  moct_visit_history row, and route_public's partner endpoint sets `'Received'` too — so
+  "two intake channels → one MOC pipeline" is essentially shipped. **5B FIX (found by actually
+  running the manual channel as a ClinicUser):** the submit failed with *"Clinic selection is
+  required"* because `emed_user.clinics` holds NAME STRINGS and one facility often owns several
+  variants ("1st Aid Station Medical Clinic LLC." + "First Aid Station"); route_clinic used the
+  naive `clinics.length === 1 ? auto : demand a pick`, so a user belonging to ONE facility could
+  not submit at all. ⚠ **This is the SAME defect Mario hit on the prescriber portal and I fixed
+  there — it survived here because the fix lived inside that router.** The variant dedupe now
+  lives in ONE place, **`server/portal_clinic_scope.js`**, and route_prescriber's local copy
+  delegates to it. Verified: ClinicUser submit → visit 1047512, status Received, clinic stored
+  as the facility's PRIMARY name, history row written. Commit f00bdf38; dev merge cb9f901c.
+  **REMAINING Phase-5 work is Nick's questionnaire branch**; when it lands, add a
+  `clinic_products` key to CLINIC_PAGES so the facility can toggle that page too.
 - 2026-08-27 — **PHASE 5 STARTED — 5A shipped: Clinic Portal per-page grid + equal-service
   parity.** ⚠ **STORAGE DECISION (the plan left it open): the clinic grid REUSES
   `prescriber_portal_page_config` with `clinic_`-PREFIXED page keys**, not a second table —
