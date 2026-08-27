@@ -21,6 +21,33 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **⚠ CSP ROOT CAUSE: helmet ships CSP only OFF localhost — two bugs that are
+  INVISIBLE in local testing.** Mario reported "why are thumbnails not being generated?" and
+  "View PDF button not working", both on the dev slot. `app.js:108` gates helmet on
+  `if (!misc.is_local_host())`, so localhost sends NO CSP header at all: (a) there was **no
+  `worker-src` directive**, so it fell back to `default-src 'self'` and **pdf.js's CDN worker
+  was blocked** → `getDocument()` rejected → the document preview produced nothing, and my
+  `catch` swallowed it (that is what hid it — evidence: tile 3 held a real 208 KB PDF with 0
+  thumbnail bytes); (b) **`frame-src` allows `'self'` + `blob:` but NOT `data:`**, so every
+  `data:application/pdf` iframe renders blank once deployed. **Fixes:** `workerSrc:
+  ['self', blob:, cdnjs]` (narrow — cdnjs is already trusted for scripts) — this ALSO
+  un-breaks the **Ops floor-plan PDF background**, which rasterizes the same way and was
+  failing for the same reason, unnoticed; the client rasterizer (`pdf_first_page_b64`) now
+  THROWS and the caller reports "Saved without a preview — <reason>"; a **Generate preview
+  from document** button + staff doc-read endpoint so already-stored PDFs get a preview
+  without re-upload; **server-side video posters** (`fetch_video_poster`: YouTube maxres→hq,
+  Vimeo oEmbed; 6s timeout, 2 MB cap, fail-open) because `imgSrc` is `'self'/data:/blob:` so a
+  browser `<img>` from img.youtube.com is blocked AND canvas would taint on a cross-origin
+  draw; a document tile now REQUIRES a file (the "Draft tile" trap: kind switched to document,
+  filename defaulted to 'document.pdf', zero bytes ever uploaded); **View PDF** switched to
+  the house `open_base64_file()` blob helper (the same mechanism MOCT's visit page already
+  used — one mechanism, not two); new shared **`base64_to_blob_url()`** in main.js with the
+  clinic **Documents + Clinic Files** inline previews moved onto blob: (pre-existing,
+  portal-facing) plus an "open in a new tab" fallback; thumbnails render `object-fit: contain`
+  so a wide logo is not cropped. **VERIFICATION NOTE — the lesson:** to test CSP behaviour
+  locally, boot with `IS_LOCAL_HOST=0` (misc.is_local_host reads that env) and read the
+  header; that is how `worker-src 'self' blob: https://cdnjs.cloudflare.com` was confirmed
+  present rather than assumed. Commit fc37a4af; dev merge 48c3fd9f.
 - 2026-08-27 — **News presentation + article CONTRIBUTORS + approved logo ON THE RX** (four
   follow-ups from Mario's screenshots, all dev-verified). **(1) Search-result rows:** Mario sent
   a Google video-results screenshot — tiles became ROWS (200px thumbnail left with a play badge
