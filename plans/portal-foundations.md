@@ -21,6 +21,33 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **PHASE 5 STARTED — 5A shipped: Clinic Portal per-page grid + equal-service
+  parity.** ⚠ **STORAGE DECISION (the plan left it open): the clinic grid REUSES
+  `prescriber_portal_page_config` with `clinic_`-PREFIXED page keys**, not a second table —
+  that table is already a generic per-(facility, page_key) toggle store, and a parallel one
+  would duplicate the loader, the TTL cache and the panel code for nothing. `CLINIC_PAGES` =
+  visits · tracking · documents · payments · threads · news; **My Clinic is deliberately NOT
+  toggleable** (facility-relationship service, always available — the shared-service rule).
+  `portal_page_gate` gained `effective_clinic_pages()` + `require_clinic_page()`, governed by
+  `clinic_portal_enabled` with the SAME deploy safety as the prescriber side (an unconfigured
+  facility keeps today's behavior, so no live clinic portal darkens on deploy day); the writer
+  keeps omitted-means-unchanged for BOTH grids (this morning's blackout lesson). Facilities
+  panel: clinic grid under the Clinic Portal subsection, saved with the facility Save, verified
+  independent of the prescriber grid (8/8 prescriber flags untouched). **EQUAL SERVICE:** the
+  Clinic Portal section now borrows **Order Tracking, Messages and Industry News** — exactly ONE
+  sidebar entry each however many portals a facility runs, skipped when the prescriber section
+  renders them; ungoverned facilities get the full set. Order Tracking is now reachable by
+  clinic-portal users (ONE canonical page, portal-aware: page + API gates widened to accept
+  View_Menu_Clinic_Portal, data still clinic-scoped, requires map updated so the registry stays
+  green at 124 pages). ⚠ PROCESS: an earlier verification run silently tested the ADMIN session
+  because the old ClinicUser test account had been deleted in the dev refresh — the impersonate
+  call 404'd and I only caught it because the status was printed. Re-run as a REAL ClinicUser:
+  clinic_news OFF ⇒ /prescriber/news 403 while tracking + messages 200, tracking API returned
+  905 clinic-scoped orders, sidebar = Visits · Clinic Info · Prescriptions · Payment Methods ·
+  Documents · Order Tracking · Messages & Requests · My Team, no news link. **ALWAYS assert the
+  impersonation succeeded before trusting a scoped test.** Commit c81d269f; dev merge 09128a70.
+  **NEXT (needs Mario): the Phase-5 intake body — D18 dispatch flow states, D19 partner JSON
+  contract, D20 drug↔questionnaire model.**
 - 2026-08-27 — **PORTAL MESSAGES page (cross-facility queue) — reps first.** Mario: facility
   messages were reachable only by expanding ONE facility at a time on the Facilities page,
   gated on `Write_Facilities` (the facility-ADMIN permission), with **no cross-facility view and
