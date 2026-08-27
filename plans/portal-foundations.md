@@ -21,6 +21,36 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **RAPID-FIRE BULK APPROVAL shipped (Mario's spec, verbatim) + VET MODEL
+  FINALIZED.** (1) **Rapid-fire:** NEW `emed_portal_draft_order` queue — any member whose tier
+  can_draft saves an order WITHOUT a signature ("Save for Approval" on Create Prescription,
+  reusing submit's validation via a draft-mode flag so the paths can't drift); My
+  Prescriptions gains an "Awaiting Approval" tab; activating Rapid-Fire opens the DISCLAIMER
+  ("you will review every pending prescription before submitting"), then checkboxes + "Bulk
+  Submit (n)", then the ATTESTATION modal — "I have reviewed and approved the below listed
+  prescriptions" listing patient + drug, standard e-signature attestation text, Submit
+  disabled until the box is ticked. ⚠ ARCHITECTURE: approval REPLAYS each stored payload
+  through the REAL new-visit handler (named `new_visit_handler`, invoked with a capture-res
+  shim + prototype-chained fake req) with the APPROVER as signer — vet/transfer rules,
+  address gates, attachment caps, preclar all apply identically; 25/batch cap; failures stay
+  pending with the reason. Verified E2E: technician (ClinicUser shell) drafts + refused at
+  approve; PIC batch-approved 2/2 → visits 1047506/1047507 through the full transfer path;
+  UI walked in-browser (disclaimer → selection gating → attestation list → checkbox-gated
+  Submit). Draft/list/withdraw endpoints gate on MEMBERSHIP capabilities (draft_ctx), not the
+  shell — that's what lets assistants/technicians draft. (2) **Vet model, final:** Mario's
+  follow-up mock reverted the morning's owner-first flip — the ORIGINAL model stands (name
+  fields = the ANIMAL's; Owner Name in the vet box; contact/address = the owner's), NEW: DOB
+  + Sex RELOCATE into the vet box on vet facilities (they're the animal's) on both the Add
+  Patient modal and the Create Prescription panel (verified in-browser). moct_person
+  owner_name restored (the pet_name rename was dev-only wip: column renamed back by hand, wip
+  file dropped — never promoted). ⚠ LESSON: the flip commit had staged the WHOLE route file,
+  sweeping in the uncommitted draft routes — its revert removed them too; restored from the
+  flip commit + un-flipped surgically (verified: 15 draft-order refs, 0 pet_name). Also
+  answered Mario: Primary Prescriber ALREADY manages the team (capability-checked, per his
+  own Phase-2 rule) — no new role needed. Commits e738ac3d / fe8074f9 / c970afc4; emed_sql
+  b1e5793 (+drop b1e5793's rename); dev merge 53445e59. STILL BUILDING from this spec round:
+  facility logo upload (square-to-3:1, staff-approved) + Industry News tiles page (mock
+  received: bordered tiles, preview block, manual title, date added).
 - 2026-08-27 — **CUSTOMER-PHARMACY REALM shipped (Mario): the facility IDENTITY drives the
   transfer portal.** "Pharmacies that transfer should be type Pharmacy, with a primary
   Fulfillment Pharmacy toggle — ON = the RxCS/MM/MEDV variety, OFF = a customer of the
