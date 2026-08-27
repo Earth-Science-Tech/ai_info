@@ -21,6 +21,30 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **News presentation + article CONTRIBUTORS + approved logo ON THE RX** (four
+  follow-ups from Mario's screenshots, all dev-verified). **(1) Search-result rows:** Mario sent
+  a Google video-results screenshot — tiles became ROWS (200px thumbnail left with a play badge
+  on video links, domain line, blue title, snippet, then "Source · Date"); new optional
+  `source_label` so staff type the source verbatim ("YouTube · Modern Healthspan"); admin page
+  gained a **Preview Page** button (staff CAN open /prescriber/news — the page gate fails open
+  for non-clinic-scoped users, verified 200) and the label/title dropped "(Manage)".
+  **(2) PDF first-page thumbnails:** a document tile with no preview image rasterizes page 1 via
+  pdf.js (the Ops floor-plan pattern, CDN script + worker); Word can't rasterize client-side and
+  keeps the icon. **(3) CONTRIBUTORS** — "all users with access can be a contributor to that
+  Blog": new `emed_portal_content_comment` + per-article `allow_comments`; every user who can
+  see the news page may post to an ARTICLE's ONE SHARED discussion and everyone with access
+  reads it. ⚠ **CROSS-FACILITY BY DESIGN** — a contributor's name + facility are visible to
+  other facilities, so the composer carries the A7 threads' no-patient-information warning;
+  author name/facility are DENORMALIZED so a comment still renders if the account is disabled or
+  moves. Authors delete their own (403 otherwise — verified); staff moderate any from a
+  Contributions column + modal (audited); comments refused on link/document tiles and when
+  contributions are switched off. **(4) APPROVED LOGO ON THE PRESCRIPTION, always 1 page:**
+  `emed.load_facility_logo()` renders ONLY `status='approved'` (a pending/rejected upload never
+  reaches a pharmacy document) at top-right with **position:absolute — OUT of the document flow,
+  so the page count cannot change**; verified a content-heavy standard Rx = **1 page** with the
+  logo and the transfer order = 1 page + embedded original; fail-open (lookup hiccup ⇒ no logo).
+  Commits a852fff8 + emed_sql 5953357 (source_label, comment table, allow_comments — all
+  dev-applied, pending prod); dev merge 178f3ae1.
 - 2026-08-27 — **FACILITY LOGO + INDUSTRY NEWS shipped — Mario's review-gate spec round is
   COMPLETE** (all three: rapid-fire, logo, news; see the entry below for rapid-fire).
   **Logo:** portal admins upload from My Clinic — PNG/JPG, square up to 3:1 landscape
