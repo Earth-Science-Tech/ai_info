@@ -21,6 +21,17 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Phase 3 Slice E shipped — PHASE 3 COMPLETE, awaiting Mario's review gate.**
+  E-1: per-facility page toggles ENFORCED (portal_page_gate: sidebar filter + page routes + all
+  10 prescriber APIs; enforcement only when the facility master switch is ON — deploy-safe for
+  live prod prescribers; eScript/billing-only = portal on, Orders off = equal service). E-2:
+  Liberty Rx history in the patient modal (exact link-based mirror reads) + refill-from-history
+  (?mirror= prefill, Product-Map catalog re-link, never materialized). E-3: Messages & Requests
+  (A7 threads) — portal page + staff reply panel on the facility page + email heads-up; Special
+  Product Requests as a subject_type. Also: delivery-address gate, Portal Admin pseudo-roles,
+  My Clinic editing, Liberty seeding (all this session). DEFERRED to the review gate: facility
+  logo + Industry News (approval-gated content — spec with Mario), recurring orders, unit suite
+  for portal_liberty_seed/page_gate.
 - 2026-08-26 — **Liberty mirror seeding shipped** (eMed + emed_sql wip migration
   emed_portal_patient_link): Sync Facility Patients + Sync Facility Prescriptions, per-facility
   (Portal Settings panel) AND all-facilities (toolbar; portal-enabled facilities only). Mirror
