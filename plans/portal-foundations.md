@@ -21,6 +21,45 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **⚠ DEV DATABASE WAS REFRESHED FROM PROD OVERNIGHT (~01:24-04:16) — what broke,
+  what didn't, and what to re-do after the next one.** Mario hit it as "why is Misc empty?".
+  Diagnosis (not a guess — evidenced): `emed_price_catalog.market`'s default constraint was
+  created 2026-08-27 01:24 (sys.default_constraints.create_date) = the column was DROPPED and
+  RE-ADDED, and the table was modified again 04:00; ZERO emed_price_audit rows for a market
+  change, so no app code did it. Signature = a ROW-LEVEL refresh from prod of core tables:
+  `emed_user` (dev portal test accounts 137-143 GONE, live users back to prod's 125),
+  `emed_facility` (portal_type NULL, both portal toggles false), `emed_price_catalog` (892 live
+  = prod's count, ZZTEST rows gone, market all back to the 'human' default). Dev-ONLY tables
+  survived intact (emed_portal_membership/attestation/thread/message/order_quote/patient_link,
+  prescriber_portal_page_config) — which left 7 MEMBERSHIP ROWS ORPHANED against deleted users
+  (cleaned; harmless because every read JOINs emed_user). **ALL SCHEMA VERIFIED PRESENT** (12
+  tables + 9 columns audited one by one) and **ALL CODE IS IN GIT** — nothing of the feature
+  work was lost, only dev row data. Restored: the misc classification (new standalone
+  re-runnable migration, see below), facility 2 = prescriber+clinic portal ON /
+  portal_type=pharmacy_transfer / all 7 pages ON, and the two pharmacy test accounts rebuilt
+  through the REAL staff path (ZZ Pharmacist id 144 staff_pharmacist, ZZ Technician id 145
+  pharmacy_technician) — which re-verified the staff-side family guard (a medical tier at a
+  pharmacy facility still 400s). **NEW MIGRATION `emed_sql/migrations/wip/
+  2026-08-27_reassert_catalog_misc_market.sql`** (dev-applied; pending prod with the rest):
+  the misc data step used to live inside the column-add file, so re-asserting it meant
+  re-running a file full of no-op ALTERs; it is now standalone, idempotent and data-only —
+  **after any future dev refresh or market-column rebuild, run just that one file.**
+  ⚠ SELF-INFLICTED BUG FOUND + FIXED WHILE RESTORING: `prescriber_portal_config
+  .set_facility_config` defaulted `pages = {}`, so a PUT that omitted the page grid DISABLED
+  ALL SEVEN PORTAL PAGES — my own restore call blacked out facility 2 (audit stamped 04:16,
+  which is how I caught it). Omitting `pages` now means "unchanged" (PUT semantics); the
+  Facilities panel always posts the full grid so turning a page OFF is unchanged. Also
+  shipped: the **attachment size guard** Mario asked for — client downscales images >1.5 MB to
+  max 2200 px JPEG q0.85 (verified in-browser: a 12 MP photo 2.26 MB -> 0.81 MB, small/
+  non-image files untouched, failure falls back to the original) + a hard 8 MB per-attachment
+  server cap (verified: 12 MB rejected by name+size, 2 MB accepted) — motivated by the finding
+  that **Liberty accepts multi-page PDFs**: proven with REAL production scripts by decoding
+  submitted PDFs and matching them inside Liberty's own mirror (visit 1026365 = 2 pages ->
+  scripts 528432/528434/528435; 1025968 = 2 pages 1.3 MB -> 526149; **1025932 = 8 pages,
+  3.8 MB -> 526200/526203**, all WorkFlowStatus V), so the 2-page Transfer Order (sheet +
+  embedded original Rx) flows to RXQ like any other script and only SIZE, not page count,
+  matters. Plus the Misc checkbox label cleanup (Mario: the "(always on price lists)" note
+  wrapped and crowded the dropdown). Commits 83ca1858 + emed_sql 807e65d; dev merge 6708b960.
 - 2026-08-26 — **TRANSFER ORDER document shipped (Mario's call at the review gate).** A
   pharmacy-transfer submission now generates a "PRESCRIPTION TRANSFER ORDER", not a
   prescription: banner title, transfer header (Transferring Pharmacy / Pharmacist / Original
