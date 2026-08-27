@@ -21,6 +21,40 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Phases 4B/4C/4D built + verified live — PHASE 4 buildable scope COMPLETE,
+  awaiting Mario's review gate.** **4B vet intake:** create-visit vet panel (Species*/Owner*/
+  Weight, paw-marked, "name = the animal's; contact/address = the owner's"), server-enforced
+  400s, patient record carries the animal shape via the A5 seam, Patients page species badge +
+  Owner column + vet modal fields; the Rx PDF prints Species/Owner/Weight (verified via
+  pdf_html intercept on live visit 1047341, Rex Barker/Dog/Sam Barker/28 kg). **Three markets
+  (Mario mid-build):** emed_price_catalog.market = human | vet | misc — misc (Shipping line
+  items + Injection Supplies; the IV-Kit rows are IV drug blends and stayed human) visible to
+  EVERY portal type; vet facilities see vet+misc, clinics human+misc, **pharmacy_transfer sees
+  all three** (get_portal_catalog `@mkt='all'`; verified live: vet=4/clinic=886/transfer=886).
+  **4C transfer intake:** portal_type='pharmacy_transfer' requires transferring pharmacy +
+  pharmacist + the ORIGINAL Rx image attachment (server 400s verified); provenance rides the
+  special-instructions block (visit page + Rx PDF print it); verified live — visit 1047342
+  created AND held by the preclar Semaglutide rule, proving transfers ride the same gate seam;
+  attachment persisted as Prescription_Attachment; clinic-type regression clean. **4D:**
+  (a) Market select on the catalog's New/Edit Product modal + market badge on the list
+  (norm_market app vocabulary, no CHECK constraint); (b) **bulk product import** (Mario:
+  "import the vet price list when we go live") — POST /api/pricing/catalog/import, server-side
+  dry-run drives the preview modal (single source of validation truth), identity =
+  (product, strength, size) among active rows -> update merging ONLY the file's columns
+  (price-only file safe), else insert; blank price = upon request never zero; rows apply
+  through create_catalog/update_catalog so per-field audit lands as UI edits do; Import modal
+  on catalog.ejs (SheetJS raw:true, template download, default-market select); verified live
+  incl. a full loop: imported vet product -> vet portal picker served it with effective_price;
+  (c) **vet special-pricing sheet verified E2E** (draft->item->override 39.99->final on dev;
+  vet portal returned special_price=39.99/is_special=1; one-final-per-facility invariant fired
+  correctly on the way — sheet 178 stepped aside and fully restored after); (d) **Zoolzy
+  toggle (D16)** on BOTH price-list email modals — attaches the recipient's final Zoolzy sheet
+  (EXACT business/dba-name or contact-email match only — fuzzy would leak negotiated prices)
+  else the shipped Standard Price List via the exported standard_list_pdf; both branches
+  verified live (zoolzy_kind=standard_list and =final_sheet). +6 import unit tests (pricing
+  129; pricing+zoolzy_pricing 279 green). Commits 723a1840 / ac21ac45 / e8cf38cb on
+  feat/portal-foundations. DEFERRED to the review gate: rapid-fire bulk approval (needs
+  Mario's spec on who approves what) + the review-gate items carried from Phase 3.
 - 2026-08-26 — **Phase 3 review round complete; pushed to origin + merged to dev (preview slot
   live). PHASE 4 STARTED.** Review round shipped: catalog-driven Dosage Form/NDC autofill
   (Liberty drug file via Product Map; catalog wording BEATS Liberty form per Mario), derived Rx
@@ -237,8 +271,8 @@ working prescriber portal.
 | 0 | Corrections & de-risking (migration header, routing verify, signature accessor, docs) | **done, in review** |
 | 1 | **built, in review** — Foundations A1–A9: migrations (`emed_portal_membership`, `prescriber_portal_page_config`, `emed_portal_attestation`, facility columns) · `portal_role` tiers · per-facility config clone · attestation persistence · patient resolver seam · status mapper · messaging primitive (D21) · masking + `external_patient_ref` · EMR-ready conventions | in review |
 | 2 | ★ Facilities-hub user/prescriber management + in-portal delegation (Nick's core ask) | built, in review |
-| 3 | Prescriber Portal to parity (order flow through preclar gate, clone/refill, patient mgmt, dedicated views, eScript equal-service) | |
-| 4 | Vet + Pharmacy-Transfer types + vet pricing line (catalog discriminator, Product-Map matching, Zoolzy toggle) | |
+| 3 | Prescriber Portal to parity (order flow through preclar gate, clone/refill, patient mgmt, dedicated views, eScript equal-service) | built, in review |
+| 4 | Vet + Pharmacy-Transfer types + vet pricing line (catalog discriminator, Product-Map matching, Zoolzy toggle) | built (bulk approval deferred to review gate) |
 | 5 | Clinic Portal (MOC pipeline; reuse Patient Portal magic-link for questionnaires) | |
 | 6 | Universal Onboarding (rep-gated; payment-before-activation; send-to-us patients; drug selection → questionnaire + alias map) | |
 | 7 | Rep Tools (consolidation, `Resubmit_Rx` for SalesRep, resubmit defect trio, preclar follow-up consumers, lead-side territory, order sets, intelligence) | |
