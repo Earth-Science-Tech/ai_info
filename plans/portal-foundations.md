@@ -21,6 +21,37 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Phase-4 live-review round (Mario on the dev slot) shipped.** (1) **Catalog
+  Market filter, twice-revised to Mario's spec:** first a single dropdown, then per his review a
+  **checkbox MULTI-select** (Human/Veterinary/Misc, all default-checked, Misc labeled "always on
+  price lists"); unchecking Misc slims the LIST view only — **generated price lists (PDF + Email)
+  ALWAYS carry Misc** (`with_misc` on the server adds it back whatever the client sends; the
+  client `confirm()`s "Misc will be ADDED to the list being generated" when it was deselected).
+  CSV export stays literal (a data export, not a customer price list). catalog_where market is a
+  whitelisted comma-list IN(...). Verified: byte-identical PDFs for market=vet vs vet,misc while
+  the literal CSV shows 0 rows; the Design-modal footer explains the filter-drives-the-PDF rule.
+  (2) **Transfer portal signing model corrected (Mario): a transfer/central fill is signed by the
+  TRANSFERRING PHARMACIST, never a prescriber** — the original prescriber rides the attached
+  original-Rx image. **Three pharmacy tiers** (pharmacist_in_charge = manages + submits ·
+  staff_pharmacist = submits · pharmacy_technician = prepares, never submits) added to
+  PORTAL_ROLES; none is_prescriber (no DEA/NPI/state-licensing surfaces); `can_sign` is the
+  submit gate and now also drives the ACCOUNT SHELL (signing tiers → ExternalPrescriber,
+  non-signing → ClinicUser). **`roles_for_portal_type()`** = the family switch: pharmacy_transfer
+  facilities offer EXACTLY the three pharmacy tiers, everything else the five medical — enforced
+  server-side on BOTH admin surfaces (portal My Team + staff Facilities Users card; both UIs
+  render the server catalog so their dropdowns followed automatically); last-admin guard protects
+  org_admin OR pharmacist_in_charge. create-visit for transfer facilities: "Pharmacist Signature"
+  header, pharmacist attestation, "Sign & Submit Transfer" button, transferring pharmacy +
+  pharmacist PREFILL from the facility + effective (impersonation-aware) user. Verified live:
+  medical_assistant refused 400 at a pharmacy; technician (ClinicUser shell) 403 at /new-visit;
+  staff pharmacist submitted visit 1047343 (held by the preclar gate — correct); My Team legend +
+  Add dropdown show the 3 pharmacy tiers; test accounts ZZ Technician (142) / ZZ Pharmacist (143)
+  left on facility 2 for Mario's review. portal_membership tests updated to the two-family
+  catalog (157 green). Commits 6a5d162c / ab8176a3 / 50695731; dev merges 4e7ff600 + 6e6b533e.
+  ⚠ OPEN for the review gate: what the GENERATED Rx PDF's prescriber block should show on a
+  transfer (today it renders the submitting pharmacist where a prescriber normally sits — the
+  legally operative document is the attached original Rx image; decide whether our PDF should
+  restyle as a "Transfer Order" naming pharmacist + original-Rx reference instead).
 - 2026-08-26 — **Phases 4B/4C/4D built + verified live — PHASE 4 buildable scope COMPLETE,
   awaiting Mario's review gate.** **4B vet intake:** create-visit vet panel (Species*/Owner*/
   Weight, paw-marked, "name = the animal's; contact/address = the owner's"), server-enforced
