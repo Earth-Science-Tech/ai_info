@@ -21,6 +21,31 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **⚠ THE DATA-URL BUG (why "the test Article" wouldn't open or preview) + draft
+  review popup.** `public/js/main.js` **`file_to_base64()` resolves the FULL data URL**
+  (`data:application/pdf;base64,…`), and the news save stored it verbatim — so
+  `Buffer.from(x,'base64')` decoded garbage: the served file failed to open AND `atob()` threw
+  before a thumbnail could render. ONE cause, BOTH symptoms. The portal ATTACHMENT path had
+  always normalized through `misc.strip_base64` ([route_prescriber.js:539]) — the newer
+  news/logo paths did not. ⚠ **THE PROCESS LESSON, second time today: my API tests passed BARE
+  base64 and went green while the real UI upload was broken — the UI and the API send different
+  shapes, so a feature is not verified until the UI path is exercised** (the same trap as the
+  PO-line product picker on 2026-08-12). Fixed: `strip_base64` on WRITE (news doc + thumb,
+  facility logo) and defensively on every READ (staff doc, portal thumb/file, Transfer Order
+  embed, Rx logo); client passes bare base64 into pdf.js; **`misc` was never imported in
+  route_facilities.js** — the same latent fault would have crashed the new video-poster helper's
+  error path — imported. **Repaired the stored dev row in place** (tile 3 "Test Article.pdf" was
+  the only corrupt one; logos clean): now serves 208,227 bytes starting `%PDF-`, confirmed
+  through the portal page itself. Also shipped Mario's draft-queue questions: queued orders
+  carry an explicit **"Pending Prescriber Approval"** badge (distinguishing them from the
+  Pending tab, which is SUBMITTED work at MOC/the pharmacy — Draft/In review/On hold/Attention
+  needed); a **REVIEW POPUP** per row (new PHI-audited `GET /draft-orders/:id` returning the
+  whole order with attachment BYTES stripped but names kept — patient identity, allergies/
+  conditions/meds, every drug incl. sig/qty/refills/form/NDC/notes/controlled, delivery + ship-to,
+  transfer provenance, special instructions, ID-photo presence) with **Approve & Sign** routing
+  through the SAME attestation step as a batch, plus Withdraw; and a **Pending-screen banner**
+  counting queued drafts so Rapid-Fire is reachable from there too. Commit 7e0d4d3b; dev merge
+  d746baf1.
 - 2026-08-27 — **⚠ CSP ROOT CAUSE: helmet ships CSP only OFF localhost — two bugs that are
   INVISIBLE in local testing.** Mario reported "why are thumbnails not being generated?" and
   "View PDF button not working", both on the dev slot. `app.js:108` gates helmet on
