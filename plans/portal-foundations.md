@@ -21,6 +21,26 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **TRANSFER ORDER document shipped (Mario's call at the review gate).** A
+  pharmacy-transfer submission now generates a "PRESCRIPTION TRANSFER ORDER", not a
+  prescription: banner title, transfer header (Transferring Pharmacy / Pharmacist / Original
+  Rx # / pharmacist phone — deliberately NO address row, the on-file address is the SUBMITTING
+  user's record, not the transferring pharmacy's), "Medication to Transfer / Fill" section,
+  pharmacist attestation + signature captioned "Transferring Pharmacist", and — the ask — the
+  uploaded ORIGINAL Rx image(s) EMBEDDED on the sheet full-width/bordered in unbreakable
+  blocks ("Original Prescription (as received from X)"); a non-image original (PDF) is
+  referenced by filename. ⚠ ARCHITECTURE: everything derives from PERSISTED state
+  (emed.parse_transfer_block over moct_special_instructions + moct_pdf
+  Prescription_Attachment rows; emed.load_transfer_context attaches v.transfer inside
+  redrive_unsent_scripts) because outbox re-drives AND preclar releases regenerate the PDF
+  long after the request body is gone — both funnel through redrive. Fail-open: a context
+  fetch hiccup renders a plain Rx, never fails a submission. Special Instructions on the
+  order strips the transfer block (it renders in the header) and keeps operator-added notes;
+  human/vet/refill documents untouched. Verified live on dev: visits 1047344/1047345 rendered
+  with the full layout + embedded image + notes-only special instructions; PDF sent to Mario.
+  Commit ca9a4426; dev merge bf184682. ⚠ Bash-heredoc'd Python edit scripts mangle
+  backslashes in this environment — write edit scripts with the Write tool and execute the
+  file (bit twice).
 - 2026-08-26 — **Phase-4 live-review round (Mario on the dev slot) shipped.** (1) **Catalog
   Market filter, twice-revised to Mario's spec:** first a single dropdown, then per his review a
   **checkbox MULTI-select** (Human/Veterinary/Misc, all default-checked, Misc labeled "always on
