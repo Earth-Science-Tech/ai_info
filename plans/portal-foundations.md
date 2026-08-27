@@ -21,6 +21,45 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **PHASE 6 SHIPPED — Universal Onboarding** (commit 3d32573f; dev merge 48701e89;
+  migration `2026-08-27_add_portal_signup.sql` = `emed_portal_signup` + `emed_portal_signup_token`,
+  dev-applied, **PENDING PROD**). One dynamic flow, three forks, all the locked 2026-08-07
+  decisions: **rep-gated entry** (new flag `Write_Portal_Signups` on Admin/SuperUser/SalesRep —
+  ⚠ also added to dev's migrated SalesRep `emed_custom_role` row, the DB list being
+  authoritative; **prod's row will need the same on promotion**), **rep confirms before
+  provisioning** (submitted → rep_confirmed is a mandatory step; approve refuses anything else),
+  **payment-before-activation** (provisioning creates facility + portal config with MASTERS OFF
+  + pages preset ON + org-admin account + emails the EXISTING payment-capture link; a
+  fire-and-forget hook in `route_payment_capture.run_submit` calls
+  `portal_signup.activate_on_payment(facility_id)` when a method lands → masters flip ON; staff
+  keep an explicit Activate-now override), **patient list = send-to-us** (a promise checkbox,
+  never an upload). Lifecycle: invited → submitted → rep_confirmed → provisioned → active |
+  rejected. Tokens = the Zoolzy bearer discipline verbatim (SHA-256 at rest, fragment-riding,
+  single-success, attempt-capped, REDACTED from the persisted email). **Provisioning is
+  CLAIM-FIRST from birth** (the same-morning approval-race lesson: one conditional UPDATE flips
+  rep_confirmed→provisioned before the slow work; failure rolls back). Provisions via the
+  existing primitives ONLY: save_facility + primary address (**the address STATE feeds the
+  capture link's pharmacy routing**), set_facility_config, emed_user shell (ExternalPrescriber /
+  ClinicUser; ⚠ `emed_user` has a trigger → SCOPE_IDENTITY not OUTPUT, the emed_email lesson),
+  set_user_scope, membership tier (primary_prescriber / org_admin / pharmacist_in_charge — a
+  Pharmacy-type signup also gets `is_fulfillment_pharmacy=0`, identity drives the transfer
+  realm), house temp-password welcome email. Surfaces: public wizard `/portal/signup#token=…`
+  (4 steps, fork cards preset from the invite, honeypot answers a plausible 200, X-Requested-With
+  from the page's own JS — the zoolzy-apply CSRF pattern, NOT a WEBHOOK_PREFIXES entry) + staff
+  queue `/admin/portal-signups` (pills, invite modal showing the link ONCE, per-status actions).
+  All registries updated in one pass (page_catalog entry + REQUIRES + WRITE_CAP + nav + sidebar
+  heading/section-links — the review-pass lesson applied). ⚠ **CAUGHT ONLY BY WALKING THE REAL
+  UI (third time today): the submit button's id `ps_submit` SHADOWED the same-named function in
+  inline-onclick scope** — every API test passed while the wizard's submit threw; renamed
+  `ps_send`. Also: a same-URL hash navigation never refetches the document (browser retest needs
+  location.reload). E2E verified live BOTH ways: API lifecycle (invite→…→active, token dies on
+  first submit, re-activate 409s) AND the browser wizard + queue (Browser Walk Clinic → facility
+  #1961 / user #148, Awaiting payment). Suite 4048 green; registry 125 pages. **Deferred within
+  Phase 6:** clinic drug-selection → questionnaire-linked offer list (blocked on the 5C answers
+  from Nick/Carlos — the wizard collects free-text products-of-interest meanwhile); rep
+  signup-link generation from the REP portal is Phase 7 E2 (staff/SalesRep invite ships now).
+  Recurring sidebar merge conflict (dev's ClinicProducts vs this branch's new links) converged by
+  carrying ClinicProducts on the branch.
 - 2026-08-27 — **REVIEW PASS over the day's ~3,500 lines: 15 confirmed defects fixed** (commit
   a62dd244, dev merge 92309db3). Three adversarial reviewers (security / correctness /
   front-end); everything verified against the running app. **Money/safety class:** (1) **double
