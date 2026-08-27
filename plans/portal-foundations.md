@@ -21,6 +21,17 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-26 — **Phase 3 review round complete; pushed to origin + merged to dev (preview slot
+  live). PHASE 4 STARTED.** Review round shipped: catalog-driven Dosage Form/NDC autofill
+  (Liberty drug file via Product Map; catalog wording BEATS Liberty form per Mario), derived Rx
+  Quantity (input only for custom drugs), destination-aware shipping in the estimate + quote,
+  Units->Quantity relabel, drug-row layout normalization, stale-field reset on drug switch,
+  white button text. Full suite 4,038 green pre-push. Phase 4A shipped: emed_price_catalog.market
+  discriminator (D15) + moct_person vet columns (patient_kind/species/owner_name/weight, A5
+  whitelisted); portal catalog + quote filter by facility portal_type (vet -> 0 rows until vet
+  products seeded — verified both ways). NEXT: 4B vet create-visit fields + patients page species,
+  4C transfer intake (transferring pharmacist + original-Rx image), 4D vet sheets/Zoolzy toggle/
+  bulk approval.
 - 2026-08-26 — **Phase 3 Slice E shipped — PHASE 3 COMPLETE, awaiting Mario's review gate.**
   E-1: per-facility page toggles ENFORCED (portal_page_gate: sidebar filter + page routes + all
   10 prescriber APIs; enforcement only when the facility master switch is ON — deploy-safe for
