@@ -56,7 +56,11 @@ related:
   first submit, re-activate 409s) AND the browser wizard + queue (Browser Walk Clinic → facility
   #1961 / user #148, Awaiting payment). Suite 4048 green; registry 125 pages. **Deferred within
   Phase 6:** clinic drug-selection → questionnaire-linked offer list (blocked on the 5C answers
-  from Nick/Carlos — the wizard collects free-text products-of-interest meanwhile); rep
+  from Nick/Carlos — the wizard collects free-text products-of-interest meanwhile). **GROUPED
+  WITH THE 5C PROPOSAL (Mario, same day):** the wizard's offer-list step reads the SAME
+  `emed_product_required_form` mapping as the clinic-intake trigger, so the `catalog_id`
+  mapping-key decision now has TWO consumers — addendum emailed to Nick + Carlos so it gets
+  settled ONCE, not re-decided per consumer; rep
   signup-link generation from the REP portal is Phase 7 E2 (staff/SalesRep invite ships now).
   Recurring sidebar merge conflict (dev's ClinicProducts vs this branch's new links) converged by
   carrying ClinicProducts on the branch.
