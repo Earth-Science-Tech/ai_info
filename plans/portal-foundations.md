@@ -21,6 +21,28 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **FACILITY LOGO + INDUSTRY NEWS shipped — Mario's review-gate spec round is
+  COMPLETE** (all three: rapid-fire, logo, news; see the entry below for rapid-fire).
+  **Logo:** portal admins upload from My Clinic — PNG/JPG, square up to 3:1 landscape
+  (portrait rejected), client-normalized to 400px height, 1 MB server cap; ONE live row per
+  facility (`emed_facility_logo`, filtered-unique); every upload lands PENDING and eMed staff
+  approve/reject from a new Portal Logo block on the Facilities panel (rejection reason shown
+  back); nothing consumes an unapproved logo — placement on documents/branding is a later
+  approval-gated step. **Industry News (built to Mario's mock: bordered tiles, preview block,
+  manual title, Date Added):** universal staff-curated tiles (`emed_portal_content`, kind =
+  link | document ≤15 MB | article, optional preview image downscaled to 800px, publish
+  switch, display order) managed at /admin/portal-news (Write_Facilities; page AdminPortalNews,
+  section emed); portal page /prescriber/news renders the grid (link opens, document streams,
+  article opens a reader modal; drafts never show); 'news' joined PORTAL_PAGES so the
+  per-facility toggle appears automatically on Portal Settings and page + APIs are page-gated
+  (verified: off → 403); readable by BOTH portal shells (universal). page_catalog +
+  check_page_registry green (123 pages). ⚠ ROUTE-ORDER NOTE: the staff news CRUD lives in
+  route_facilities as '/portal-news' registered BEFORE the bare '/:id' route — moving it below
+  would make '/portal-news' parse as a facility id. Verified live end-to-end: staff created
+  link/article/draft → portal listed exactly the 2 published; article body + streamed jpeg
+  thumbnail served; tile grid rendered per the mock in-browser; logo upload → pending → staff
+  approve → approved badge + image on My Clinic. Commit e8c201c3; dev merge 6d9ad1e8. Tables
+  were created in 2026-08-27_add_portal_draft_orders_logo_news.sql (dev-applied, pending prod).
 - 2026-08-27 — **RAPID-FIRE BULK APPROVAL shipped (Mario's spec, verbatim) + VET MODEL
   FINALIZED.** (1) **Rapid-fire:** NEW `emed_portal_draft_order` queue — any member whose tier
   can_draft saves an order WITHOUT a signature ("Save for Approval" on Create Prescription,
