@@ -21,6 +21,38 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **PHASE 7 E3+E4+E5+E6 SHIPPED — the phase's build items are COMPLETE** (E3-E5
+  commit 709cb05b / merge 348a7839; E6 commit e975ffe7 / merge fbac59de; E7 leads-slice
+  extraction stays the designated slack-week item). **E3 My Facilities** (`/rep/facilities`):
+  territory facilities (paged — 890 for the test rep) with portal state, payment-on-file,
+  linked-lead status + invite-to-portal for portal-less facilities;
+  `GET /api/facilities/rep/territory` registered BEFORE '/:id'. **E4 My Patients**
+  (`/rep/patients`, new `/api/rep` router) — the A8 tiers as built: **masked LIST, audited
+  unmasked own-scope DETAIL** (each open writes a PHI audit row; out-of-scope 404s with NO
+  audit row). ⚠ TWO MASKING GAPS found while verifying: **`external_patient_ref`/`external_id`
+  EMBED First-Last-DOB for portal-created patients** (fine as the owning clinic's record key on
+  exports; decorative-mask-defeating on a rep bulk list — DROPPED on this surface, numeric id
+  is the handle) and **`owner_name` was unmasked** (on a vet record the name fields are the
+  ANIMAL's but owner_name is the HUMAN — added to PHI_FIELDS). **E5 Order Sets**
+  (`/rep/order-sets` + `emed_order_set`/`_item`, migration `2026-08-27_add_order_sets.sql`
+  dev-applied **PENDING PROD**): reps propose per-facility drug bundles, staff approve
+  (**Write_QuickAdds — a rep can never approve their own**; claim-first transitions IN the
+  UPDATE; approved/rejected frozen — edit = clone, the price-sheet lesson), and the portal's
+  create-prescription page grew an "Apply an order set" control that prefills **through the
+  SAME `fill_drug_rows` loop clones/drafts use** — pricing/validation/preclar all run normally;
+  a set is a prefill, never a bypass. E2E verified: rep 58 → "GLP-1 Starter Bundle" →
+  staff approve → prescriber 144's form applied both drugs+sigs. **E6 order→lead intelligence**
+  (`server/order_lead_intel.js` + nightly `order_intel_cron`): `total_orders`/`last_order_date`
+  refresh from the **Liberty MIRROR** (`<pharm>_rxqFullOrder`, 9999-sentinel excluded) —
+  never the live API — resolved through **`emed_facility_name` (THE alias consolidation)**,
+  variants summing per facility, unlinked leads exact-match only, NO fuzz (unmatched volume
+  logged, never guessed). Updates touch ONLY the two columns — **never `date_modified`** (it
+  orders the CRM list). Proven on dev's real mirror: 1,655 clinics → 1,642 facilities, 1,505
+  leads updated, 11 unmatched (93 fills, junk names); top lead (Valhalla, 55,715 fills)
+  hand-recounted EXACT. The manual `/import-order-data` CSV loop is superseded for the two
+  order columns (endpoint stays for business-status transitions). Suite 4096; registry 129
+  pages. ⚠ PROD env on promotion: nothing new (cron is always-on off-localhost; ships dark
+  without mirrors).
 - 2026-08-27 — **PHASE 7 E1+E2 SHIPPED** (commit 9c84e1f6; dev merge 3a61f0e7; migration
   `2026-08-27_add_group_sales_team_code.sql` = 2 additive columns on `emed_facility_group`,
   dev-applied, **PENDING PROD**). **E1 lead-side territory:** `sales_team_code` (maps a sales
