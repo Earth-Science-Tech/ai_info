@@ -21,6 +21,40 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **PHASE 7 STARTED — E0 SHIPPED** (commit 6f4c2c9c; dev merge e4b6aa1a). **Q-HOUSE
+  DECIDED (recommendation a):** the Rep Tools heading renders for HOUSE reps too — predicate
+  `View_Menu_Rep_Tools && (is_clinic_scoped || !View_Menu_Admin)` (the compound route_clinic
+  trick; Admin holds every flag by design). Hub = Held + eMed Orders + Script Search +
+  Clarifications + My/Lead Tasks + **Special Pricing (MOVED out of the Pricing heading for
+  rep-home viewers)**. EXTERNAL reps: scattered links MOVED into the hub; HOUSE reps: hub in
+  ADDITION (eMed muscle memory). ⚠ Tasks MOVES for both — the My/Lead Tasks badges are DOM ids
+  and must render once per viewer. SalesRep() gains View_Menu_Rep_Tools in code;
+  **Resubmit_Rx = a UI grant on the SalesRep custom-role row (dev applied; PROD row needs
+  View_Menu_Rep_Tools + Resubmit_Rx + Write_Portal_Signups on promotion)**. Verified live:
+  pure SalesRep user 99 = full hub incl. eMed Orders; multi-role user 51 correctly EXCLUDED
+  (holds View_Menu_Admin); ExternalRep 58 = consolidated hub. **THE RESUBMIT DEFECT TRIO —
+  investigated (all three confirmed with exact mechanisms) and FIXED:** (1) **reject-clone
+  landmine** — a rejected held clone stayed live (no script_created, no OPEN hold ⇒ redrive
+  candidate; the gate re-evaluates prior='rejected' fresh; corrected fields often no longer
+  fire ⇒ a human-REJECTED prescription could reach the pharmacy and supersede a possibly-
+  dispensed parent; also bricked the parent's resubmit forever). reject_hold now soft-deletes a
+  never-sent clone + its ledger row (the 12c cleanup); ordinary holds and pharmacy-reached
+  clones untouched. (2) **release_hold never re-ran the pharmacy-eligibility check** — a clone
+  held for days could submit after the pharmacy dispensed the PARENT. Release now re-runs
+  rx_resubmit.check_eligibility on the PARENT row (its rx id is the pharmacy's tag), clones
+  only, after the rule re-gate and BEFORE the ledger/flip — refusal leaves the hold OPEN;
+  fail-closed on Liberty errors with the existing override escape hatch. (3) **override-on-
+  unconfirmed unreachable from ResubmitModal** — endpoint accepted override_reason, modal never
+  collected it; prefill now returns can_override, the banner grows the reason input, the 409
+  keeps the modal open. **THE TWO PRECLAR CONSUMERS** (`server/preclar_alerts_cron.js`): aging
+  escalation (holds open > PRECLAR_AGING_DAYS, default 3) + rule threshold breaches computed by
+  **preclar.run_discovery — the SAME evaluator production uses** (7-day window, parent
+  population denominator; each check persists a discovery run as the alert's evidence). One
+  daily digest to PRECLAR_ALERT_EMAIL; dormant unset; NO quiet-day email; localhost-guarded.
+  ⚠ PROD ENV on promotion: set PRECLAR_ALERT_EMAIL. Tests: +8 trio regressions (preclar 69),
+  preclar_alerts_cron (8); suite 4063 green. NEXT in Phase 7: E1 lead-side territory
+  (`Write_Rep_Leads`), E2 external-rep lead view + signup-link generation (Phase 6's front
+  door), E3 My Facilities, E4 territory patients, E5 Order Sets, E6 order→lead intelligence.
 - 2026-08-27 — **PHASE 6 SHIPPED — Universal Onboarding** (commit 3d32573f; dev merge 48701e89;
   migration `2026-08-27_add_portal_signup.sql` = `emed_portal_signup` + `emed_portal_signup_token`,
   dev-applied, **PENDING PROD**). One dynamic flow, three forks, all the locked 2026-08-07
