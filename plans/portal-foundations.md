@@ -20,6 +20,23 @@ related:
 
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
+## PROMOTION CHECKLIST (dev -> main PR to Jose, compiled 2026-08-28)
+**Migrations (13, all dev-applied, `emed_sql/migrations/wip/` — must land before/with the deploy):**
+2026-08-26: `add_catalog_market_and_vet_patient` · `add_portal_foundations` (membership/config/
+attestation tables) · `add_portal_order_quote` · `add_portal_patient_link` — 2026-08-27:
+`add_facility_is_fulfillment_pharmacy` · `add_group_sales_team_code` · `add_order_sets` ·
+`add_portal_content_comment` · `add_portal_content_source_label` ·
+`add_portal_draft_orders_logo_news` · `add_portal_signup` · `reassert_catalog_misc_market` —
+2026-08-28: `add_recurring_orders`. All idempotent + granted; the app ships dark without them
+(probe-then-noop), but the portal features simply won't work until applied.
+**PROD custom-role rows (the DB list is authoritative over code — dev already done):**
+SalesRep += `View_Menu_Rep_Tools|Resubmit_Rx|Write_Portal_Signups`; MOCT / Clarifications /
+CustomerService / SalesRep += `View_Portal_Messages|Write_Portal_Messages|View_All_Portal_Messages`
+(SalesRep gets all three; the others per the code factories).
+**PROD env:** `PRECLAR_ALERT_EMAIL` (preclar daily digest — dormant unset); nothing else new.
+**Cross-repo:** Nick's PeakNow migrations share the wip folder — the program's 13 are the
+dated files above only.
+
 ## Status & history
 - 2026-08-28 — **RECURRING ORDERS built** (commit 6331d5de; dev merge 7179e9c7; migration
   `2026-08-28_add_recurring_orders.sql` = `emed_portal_recurring_order` +
