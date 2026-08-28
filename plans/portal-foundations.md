@@ -21,6 +21,12 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **Per-cluster All tabs (Mario's refined layout):** [In Review | Prescribed |
+  **All Submitted**] (visits only) and [Awaiting Approval | My Drafts | **All Pending**]
+  (queue + drafts merged into the visits-table style — the pseudo-row rendering moved there
+  from the one-big-All). Counts close per cluster: 1+7=8 and 5+1=6, verified live. ⚠ dev-only:
+  the localhost forced-admin session can race the impersonation store on start+navigate —
+  reload with the live impersonation instead.
 - 2026-08-27 — **Visits tab strip split into two clusters (Mario's mock):** [In Review /
   Prescribed / All] and [Awaiting Approval / My Drafts] as separate button groups with a gap —
   submitted buckets vs pre-signature work. Purely visual; All still contains everything;
