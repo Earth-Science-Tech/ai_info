@@ -21,6 +21,10 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **Per-realm account-type labels (Users card):** transfer pharmacies read
+  'Pharmacist (signs)' / 'Pharmacy Staff (non-signing)' (+ matching row badges); clinics keep
+  'External Prescriber' / 'Clinic Portal User'. Words only — role VALUES stay
+  ClinicUser/ExternalPrescriber (one shell machinery). Realm from the portal-members payload.
 - 2026-08-27 — **REALM SEPARATION (Mario's screen recording): a pharmacy gets no clinic
   options, a clinic no pharmacy options.** Server: `get_facility_config` derives
   `clinic_portal_enabled=false` for customer pharmacies (identity beats the stored toggle,
