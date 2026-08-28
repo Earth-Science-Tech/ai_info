@@ -38,6 +38,48 @@ CustomerService / SalesRep += `View_Portal_Messages|Write_Portal_Messages|View_A
 dated files above only.
 
 ## Status & history
+- 2026-08-28 — **Blaze-parity + billing-docs round (4 asks, all on PR #482; dev-merged):**
+  **(1) QUICK ADDS surfaced twice** over the existing `moct_drug_quickadd` — a panel on the
+  portal Create Prescription page + an "Add from Quick Adds" picker in the Order Sets builder,
+  via read-only seam `server/quick_adds.js`. ⚠ THE SCOPING TRAP: quickadd.account holds LEGACY
+  BLAZE clinic strings ("PEAKS Curative, LLC" != "Peaks Curative LLC"), so matching runs through
+  `emed_facility_name` (the E6 alias consolidation) with a direct-account arm for unregistered
+  clinics; verified live, facility 1161 = 45 quick-adds. Every Add is a prefill through the SAME
+  `set_drug_row` (extracted from fill_drug_rows) that clone/refill/draft/order-set use.
+  **(2) ANNOUNCEMENTS + MY CLINIC HOME** — `kind='announcement'` on the existing Industry News
+  admin page (NO migration, kind is app vocab), rendered as a banner on My Clinic, which is now
+  the portal HOME (index.ejs + sidebar home_href); excluded from the news tile grid. The banner
+  block uses raw fetch + a local escaper — that view's scripts run BEFORE the footer loads
+  main.js, so api_call_async/escape_html are not yet defined.
+  **(3) BILLING DOCS AUTO-POPULATE** (was Phase 8, pulled forward): `server/portal_billing_docs.js`
+  files a PAID invoice's PDF into `moct_clinic_documents` — the table the Documents page already
+  reads — hooked in `invoice.mark_paid` (covers manual Mark-as-Paid AND auto-mark on a full card
+  charge). Paid-only; ONE row per invoice forever (idempotent on filename); adjustment families
+  keep ONE receipt (root-anchored `COALESCE(parent_invoice_id, id)`); deferred setImmediate +
+  self-catching so a PDF hiccup can never fail a payment. ⚠ VERIFIED NOT ASSUMED: **`emed_invoice`
+  has NO `bill_to_id`** — the clinic key is `clinic_name`; and `/api/clinic/documents` matches
+  `clinic IN (<user clinics>)` **EXACTLY, no aliasing**, so the row carries clinic_name verbatim
+  (scope-derived users hold every registered variant, so any variant is visible; per-variant rows
+  were REJECTED because those users would see duplicates). E2E: real $5,063.50 invoice ->
+  19.8 KB PDF row, 2nd call `already_filed`, portal user's own API returned it.
+  **(4) REORDER LEAD TIME** (Mario's clinical correction): 28/30-day supplies must be ORDERED 5-6
+  days early — review + signature + dispensing + shipping. `interval_days` stays the supply
+  cadence; NEW `lead_days` shifts the draft earlier: `first = interval - lead`, later `+ interval`
+  — a FULL interval from the shifted run date keeps the rhythm anchored; `(interval - lead)` each
+  cycle would creep earlier and drift. `resolve_lead_days` clamps [0,14] and never lets the lead
+  reach the interval. Selector: 28/30/60-day + 3-month supplies + "reorder N days early" (default
+  5), live-computed hint. Migration `2026-08-28_add_recurring_lead_days.sql` (dev-applied, pending
+  prod — now the **14th** migration on emed_sql#66). Verified live as the prescriber:
+  `{interval_days:28, lead_days:6, next_run_in_days:22}`, DB date exactly 22 days out.
+  ⚠ **DEV FIXTURES WERE DELETED mid-session by someone else** (users 147-149 + facility 1960,
+  hard delete; their moct_visits survived) — RE-SEEDED as facility **1963** / prescriber **150**
+  (Olive Onboard, medical_director) / clinic user **151** (Demo Staff, medical_assistant).
+  Two seed gotchas worth remembering: `emed_user` has NO `password` column (it is
+  `password_hash`) and `draft_ctx` resolves the actor via `get_user_by_email`, so the **`email`
+  column must be populated** (not just user_login) or every portal write 403s "Unauthorized";
+  and `set_facility_config` expects pages as `{key:{enabled:true}}` — passing `{key:true}` silently
+  saves every page OFF (the same enable-master footgun, hit programmatically).
+  Suite 4,178 green; lint clean; registry 129.
 - 2026-08-28 — **Both-portals prescribers = FULL Clinic Portal members** (`708d7216`, superseding
   the same-evening view-only cut `d4e94736`; dev-merged). Mario's refinement: not view-only —
   a prescriber at a both-portals facility ADDS MOC visits like clinic staff; the no-prescribe
