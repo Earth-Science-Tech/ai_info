@@ -38,6 +38,26 @@ CustomerService / SalesRep += `View_Portal_Messages|Write_Portal_Messages|View_A
 dated files above only.
 
 ## Status & history
+- 2026-08-28 — **Both-portals prescribers = FULL Clinic Portal members** (`708d7216`, superseding
+  the same-evening view-only cut `d4e94736`; dev-merged). Mario's refinement: not view-only —
+  a prescriber at a both-portals facility ADDS MOC visits like clinic staff; the no-prescribe
+  rule holds BY CONSTRUCTION (the clinic portal has no prescribing surface; MOC flags pinned 0
+  by test). Grant = `View_Menu_Clinic_Portal` on ExternalPrescriber (code-resolved built-in — no
+  prod role-row step); PERM_SCHEMA_VERSION 4→5. HIPAA test-patient narrowing became three-flag
+  (`ReadOnly && !Menu && !PrescriberPortal`, locked test updated — API-only). Sidebar:
+  facility-conditional (governed clinic portal required; legacy prescribers unchanged on deploy
+  day) + shared-service dedup (My Clinic/Payments/Documents stay in the Prescriber section;
+  clinic section = Visits + Prescriptions). ⚠ TWO ORDERING TRAPS the flag flip exposed: index.ejs
+  `/` render AND sidebar home_href both had the clinic branch before the prescriber branch —
+  every prescriber would have homed on /clinic/visits; both now yield to
+  `Write_External_Prescriptions`. Patients needed NO work — `portal_patients.get_patients`
+  already reads all of `moct_person` per clinic (verified live: MOC-visit patient + portal
+  patient on one list). Live-verified 4 personas on localhost/dev DB: Olive (147, section +
+  Create button + real visits), Wanda (148, no section), Demo Staff (149, unchanged), Admin
+  (unchanged). Also: PR #482's two failing checks fixed — Lint (vendored pdf.js bundles now
+  eslint-ignored + 4 real errors incl. a `var` no-redeclare in portal_threads.js) and the
+  migration-check (Schema-changes section with all 13 literal `migrations/pending/` paths).
+  All 4 PR checks green.
 - 2026-08-27 — **PRs OPENED to Jose (etst-josegonzalez), both mergeable, cross-linked:**
   app **eMed#482** (feat/portal-foundations → main; 80 commits / 102 files / +16,193) and schema
   **emed_sql#66** (feat/portal-foundations-schema → main; the 13 pending/ migrations). #482's
