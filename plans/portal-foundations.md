@@ -38,6 +38,32 @@ CustomerService / SalesRep += `View_Portal_Messages|Write_Portal_Messages|View_A
 dated files above only.
 
 ## Status & history
+- 2026-08-28 — **PRE-PR REGRESSION REVIEW (two independent passes over the full 98-file diff
+  vs main) — verdict: SHIP-READY after fixes** (commit 6faa5795; dev merge c6e5526b). Every
+  internal role verified clean (MOCT / Clarifications / CustomerService / Billing×3 / Pharmacy /
+  Shipping / Peaks / Prescriber / ITSupport / Admin: zero links lost, zero flags shrunk, preclar
+  queue byte-identical, partner API contracts untouched, zero removed lines in permissions.js).
+  **Fixed from the review:** (1) HIGH — `rep_tools_home` misfired for **SUPERUSER** (zeroes
+  View_Menu_Admin but inherits Rep Tools ⇒ Tasks heading vanished, five links relocated);
+  predicate now also requires `!Manage_User_Auth`. (2) MOCT got dead-end borrowed links
+  (Messages 403 'No clinic assigned') — borrows now require `is_clinic_scoped`. (3)
+  **enable-master footgun** — flipping "Enable Portal" on an unconfigured facility wrote every
+  page OFF and 403'd its prescribers; the panel now pre-checks all pages when nothing is
+  configured (storage stays default-deny). (4) preclar release refusal read `elig.status_label`,
+  a field `check_eligibility` never returns — now `{status, detail}`. (5) `emed.js` attachment
+  write gained the clean_base64 gate. (6) **logo parity** — the ORIGINAL MOCT sign now stamps
+  the facility logo like every re-drive path already did (same Rx, same letterhead). (7) ⚠ the
+  **E3 `GET /api/facilities/rep/territory` endpoint was never committed** — My Facilities would
+  have shipped broken; committed. (8) **DEPLOY ORDER: the 13 program migrations moved
+  emed_sql wip/ → pending/** — wip is NOT scanned by push prod, and THREE of them are NOT
+  ship-dark (`emed_price_catalog.market` empties the Product Catalog with success-looking
+  zeroes; `emed_facility.is_fulfillment_pharmacy` empties the Facilities list and turns facility
+  saves into silent no-ops; `get_pharmacy_facility` degrades capture-link identity) because
+  **sql.js never throws — a missing column reads as empty, so smoke tests pass while features
+  are dark. Migrations MUST land before/with the deploy.** ⚠ Also from the review, standing
+  facts: SalesRep's SEEDED custom-role row beats the code factory, so the Phase-7 hub ships for
+  house reps only when prod's row gains the flags (in the checklist); `--reporter=basic` does
+  not exist in this vitest (exits 0 on the startup error — a silent false pass if scripted).
 - 2026-08-28 — **RECURRING ORDERS built** (commit 6331d5de; dev merge 7179e9c7; migration
   `2026-08-28_add_recurring_orders.sql` = `emed_portal_recurring_order` +
   `emed_portal_draft_order.recurring_id`, dev-applied, **PENDING PROD**). Mario asked if a
