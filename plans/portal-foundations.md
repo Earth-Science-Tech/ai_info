@@ -38,6 +38,26 @@ CustomerService / SalesRep += `View_Portal_Messages|Write_Portal_Messages|View_A
 dated files above only.
 
 ## Status & history
+- 2026-08-28 — **Clinic Info = top link + home for BOTH portals; Order Sets given a menu path**
+  (`bb950e46`, dev-merged). **(1)** Clinic Info is pinned to the top of whichever portal section
+  renders FIRST (Clinic Portal when present — it renders above Prescriber Portal — else the top
+  of Prescriber Portal) and excluded from both sections' normal lists, so it stays ONE entry;
+  verified no duplicates on a both-portals prescriber. The clinic-portal home arm
+  (home_href + index.ejs) now points at `/facility/info` like the prescriber arm, guarded on
+  `is_clinic_scoped` so MOCT/Admin can never be pulled into the portal home. ⚠ **EJS TRAP:** the
+  home_href chain lives inside ONE open `<% %>` block — an `<%# %>` comment there is a syntax
+  error; use `//`. **(2) ⚠ ORDER SETS HAD NO MENU PATH FOR STAFF** — the entire Rep Tools section
+  was gated on `rep_tools_home`, deliberately FALSE for Admin/SuperUser (they hold
+  `Manage_User_Auth`), so the 4 rep pages incl. the Order Sets builder rendered for nobody but
+  reps. Heading + own pages now render for any `View_Menu_Rep_Tools` holder; the BORROWED links
+  (Script Search/Clarifications/Tasks/Special Pricing) still relocate only for rep-home viewers.
+  **(3) The portal controls were INVISIBLE WHEN EMPTY** — the order-set selector and Quick Adds
+  panel hid themselves with zero rows, so nobody could learn they exist; worse, in a **"Viewing
+  as" ROLE PREVIEW the viewer has no clinic at all** (preview carries the admin's empty clinics),
+  so both were *always* hidden for Mario. Both now always render with a self-explaining empty
+  state. **REVIEW NOTE for the dev slot: use View-As IMPERSONATION of a real portal user, not
+  role preview** — facility-scoped lists (quick adds, order sets, drafts) are empty under preview
+  by design.
 - 2026-08-28 — **Blaze-parity + billing-docs round (4 asks, all on PR #482; dev-merged):**
   **(1) QUICK ADDS surfaced twice** over the existing `moct_drug_quickadd` — a panel on the
   portal Create Prescription page + an "Add from Quick Adds" picker in the Order Sets builder,
