@@ -21,6 +21,27 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-28 — **RECURRING ORDERS built** (commit 6331d5de; dev merge 7179e9c7; migration
+  `2026-08-28_add_recurring_orders.sql` = `emed_portal_recurring_order` +
+  `emed_portal_draft_order.recurring_id`, dev-applied, **PENDING PROD**). Mario asked if a
+  prescription can auto-generate X days later into Awaiting Approval — it was the Phase-3 plan
+  line ("auto-generated recurring orders → Pending for approval"), never built; built now on
+  the draft queue + its approval replay. **A SCHEDULER, NEVER AN AUTO-SUBMITTER:** "Repeat this
+  order" selector (30/60/90/custom 7-365d) on Create Prescription; registered best-effort after
+  a real Sign & Send; a daily sweep materializes each due occurrence as a **PENDING DRAFT in
+  Awaiting Approval** where a prescriber signs it — so pricing/validation/preclar run per
+  occurrence through the SAME replay. Rules (all test-pinned): **claim-and-advance in ONE
+  UPDATE** (zoolzy count-schedule pattern; failure ROLLS THE DATE BACK, retries tomorrow, never
+  skips); **NO STACKING** — an un-actioned occurrence parks the cycle and pushes the date
+  forward (an unworked queue must not fill with copies); **transfer facilities REFUSED** (every
+  transfer needs its original Rx image; drafts carry no attachments); first run one full
+  interval out; cancel is creator-or-oversight and already-queued occurrences survive.
+  Surfaces: `POST/GET/DELETE /api/prescriber/recurring` + a "Recurring orders" card on the
+  Awaiting Approval tab (patient/drugs/interval/next run/run count + stop). Cron
+  `recurring_orders_cron` daily, localhost-guarded (`RECURRING_ORDERS_ON_LOCALHOST=1`).
+  Verified live as a clinic prescriber: schedule → forced due → ONE pending draft (id 11,
+  "Olive Onboard (recurring)") → advanced +30d, run_count 1 → second sweep SKIPPED → occurrence
+  visible in the queue and opens in the review popup; transfer refusal confirmed. Suite 4111.
 - 2026-08-27 — **Per-realm account-type labels (Users card):** transfer pharmacies read
   'Pharmacist (signs)' / 'Pharmacy Staff (non-signing)' (+ matching row badges); clinics keep
   'External Prescriber' / 'Clinic Portal User'. Words only — role VALUES stay
