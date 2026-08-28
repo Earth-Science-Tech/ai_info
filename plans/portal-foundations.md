@@ -21,6 +21,16 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **"All" tab now means ALL** (commit 64ed4391; dev merge 4889877f; Mario's
+  follow-ups to the tab arithmetic). All merges THREE kinds: visits + the team's
+  awaiting-approval queue (badge "Pending Prescriber Approval", drafted-by, Review action =
+  the same dr_modal) + MY personal drafts (badge "Draft", Resume action `?draft=`). Pseudo-rows
+  carry the exact visit-row key set (gen_datatable derives the header from the FIRST row's
+  keys). Count = visits + queue + drafts, re-rendered when the async draft lists land.
+  Verified live: All = 14 = 8 + 5 + 1, review popup opens from inside All. ⚠ LESSON: an
+  earlier verification pass read ALL ZEROS and looked like a regression — **the impersonation
+  had EXPIRED mid-check** (session fell back to the clinic-less localhost admin). Impersonated
+  browser checks must re-impersonate and assert IN ONE flow.
 - 2026-08-27 — **'Pending' tab → 'In Review' + every visit bucketed** (commit 91c6ac77; dev
   merge f6972bd4). Mario asked twice what the Pending tab was for — two real defects behind the
   confusion: (1) its member set carried **'Draft', dead code** (nothing ever sets the is_draft
