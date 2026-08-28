@@ -38,6 +38,12 @@ CustomerService / SalesRep += `View_Portal_Messages|Write_Portal_Messages|View_A
 dated files above only.
 
 ## Status & history
+- 2026-08-27 — **PRs OPENED to Jose (etst-josegonzalez), both mergeable, cross-linked:**
+  app **eMed#482** (feat/portal-foundations → main; 80 commits / 102 files / +16,193) and schema
+  **emed_sql#66** (feat/portal-foundations-schema → main; the 13 pending/ migrations). #482's
+  Dependencies section carries the hard deploy order (#66 first — the three non-ship-dark
+  columns), the prod custom-role row grants, PRECLAR_ALERT_EMAIL, and the MOC-impact all-clear.
+  Program state: awaiting Jose's review/merge; post-merge steps live in the PROMOTION CHECKLIST.
 - 2026-08-28 — **PRE-PR REGRESSION REVIEW (two independent passes over the full 98-file diff
   vs main) — verdict: SHIP-READY after fixes** (commit 6faa5795; dev merge c6e5526b). Every
   internal role verified clean (MOCT / Clarifications / CustomerService / Billing×3 / Pharmacy /
