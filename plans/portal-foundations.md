@@ -38,6 +38,31 @@ CustomerService / SalesRep += `View_Portal_Messages|Write_Portal_Messages|View_A
 dated files above only.
 
 ## Status & history
+- 2026-08-28 — **PROD BUG from #482, fixed: hotfix PR eMed#490** (`hotfix/facilities-msgs-guard`).
+  `/admin/facilities` alerted **"Failed to load facility: fac_load_msgs is not defined"** and the
+  detail pane never rendered, for ANY viewer without `Write_API_Users` (Mario hit it impersonating
+  a SalesRep). **Cause:** `fac_load_msgs` is DEFINED inside `<% if (perm.Write_API_Users) %>` but
+  CALLED from two sites OUTSIDE it — Admin/SuperUser hold the flag, which is exactly why review
+  and every localhost check missed it (localhost forces Admin). **Fix:** `typeof … === 'function'`
+  guards, the pattern the `fac_load_users` line directly above each already used. ⚠ **LESSON:
+  when adding a call next to a guarded sibling call, the guard is load-bearing — copy it.** Swept
+  the file: of 18 functions defined in gated blocks these were the only outside callers (the other
+  4 hits are inline handlers on markup inside the same gate). Reproduced + verified via **role
+  preview as SalesRep** — the one localhost technique that exposes non-Admin perms.
+- 2026-08-28 — **Quick Adds moved to Rep Tools** (on PR #484, commit `2ae7bc12`): section
+  `'reptools'` so it sits beside Order Sets (a rep builds a set FROM quick adds); the Rep Tools
+  heading also renders for a bare `Write_QuickAdds` holder. Reverted the eMed-heading additions.
+- 2026-08-28 — **Legacy Import + external reps (answered, NOT changed):** ExternalRep NEVER had
+  it. `permissions.ExternalRep()` grants only `View_Menu_Special_Pricing`/`Write_Special_Pricing`
+  and the code comment there says outright that `View_Menu_Pricing`/`Write_Pricing` gate "the
+  standard Product Catalog / Special Products / Modifications / **Import** — internal".
+  `PricingImport`'s read requires `View_Menu_Pricing`+`Write_Pricing`, so the LINK cannot render
+  for a rep. ⚠ **BUT the page ROUTE is inconsistent** — `app.js:540` accepts
+  `perm_any(['View_Menu_Pricing','View_Menu_Special_Pricing'])`, so an ExternalRep CAN still open
+  `/pricing/import` by URL. The importer commits draft sheets for EVERY facility in the uploaded
+  workbook with no territory scoping, so this is a real (pre-existing, not program-introduced)
+  authorization gap. Left for Mario to decide: close the route to `View_Menu_Pricing`, or scope
+  the importer per-territory if reps are meant to have it.
 - 2026-08-28 — **PROGRAM MERGED: eMed#482 + emed_sql#66 merged to main by Jose** (main is now
   `9c678f79`). Follow-up work goes out as HOTFIX branches cut from the new main, NOT on
   feat/portal-foundations (that branch is done — commits pushed there after its PR merged would
