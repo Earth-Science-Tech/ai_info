@@ -21,6 +21,20 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **SIGNUP WIZARD PRODUCT PICKER (Mario's directive on the 5C seam)** (commit
+  e29532f4; dev merge 1125541f). The clinic fork's "What are you looking to order?" free-text
+  box is now a real picker over the price catalog — **category → subcategory → products,
+  SELECT-ALL at every level** (tri-state parents), filter box, running count. Prescriber-only
+  signups keep the free text. Tree = ACTIVE catalog, **names only** (no prices on an anonymous
+  surface), vial ladders deduped by (product, strength) — an interest list picks PRODUCTS not
+  SKUs; token-gated `POST /api/public/portal-signup/catalog`. **Stored TWICE on purpose:**
+  structured `{catalog_id, name}` pairs in `answers_json` — **the exact input the 5C
+  questionnaire mapping (emed_product_required_form keyed catalog_id) will consume** — plus a
+  human-readable `products_interest` summary COMPOSED SERVER-SIDE from the structure so the two
+  can't disagree. Verified through the real wizard: clinic invite → 24 categories, category
+  select-all + 1 individual = 8 selected → review listed them → stored summary + 8 structured
+  pairs (first: catalog_id 784). ⚠ vitest footnote: asserting "no prices in the query" via
+  /price/i matches the TABLE NAME emed_price_catalog — assert on the price COLUMN names.
 - 2026-08-27 — **PHASE 7 E3+E4+E5+E6 SHIPPED — the phase's build items are COMPLETE** (E3-E5
   commit 709cb05b / merge 348a7839; E6 commit e975ffe7 / merge fbac59de; E7 leads-slice
   extraction stays the designated slack-week item). **E3 My Facilities** (`/rep/facilities`):
