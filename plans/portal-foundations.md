@@ -38,6 +38,31 @@ CustomerService / SalesRep += `View_Portal_Messages|Write_Portal_Messages|View_A
 dated files above only.
 
 ## Status & history
+- 2026-08-28 — **PROGRAM MERGED: eMed#482 + emed_sql#66 merged to main by Jose** (main is now
+  `9c678f79`). Follow-up work goes out as HOTFIX branches cut from the new main, NOT on
+  feat/portal-foundations (that branch is done — commits pushed there after its PR merged would
+  silently never reach main; see the open-pr skill's lifecycle rule).
+- 2026-08-28 — **Quick Adds MANAGEMENT PAGE** (hotfix PR **eMed#484**, `hotfix/quick-adds-page`
+  off `9c678f79`; dev-merged; NO schema). `/emed/quick-adds` (eMed section, `Write_QuickAdds`):
+  search + clinic filter + create/edit/delete. **No new table, no new writer** — reads via
+  `quick_adds.list_all/list_accounts`, writes through the EXISTING `route_moct /drug-quickadd`
+  endpoints, so `moct_drug_quickadd` keeps one write path and the MOC visit screen is untouched.
+  **⚠ MARIO'S CATCH: the product field must be the PORTALS' catalog, not MOC's legacy strings.**
+  It is now a picker over the same active `emed_price_catalog` rows the portal drug picker uses
+  (new `GET /api/moct/drug-quickadd/catalog`, names only), and `apply_quickadd` RE-LINKS by name
+  so the portal line is catalog-keyed and priced. **THE DETAIL THAT MAKES IT WORK:** the endpoint
+  must build its label with the EXACT string `create-visit.ejs catalog_label()` produces
+  (`product · strength · size_qty`) — the first cut used `product strength - size` and would
+  never have matched. Keep the two in sync. Verified live: saved as
+  `Semaglutide · 10 mg/mL · 1 mL` -> applied catalog-LINKED, priced $135.00.
+  **Inherited data problem now visible:** quick-add accounts are legacy Blaze clinic strings and
+  **28 of 77 dev rows sit under a name absent from the facility registry**, so those prescribers
+  cannot see them — flagged per row + counted in the stat line + warned in the editor. Cleanup
+  (add the name as a facility name variant) is separate.
+  ⚠ **REGISTRY CHECKLIST for any new sidebar page** (all four failed on first run): read
+  `requires` + write `requires` in page_catalog, a `NAV_META` icon (missing = renders icon-less),
+  AND the section heading's visibility flag list must include the page's gate flag or the link
+  renders for nobody. Suite 4,179; registry 130 pages.
 - 2026-08-28 — **Clinic Info = top link + home for BOTH portals; Order Sets given a menu path**
   (`bb950e46`, dev-merged). **(1)** Clinic Info is pinned to the top of whichever portal section
   renders FIRST (Clinic Portal when present — it renders above Prescriber Portal — else the top
