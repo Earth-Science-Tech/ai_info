@@ -21,6 +21,16 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **'Pending' tab → 'In Review' + every visit bucketed** (commit 91c6ac77; dev
+  merge f6972bd4). Mario asked twice what the Pending tab was for — two real defects behind the
+  confusion: (1) its member set carried **'Draft', dead code** (nothing ever sets the is_draft
+  flag), and the name collided with 'Pending Prescriber Approval'; renamed **In Review** =
+  In review / On hold / Attention needed (submitted, not yet moving at the pharmacy). (2)
+  **drug-less MOC visits (Received / Pending Consultation / Missing Forms) mapped to NO portal
+  status** and fell out of every tab — Mario caught the arithmetic (All 8, tabs 7). They now map
+  to 'In review' (they ARE with our medical team); other drug-less visits keep the raw-status
+  fallback. Verified on the screenshot's own data: 1 In Review (1047512) + 7 Prescribed + 0
+  unbucketed.
 - 2026-08-27 — **SIGNUP WIZARD PRODUCT PICKER (Mario's directive on the 5C seam)** (commit
   e29532f4; dev merge 1125541f). The clinic fork's "What are you looking to order?" free-text
   box is now a real picker over the price catalog — **category → subcategory → products,
