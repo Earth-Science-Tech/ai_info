@@ -21,6 +21,18 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **REALM SEPARATION (Mario's screen recording): a pharmacy gets no clinic
+  options, a clinic no pharmacy options.** Server: `get_facility_config` derives
+  `clinic_portal_enabled=false` for customer pharmacies (identity beats the stored toggle,
+  like portal_type) + `set_facility_config` REFUSES enabling it (loud, not silent-drop).
+  Panel: pharmacy → Clinic Portal block hidden behind a "Transfer Portal only" note +
+  portal-type select identity-locked; clinic → the Pharmacy Transfer OPTION removed from the
+  dropdown (Type+Fulfillment is the realm switch, never this select). ⚠ TIER/SHELL FIX: the
+  capability filter keyed on `is_prescriber`, but the pharmacy signing tiers sign WITHOUT
+  being prescribers — a non-signing shell could hold Pharmacist in Charge; now keyed on
+  `can_sign`, signing default per realm (pharmacist_in_charge on transfer). Verified live both
+  directions on the video's facility. ⚠ facility 2 (transfer test bed) correctly LOSES clinic-
+  portal access — future clinic-portal tests use a Clinic-type facility (1960).
 - 2026-08-27 — **Per-cluster All tabs (Mario's refined layout):** [In Review | Prescribed |
   **All Submitted**] (visits only) and [Awaiting Approval | My Drafts | **All Pending**]
   (queue + drafts merged into the visits-table style — the pseudo-row rendering moved there
