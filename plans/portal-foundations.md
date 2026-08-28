@@ -21,6 +21,10 @@ related:
 # Prescriber & Clinic Portals + Rep Tools — Program (Facilities-Hub model)
 
 ## Status & history
+- 2026-08-27 — **Visits tab strip split into two clusters (Mario's mock):** [In Review /
+  Prescribed / All] and [Awaiting Approval / My Drafts] as separate button groups with a gap —
+  submitted buckets vs pre-signature work. Purely visual; All still contains everything;
+  switch_tab matches data-tab across both groups.
 - 2026-08-27 — **"All" tab now means ALL** (commit 64ed4391; dev merge 4889877f; Mario's
   follow-ups to the tab arithmetic). All merges THREE kinds: visits + the team's
   awaiting-approval queue (badge "Pending Prescriber Approval", drafted-by, Review action =
