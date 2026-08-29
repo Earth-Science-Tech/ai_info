@@ -10,6 +10,8 @@ change its status. Full rules: [`skills/plan-tracking.md`](../skills/plan-tracki
 
 | Status | Plan | Project | Branch | Developers | Updated |
 |--------|------|---------|--------|------------|---------|
+| Completed in Production | [ExternalRep — Blaze Orders access (read-only, clinic-scoped)](externalrep-blaze-orders.md) | emed_app | `feat/externalrep-blaze-orders` (1.0.239) | Nicholas Cardell | 2026-08-29 |
+| Completed in Production | [Clarifications / Script Modal by-id — clinic-scope hardening (PHI IDOR)](clarifications-clinic-scope.md) | emed_app | `feat/clarifications-clinic-scope` (1.0.239) | Nicholas Cardell | 2026-08-29 |
 | Completed in Production | [Sync Pharmacy Facilities](pharmacy-facility-sync.md) | emed_app | `feat/pharmacy-facility-sync` (1.0.224) | Nicholas Cardell | 2026-08-22 |
 | Completed in Production | [Facility Scope Unification (FacilityGroups)](facility-scope-groups.md) | multi | `feat/patient-portal-secure-messaging` (1.0.205–1.0.207, 1.0.211) | Nicholas Cardell | 2026-08-19 |
 | Completed in Production | [Patient Portal + Secure Messaging (Phase 1, ships DARK)](patient-portal-secure-messaging.md) | multi | `feat/patient-portal-secure-messaging` (1.0.205) | Nicholas Cardell | 2026-08-19 |
