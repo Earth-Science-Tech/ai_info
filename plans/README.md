@@ -10,6 +10,7 @@ change its status. Full rules: [`skills/plan-tracking.md`](../skills/plan-tracki
 
 | Status | Plan | Project | Branch | Developers | Updated |
 |--------|------|---------|--------|------------|---------|
+| Completed in Production | [Peak Now Patient-Portal Integration (webhooks, intake forms, embedded portal + SSO — ships DARK)](peaknow-portal-integration.md) | multi | `feat/peaknow-portal-integration` (1.0.241) | Nicholas Cardell | 2026-08-30 |
 | Completed in Production | [ExternalRep — Blaze Orders access (read-only, clinic-scoped)](externalrep-blaze-orders.md) | emed_app | `feat/externalrep-blaze-orders` (1.0.239) | Nicholas Cardell | 2026-08-29 |
 | Completed in Production | [Clarifications / Script Modal by-id — clinic-scope hardening (PHI IDOR)](clarifications-clinic-scope.md) | emed_app | `feat/clarifications-clinic-scope` (1.0.239) | Nicholas Cardell | 2026-08-29 |
 | Completed in Production | [Sync Pharmacy Facilities](pharmacy-facility-sync.md) | emed_app | `feat/pharmacy-facility-sync` (1.0.224) | Nicholas Cardell | 2026-08-22 |
