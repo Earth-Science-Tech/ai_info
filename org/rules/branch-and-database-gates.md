@@ -1,6 +1,7 @@
 # Branch Access & Database Change Gates
 
-**Effective 2026-07-16; updated 2026-07-17** (added Jose as backup gatekeeper). Enforced via
+**Effective 2026-07-16; updated 2026-07-17** (added Jose as backup gatekeeper) **and 2026-08-31**
+(added Carlos Obregon as a full gatekeeper). Enforced via
 GitHub branch protection + a tag ruleset on the `Earth-Science-Tech` org — this is live
 configuration, not just convention.
 
@@ -13,6 +14,7 @@ The people allowed to merge to production, cut prod deploy tags, and change the 
 | Nicholas Cardell | `nicholas-cardell` | Primary (eng lead, org owner) |
 | Carlos Cueto | `carcuet` | Co-gatekeeper (esp. prod DB / emed_sql) |
 | Jose Daniel Garcia Gonzalez | `etst-josegonzalez` | **Backup** (added 2026-07-17) |
+| Carlos Obregon | `Obregon1993` | Gatekeeper (Senior SW Engineer; added 2026-08-31) |
 
 Full team roster (and the two-Carlos gotcha) in [../../team/roster.md](../../team/roster.md).
 
@@ -25,7 +27,7 @@ Full team roster (and the two-Carlos gotcha) in [../../team/roster.md](../../tea
 
 ## TL;DR
 
-- **Dev is open. Production is gated.** Move fast in dev; only the three gatekeepers touch production.
+- **Dev is open. Production is gated.** Move fast in dev; only the four gatekeepers touch production.
 - Anything wrong in dev is isolated and recoverable; anything wrong in prod reaches customers. The rules reflect that asymmetry.
 
 ## Merge / push matrix
@@ -33,9 +35,9 @@ Full team roster (and the two-Carlos gotcha) in [../../team/roster.md](../../tea
 | Repo | Branch | Who can merge / push | PR required? |
 |------|--------|----------------------|--------------|
 | **eMed** (emed_app) | `dev` | **All developers, directly** | **No** — push straight in, no approval |
-| **eMed** (emed_app) | `main` (prod) | **Gatekeepers only** (Nicholas, Carlos, Jose), direct push | No (gated by identity) |
+| **eMed** (emed_app) | `main` (prod) | **Gatekeepers only** (Nicholas, Carlos Cueto, Jose, Carlos Obregon), direct push | No (gated by identity) |
 | **emed_sql** (prod DB schema) | `main` (prod) | **Gatekeepers only**, direct push | No (gated by identity) |
-| **emed_etl** (prod ETL) | `main` (prod) | All devs **via PR + 1 approval**; Nicholas + Carlos push directly (PR bypass) | **Yes**, except N + C |
+| **emed_etl** (prod ETL) | `main` (prod) | All devs **via PR + 1 approval**; Nicholas + Carlos Cueto push directly (PR bypass) | **Yes**, except N + CC |
 | **ai_info** | `main` | Everyone, directly | No (knowledge base) |
 
 All branches block force-pushes and deletions.
@@ -79,22 +81,22 @@ go live while an unready one stays behind.
 A prod deploy of eMed is triggered by pushing a git tag matching `x.x.x` (e.g. `1.0.114`) →
 Azure CI/CD. A **tag ruleset** on eMed restricts creating / updating / deleting `*.*.*` tags to
 the `admin` + `maintain` repository roles and org owners — i.e. exactly the gatekeepers plus
-Chris Rose (CTO/org owner). Carlos and Jose hold the `maintain` role on eMed for this purpose.
-Regular `write` developers (Mario, Carlos Obregon, Jorge) **cannot** cut a deploy tag, so they
-cannot trigger a prod deploy even by pushing a tag. (`maintain` does not grant them the ability
-to edit branch protection, bypass the merge gate, or delete anything.)
+Chris Rose (CTO/org owner). Carlos Cueto, Jose, and Carlos Obregon hold the `maintain` role on
+eMed for this purpose. Regular `write` developers (Mario, Jorge) **cannot** cut a deploy tag, so
+they cannot trigger a prod deploy even by pushing a tag. (`maintain` does not grant them the
+ability to edit branch protection, bypass the merge gate, or delete anything.)
 
 ## Rules for Claude instances
 
 1. **eMed `dev`:** commit and push directly. No PR, no approval, no waiting. Default integration
    branch for all feature work.
 2. **eMed `main` / emed_sql `main` (production):** do **not** push or merge here unless the person
-   you are working for is a gatekeeper (Nicholas, Carlos, or Jose). Everyone else is blocked at the
+   you are working for is a gatekeeper (Nicholas, Carlos Cueto, Jose, or Carlos Obregon). Everyone else is blocked at the
    GitHub level. Path for others: author the change on a `feat/*` branch **cut from `main`**, preview it
    by merging into `dev`, then open a `feat/* → main` PR that a gatekeeper reviews, merges, and tags (see
    the "Release model" section above and the push-prod / open-pr skills). Do **not** ship by tagging a
    `dev` SHA — that carries all of `dev`, including unready work.
-3. **emed_etl `main`:** open a PR and get 1 approval from any developer. (Nicholas & Carlos may push
+3. **emed_etl `main`:** open a PR and get 1 approval from any developer. (Nicholas & Carlos Cueto may push
    directly.) emed_etl auto-deploys to prod on the next scheduled Prefect run, so its `main` is
    production even though it isn't the database.
 4. **emed_sql *is* the production database.** Any change that reaches `liberty_link_stage` (prod DB)
@@ -105,11 +107,12 @@ to edit branch protection, bypass the merge gate, or delete anything.)
 
 - **Dev DB (`liberty_link_dev`) — open to all developers.** Any developer may write and apply
   migration files against dev. Develop schema changes on dev first, freely, without gatekeeping.
-- **Prod DB (`liberty_link_stage`) — gatekeepers only** (Nicholas, Carlos, Jose). A migration reaches
-  prod only via the emed_sql `main` → push-prod flow, executed by a gatekeeper. Jose runs prod
-  migrations using the shared emed_sql prod admin credentials (held out-of-band, **never** committed
-  to any repo). Caveat: migrations run under the shared admin `sql_user`, so they are not individually
-  attributable to Jose in the DB audit trail.
+- **Prod DB (`liberty_link_stage`) — gatekeepers only** (Nicholas, Carlos Cueto, Jose, Carlos Obregon).
+  A migration reaches prod only via the emed_sql `main` → push-prod flow, executed by a gatekeeper.
+  Jose runs prod migrations using the shared emed_sql prod admin credentials (held out-of-band,
+  **never** committed to any repo). Caveat: migrations run under the shared admin `sql_user`, so they
+  are not individually attributable in the DB audit trail. (Whether Carlos Obregon holds those shared
+  creds is decided out-of-band; his GitHub-level gate access was granted 2026-08-31.)
 - Standard flow: build on dev DB → write migration in emed_sql → a gatekeeper applies to prod.
   See `sql-safety.md` and the emed_sql prod/dev split docs.
 
