@@ -28,6 +28,7 @@ deadline (RingCentral purges call audio after ~90 days). Fix all three before de
 | 2026-09-01 ~13:26 (first Tailscale sighting) | **96.64.184.142** | all three lists → ~5.5 h rxcs outage, fixed one list at a time (NSG 13:47, SQL ~14:30, blob 14:57) |
 | 2026-09-01 14:52 | — | 99.173.152.84 **removed** from the NSG as "stale" |
 | 2026-09-01 18:23 | **99.173.152.84** again | NSG (removed 3.5 h earlier) + storage (never re-added) → rxcs queue dead overnight, 9 h+ |
+| 2026-09-02 ~03:28 | 99.173.152.84 | recovered: both IPs added to the NSG rule and the storage account (SQL already had both); workers reconnected within ~90 s; verified from both hosts |
 
 **Lesson: never remove the "old" IP from an allowlist after a lease change — the lease flips back.**
 Keep every IP the site has been seen on in **all three** lists until the site has a static IP.
