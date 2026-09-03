@@ -138,7 +138,7 @@ Rows (RXCS): 602,607 | Columns: 155 | PK: (`ScriptNumber`, `RefillNumber`) | ETL
 | Discount | varchar(50) | Yes | | |
 | DispenseAsWritten | varchar(50) | Yes | | |
 | DrugId | varchar(50) | Yes | → rxqDrug | |
-| ExpirationDate | date | Yes | | |
+| ExpirationDate | date | Yes | | **Per-fill beyond-use date of the dispensed product** (Peaks compounds: mostly 45–180 days after `DateDispensedSQL`), NOT the script's validity — that is `rxqScriptBase.RefillUntilDate`. Gating refill eligibility on this column refused ~63% of refillable Peaks scripts (eMed 1.0.296 fix, 2026-09-02). |
 | Fee | decimal(9,2) | Yes | | |
 | Icd9Code | varchar(50) | Yes | → rxqIcd9 (unconfirmed, see Relationships) | |
 | LevelOfService | varchar(50) | Yes | | |
