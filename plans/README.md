@@ -10,7 +10,7 @@ change its status. Full rules: [`skills/plan-tracking.md`](../skills/plan-tracki
 
 | Status | Plan | Project | Branch | Developers | Updated |
 |--------|------|---------|--------|------------|---------|
-| Completed in Production | [Refill-aware intake forms + any-origin refill candidates (Peaks / PeakNow)](refill-aware-intake.md) | emed_app | `feat/refill-aware-intake` | Nicholas Cardell | 2026-09-03 |
+| Completed in Production | [Refill-aware intake forms + any-origin refill candidates (Peaks / PeakNow)](refill-aware-intake.md) | emed_app | `feat/refill-aware-intake` | Nicholas Cardell | 2026-09-04 |
 | Completed in Production | [Facility merge carries every facility_id reference (portal key, mappings, settings, scopes)](facility-merge-complete.md) | emed_app | `feat/facility-merge-complete` | Nicholas Cardell | 2026-09-04 |
 | Completed in Production | [Legacy intake forms for held Peaks visits (drug fallback, staff assignment, no-mapping guard)](legacy-intake-forms.md) | multi | `feat/legacy-intake-forms` | Nicholas Cardell | 2026-09-04 |
 | Completed in Production | [Peak Now Patient-Portal Integration (webhooks, intake forms, embedded portal + SSO — ships DARK)](peaknow-portal-integration.md) | multi | `feat/peaknow-portal-integration` (1.0.241) | Nicholas Cardell | 2026-08-30 |
