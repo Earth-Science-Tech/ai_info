@@ -1,15 +1,15 @@
 ---
 title: Legacy intake forms for held Peaks visits (drug fallback, staff assignment, no-mapping guard)
 slug: legacy-intake-forms
-status: In-Progress
+status: Completed in Production
 project: multi
 branches:
   - emed_app: feat/legacy-intake-forms
   - emed_sql: main (migrations/pending/2026-09-04_add_emed_visit_required_form.sql)
 developers:
   - nicholas-cardell
-prs: ["emed_app#648 (feat->main)"]
-tags: []
+prs: ["emed_app#648 (feat->main, merged 2026-09-04)"]
+tags: ["1.0.304"]
 created: 2026-09-04
 updated: 2026-09-04
 related: [refill-aware-intake, facility-merge-complete, peaknow-portal-golive]
@@ -19,6 +19,7 @@ related: [refill-aware-intake, facility-merge-complete, peaknow-portal-golive]
 
 ## Status & history
 - 2026-09-04 — Not Started → In-Progress (nicholas-cardell): code + 22 tests on `feat/legacy-intake-forms`, PR #648 open; migration dev-applied and promoted to `pending/`; adversarial review in progress.
+- 2026-09-04 — In-Progress → Completed in Production (nicholas-cardell): adversarial review → 11 fixes (header alignment of the Select column, fail-closed advance on a configured facility with no covering rule, staff action releases to review without auto-advance, exact bundle/OTC drug matching, 24h notice throttle, recency clamp, IF EXISTS revive; merge tool: target-group recompute, provisioned_facility_id, all portal switches); PR #648 merged, migration applied dev+prod, tag **1.0.304**.
 
 ## Summary
 ~225 legacy Peaks Curative visits (Dec-2025 .. Sep-2026, all patients with phone + DOB) sit in

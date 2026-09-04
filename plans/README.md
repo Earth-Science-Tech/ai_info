@@ -12,7 +12,7 @@ change its status. Full rules: [`skills/plan-tracking.md`](../skills/plan-tracki
 |--------|------|---------|--------|------------|---------|
 | Completed in Production | [Refill-aware intake forms + any-origin refill candidates (Peaks / PeakNow)](refill-aware-intake.md) | emed_app | `feat/refill-aware-intake` | Nicholas Cardell | 2026-09-03 |
 | Completed in Production | [Facility merge carries every facility_id reference (portal key, mappings, settings, scopes)](facility-merge-complete.md) | emed_app | `feat/facility-merge-complete` | Nicholas Cardell | 2026-09-04 |
-| In-Progress | [Legacy intake forms for held Peaks visits (drug fallback, staff assignment, no-mapping guard)](legacy-intake-forms.md) | multi | `feat/legacy-intake-forms` | Nicholas Cardell | 2026-09-04 |
+| Completed in Production | [Legacy intake forms for held Peaks visits (drug fallback, staff assignment, no-mapping guard)](legacy-intake-forms.md) | multi | `feat/legacy-intake-forms` | Nicholas Cardell | 2026-09-04 |
 | Completed in Production | [Peak Now Patient-Portal Integration (webhooks, intake forms, embedded portal + SSO — ships DARK)](peaknow-portal-integration.md) | multi | `feat/peaknow-portal-integration` (1.0.241) | Nicholas Cardell | 2026-08-30 |
 | Completed in Production | [ExternalRep — Blaze Orders access (read-only, clinic-scoped)](externalrep-blaze-orders.md) | emed_app | `feat/externalrep-blaze-orders` (1.0.239) | Nicholas Cardell | 2026-08-29 |
 | Completed in Production | [Clarifications / Script Modal by-id — clinic-scope hardening (PHI IDOR)](clarifications-clinic-scope.md) | emed_app | `feat/clarifications-clinic-scope` (1.0.239) | Nicholas Cardell | 2026-08-29 |
