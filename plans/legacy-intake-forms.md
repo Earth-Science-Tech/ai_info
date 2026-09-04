@@ -9,7 +9,7 @@ branches:
 developers:
   - nicholas-cardell
 prs: ["emed_app#648 (feat->main, merged 2026-09-04)"]
-tags: ["1.0.304"]
+tags: ["1.0.304", "1.0.305", "1.0.307"]
 created: 2026-09-04
 updated: 2026-09-04
 related: [refill-aware-intake, facility-merge-complete, peaknow-portal-golive]
@@ -20,6 +20,7 @@ related: [refill-aware-intake, facility-merge-complete, peaknow-portal-golive]
 ## Status & history
 - 2026-09-04 — Not Started → In-Progress (nicholas-cardell): code + 22 tests on `feat/legacy-intake-forms`, PR #648 open; migration dev-applied and promoted to `pending/`; adversarial review in progress.
 - 2026-09-04 — In-Progress → Completed in Production (nicholas-cardell): adversarial review → 11 fixes (header alignment of the Select column, fail-closed advance on a configured facility with no covering rule, staff action releases to review without auto-advance, exact bundle/OTC drug matching, 24h notice throttle, recency clamp, IF EXISTS revive; merge tool: target-group recompute, provisioned_facility_id, all portal switches); PR #648 merged, migration applied dev+prod, tag **1.0.304**.
+- 2026-09-04 — follow-ups shipped: **1.0.305** Assign-form picker limited to form-builder category 'Intake Form' (PR #652); **1.0.307** **Re-process order** staff action (PR #657) — `wc_ingest.reprocess_visit` re-runs the webhook's auto-prescribe → forms gate → advance ON THE SERVER for Received / Missing Forms visits (bulk button on Peaks Visits, per-visit button on the visit page). Built because nothing revisited a visit ingested before its product mappings existed (5 PeakNow orders from the 01:50–03:26 UTC merge window). Never re-run the gate from a laptop (Azure switches + live Liberty).
 
 ## Summary
 ~225 legacy Peaks Curative visits (Dec-2025 .. Sep-2026, all patients with phone + DOB) sit in
