@@ -1,14 +1,14 @@
 ---
 title: Refill-aware intake forms + any-origin refill candidates (Peaks / PeakNow)
 slug: refill-aware-intake
-status: In-Progress
+status: Completed in Production
 project: emed_app
 branches:
   - emed_app: feat/refill-aware-intake
 developers:
   - nicholas-cardell
-prs: ["emed_app#640 (feat->main)"]
-tags: []
+prs: ["emed_app#641 (feat->main, merged 2026-09-03; #640 closed — cut from a stale local main)"]
+tags: ["1.0.300"]
 created: 2026-09-03
 updated: 2026-09-03
 related: [peaknow-portal-golive]
@@ -18,6 +18,7 @@ related: [peaknow-portal-golive]
 
 ## Status & history
 - 2026-09-03 — Not Started → In-Progress (nicholas-cardell): code + tests on `feat/refill-aware-intake`, both flags default OFF.
+- 2026-09-03 — In-Progress → Completed in Production (nicholas-cardell): PR #641 merged to `main` (the first PR, #640, was cut from a stale local `main` at 1.0.298 so GitHub could not build its merge ref; recreated after merging `origin/main` 1.0.299), tagged **1.0.300**. Both flags remain OFF in prod — Phase 0 (Sync Links 1161/1923 + 2 crosswalk rows), Phase 1 and Phase 2 still to run.
 
 ## Summary
 A Peaks staff member noticed PeakNow orders were being held in **Missing Forms** for patients who already

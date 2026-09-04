@@ -10,7 +10,7 @@ change its status. Full rules: [`skills/plan-tracking.md`](../skills/plan-tracki
 
 | Status | Plan | Project | Branch | Developers | Updated |
 |--------|------|---------|--------|------------|---------|
-| In-Progress | [Refill-aware intake forms + any-origin refill candidates (Peaks / PeakNow)](refill-aware-intake.md) | emed_app | `feat/refill-aware-intake` | Nicholas Cardell | 2026-09-03 |
+| Completed in Production | [Refill-aware intake forms + any-origin refill candidates (Peaks / PeakNow)](refill-aware-intake.md) | emed_app | `feat/refill-aware-intake` | Nicholas Cardell | 2026-09-03 |
 | Completed in Production | [Peak Now Patient-Portal Integration (webhooks, intake forms, embedded portal + SSO — ships DARK)](peaknow-portal-integration.md) | multi | `feat/peaknow-portal-integration` (1.0.241) | Nicholas Cardell | 2026-08-30 |
 | Completed in Production | [ExternalRep — Blaze Orders access (read-only, clinic-scoped)](externalrep-blaze-orders.md) | emed_app | `feat/externalrep-blaze-orders` (1.0.239) | Nicholas Cardell | 2026-08-29 |
 | Completed in Production | [Clarifications / Script Modal by-id — clinic-scope hardening (PHI IDOR)](clarifications-clinic-scope.md) | emed_app | `feat/clarifications-clinic-scope` (1.0.239) | Nicholas Cardell | 2026-08-29 |
