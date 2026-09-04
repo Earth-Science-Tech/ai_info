@@ -8,7 +8,7 @@ branches:
 developers:
   - nicholas-cardell
 prs: ["emed_app#641 (feat->main, merged 2026-09-03; #640 closed — cut from a stale local main)"]
-tags: ["1.0.300"]
+tags: ["1.0.300", "1.0.308"]
 created: 2026-09-03
 updated: 2026-09-04
 related: [peaknow-portal-golive]
@@ -25,7 +25,7 @@ related: [peaknow-portal-golive]
   trigger `trg_moct_visit_audit`, SQL Server rejects a bare OUTPUT on a triggered table (error 334), and
   `sql.query()` swallowed the error as null → `claim_lost` → the visit stayed **Received** with its refills
   detected but never sent (11 PeakNow orders on 2026-09-04; found on 1049457). Fixed with
-  `OUTPUT INSERTED.id INTO @ids` (branch `feat/auto-approve-claim-fix`), plus a CI scan test forbidding bare
+  `OUTPUT INSERTED.id INTO @ids` (PR #660 → **1.0.308**), plus a CI scan test forbidding bare
   OUTPUT on triggered tables and a history row `Received (not auto-advanced: <reason>)` from the ingest path.
   Remediation: staff select the Received PeakNow visits → **Re-process orders** (server-side; live refill
   verify → Approved Refills / Approved OTC + submit).
