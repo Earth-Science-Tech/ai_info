@@ -19,6 +19,7 @@ related: [peaknow-portal-golive, legacy-intake-forms]
 ## Status & history
 - 2026-09-04 — Not Started → In-Progress (nicholas-cardell): Nick decided Peaks Curative (1161, legal name "PEAKS Curative, LLC") is the surviving facility and PeakNow (1923) folds into it; the merge tool had to carry everything first.
 - 2026-09-04 — In-Progress → Completed in Production (nicholas-cardell): PR #646 merged, tag 1.0.303. **The Peaks merge itself (1923 → 1161) is a separate operator step** — run after the adversarial review with `DB_NAME=liberty_link_stage node scripts/merge_facility.js 1923 1161 --apply` (preview first).
+- 2026-09-04 — **Peaks merge APPLIED in prod** (after review fixes shipped in 1.0.304): source 1923 retired; 1161 now carries 5 name variants (PEAKS Curative, LLC | Peaks Curative | PeakNow | Peak Now | Peaks Now), the portal embed key, the 76 product mappings, 4 + 14 live page configs, 3 origins; portal_family group 13 down to one member; 3 API users' clinics regenerated with both names; patient portal on, home URL https://peaknow.com/my-account/. Verified by query immediately after.
 
 ## Summary
 `facilities.merge_facility` moved names, addresses, payment records, billing strings, leads, pricing
