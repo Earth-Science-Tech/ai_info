@@ -10,7 +10,7 @@ developers:
   - nicholas-cardell
 prs:
   - "emed_app#515 (feat->main)"
-tags: ["1.0.241", "1.0.313"]
+tags: ["1.0.241", "1.0.313", "1.0.314"]
 created: 2026-08-30
 updated: 2026-09-05
 related: ["[[patient-portal-secure-messaging]]", "[[facility-scope-groups]]"]
@@ -19,6 +19,7 @@ related: ["[[patient-portal-secure-messaging]]", "[[facility-scope-groups]]"]
 # Peak Now Patient-Portal Integration
 
 ## Status & history
+- 2026-09-05 — Hotfix **1.0.314** (nicholas-cardell): the 1.0.313 PN Orders page rendered Peaks Curative (badge, title AND orders) — `views/peaks/orders.ejs` read the site as top-level locals while `html_data(req, ext)` exposes route extras as `ext`; the pre-ship render smoke passed because it supplied locals flat. Fix: `peaks_sites.orders_page_locals()` → `ext.peaks_site`, the view THROWS without it, and `peaks_orders_pages.test.js` renders the full view through the real `ext` shape. Caught by Nick in the live app.
 - 2026-09-05 — Enhancement (nicholas-cardell): **Peaks Orders split into two sidebar pages** — "PC Orders" (`/peaks/pc-orders`, Peaks Curative) and "PN Orders" (`/peaks/pn-orders`, Peak Now), page_catalog `PeaksPCOrders` / `PeaksPNOrders` with their own Read/Write flags (tag **1.0.313**). The Site dropdown is gone (the route fixes the site; a badge + "Switch to … orders" link remain); `/peaks/orders` redirects by `?site=`. Roles: legacy capability roles derive both; the page-ticked custom rows (Peaks, CustomerService, OpsManagement) carried over by `emed_sql 2026-09-05_split_peaks_orders_page_perms.sql` (applied dev+prod before the deploy).
 - 2026-09-05 — peaknow.com data repair (nicholas-cardell, Nick's go): WooCommerce HPOS placeholder posts were never created by the migration (41,997 migrated orders had no `wp_posts` row → every API edit 403 `woocommerce_rest_cannot_edit`; 845 order ids collide with unrelated posts). Backfilled the 41,997 placeholders (marker `post_content_filtered='peaks_migrate_placeholder_2026-09-05'`), repaired the 3 open colliders held by old revisions (55307/55390/67185). 842 collisions left by decision (orders read fine; admins can edit; **never enable WooCommerce compatibility/sync mode**). Also: the peaknow REST key was read-only for orders → Nick set Read/Write.
 - 2026-09-05 03:31 UTC — first run on the legacy-scope code: **66 shipments pushed to peaknow.com, 0 failed**. Picked-up completion failed 7/7 with `woocommerce_rest_cannot_edit` (HTTP 403 from WooCommerce, not Cloudflare): the peaknow.com REST key behind `peaknow-woo-consumer-key` is READ-only for orders. OPEN for Nick: WooCommerce → Settings → Advanced → REST API → set that key to Read/Write (same key value, no Secret change); the 7 orders retry every 10 min.
