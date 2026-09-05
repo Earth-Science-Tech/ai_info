@@ -19,6 +19,7 @@ related: ["[[patient-portal-secure-messaging]]", "[[facility-scope-groups]]"]
 # Peak Now Patient-Portal Integration
 
 ## Status & history
+- 2026-09-05 — Enhancement (nicholas-cardell): **expedited shipping → priority 5 + OVERNIGHT SHIPPING** (PR emed_app#663, tag **1.0.309**). peaknow.com charges shipping only for Expedited Shipping, so `shipping_total > 0` (or an expedited shipping-line title) marks the visit at ingest (`wc_ingest` step 3b) and on Re-process; idempotent through the instruction row; never lowers priority. Same day: GIP/GLP-1 program Step 1/2/3 name-keyed Clinic Products rows (78–80 → tirzepatide 1/2/3 mL + syringes) and the 1.0.308 auto-approve claim fix (see refill-aware-intake).
 - 2026-08-30 — In-Progress → Completed in Production (nicholas-cardell), tag **1.0.241**.
 
 ## Summary
