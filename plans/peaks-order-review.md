@@ -8,7 +8,7 @@ branches:
 developers:
   - nicholas-cardell
 prs: ["emed_app#669 (feat->main, merged 2026-09-05)"]
-tags: ["1.0.311"]
+tags: ["1.0.311", "1.0.312"]
 created: 2026-09-05
 updated: 2026-09-05
 related: [peaknow-portal-integration, refill-aware-intake]
@@ -23,6 +23,9 @@ related: [peaknow-portal-integration, refill-aware-intake]
 
 - 2026-09-05 — In-Progress → Completed in Production (nicholas-cardell): PR #669 merged (merge commit), tagged **1.0.311**, Azure deploy
   succeeded 04:54 UTC. Rules v1 live: weight-loss step (all), TriMix (all), customer note. 113 tests green across the intake suites.
+
+- 2026-09-05 — Follow-up **1.0.312** (nicholas-cardell): Peaks Orders backlog banner shows Received AND Needs Clarification counts, each
+  clickable oldest-first (`/received/count` returns both; `/received?status=`); Needs Clarification in the page's default filter.
 
 ## Summary
 Some Peaks / PeakNow orders should be seen by Peaks STAFF before a prescriber or the pharmacy: the
