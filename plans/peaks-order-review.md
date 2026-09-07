@@ -8,9 +8,9 @@ branches:
 developers:
   - nicholas-cardell
 prs: ["emed_app#669 (feat->main, merged 2026-09-05)"]
-tags: ["1.0.311", "1.0.312"]
+tags: ["1.0.311", "1.0.312", "1.0.315"]
 created: 2026-09-05
-updated: 2026-09-05
+updated: 2026-09-07
 related: [peaknow-portal-integration, refill-aware-intake]
 ---
 
@@ -26,6 +26,13 @@ related: [peaknow-portal-integration, refill-aware-intake]
 
 - 2026-09-05 — Follow-up **1.0.312** (nicholas-cardell): Peaks Orders backlog banner shows Received AND Needs Clarification counts, each
   clickable oldest-first (`/received/count` returns both; `/received?status=`); Needs Clarification in the page's default filter.
+
+- 2026-09-07 — Rule v2 **1.0.315** (nicholas-cardell): `intake_name_mismatch` — the newest intake form that names its
+  respondent is compared with the visit's patient (`server/intake_identity.js names_match`); a different name holds the
+  visit ("Name on Intake Form differs from Patient name") with the form / date / both names in the note. Rules now take
+  `(order, ctx)`; `review_before_advance` takes `person_id`. Same release: DOB fill-only from the intake form when the
+  name matches (`forms.apply_intake_to_person`), vitals name-gated, staff "Edit Patient Info" modal + endpoint, intake
+  image lightbox / no download links. Nicknames (Abby vs Abigail) flag on purpose — staff decide.
 
 ## Summary
 Some Peaks / PeakNow orders should be seen by Peaks STAFF before a prescriber or the pharmacy: the
@@ -56,6 +63,9 @@ the intake-form gate have all run by then.
   new subscription (scheme) / subscription renewal via `_wcsatt_scheme` + `_subscription_renewal`);
   customer note = non-blank `customer_note` quoted (≤1000 chars). Expected volume ≈ 15 of the first 91
   PeakNow orders (6 notes, 7 TriMix, 4 weight-loss).
+- Rule v2 (Nick 2026-09-07): `intake_name_mismatch` — ctx `{ patient, intake_identity }` loaded from `person_id`;
+  undecidable (no named form) never flags; the same matcher gates the intake -> patient write-back, so a flagged
+  visit never received the stranger's DOB / vitals.
 - UI: `Needs Clarification` already exists everywhere (status options, list filter pills, prescriber views);
   the visit page's Notes card shows type `Order Review` with a terracotta "Review" badge.
 
