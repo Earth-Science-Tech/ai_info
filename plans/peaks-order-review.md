@@ -8,9 +8,9 @@ branches:
 developers:
   - nicholas-cardell
 prs: ["emed_app#669 (feat->main, merged 2026-09-05)"]
-tags: ["1.0.311", "1.0.312", "1.0.315"]
+tags: ["1.0.311", "1.0.312", "1.0.315", "1.0.316"]
 created: 2026-09-05
-updated: 2026-09-07
+updated: 2026-09-08
 related: [peaknow-portal-integration, refill-aware-intake]
 ---
 
@@ -33,6 +33,13 @@ related: [peaknow-portal-integration, refill-aware-intake]
   `(order, ctx)`; `review_before_advance` takes `person_id`. Same release: DOB fill-only from the intake form when the
   name matches (`forms.apply_intake_to_person`), vitals name-gated, staff "Edit Patient Info" modal + endpoint, intake
   image lightbox / no download links. Nicknames (Abby vs Abigail) flag on purpose — staff decide.
+
+- 2026-09-08 — Gate v3 **1.0.316** (nicholas-cardell): resolving identity holds — **name variants** (`moct_person_name_alias`;
+  "Same patient — add X as a name variant" on the visit page; matcher + write-back + rule all alias-aware) and **transfer**
+  (`intake_transfer.js`: new visit for the other patient on the same order, lines + drafts + form moved, gate re-run);
+  new rule `sex_restricted_product` off the Clinic Products "For" column (`sex_restriction`); **Peaks -> Gate Rules page**
+  (`PeaksGateRules`) with per-rule description / checks / example / 30-day holds and an on-off switch stored in
+  `emed_gate_rule` (fail-open). Real cases: 1049621 Chris/Christopher (alias), 1049347 Dave/Kimberly Burson (transfer).
 
 ## Summary
 Some Peaks / PeakNow orders should be seen by Peaks STAFF before a prescriber or the pharmacy: the
@@ -66,6 +73,10 @@ the intake-form gate have all run by then.
 - Rule v2 (Nick 2026-09-07): `intake_name_mismatch` — ctx `{ patient, intake_identity }` loaded from `person_id`;
   undecidable (no named form) never flags; the same matcher gates the intake -> patient write-back, so a flagged
   visit never received the stranger's DOB / vitals.
+- Rule v3 (Nick 2026-09-08): `sex_restricted_product` — ctx.line_mappings (Clinic Products row per order line) vs
+  `normalize_sex(intake_identity.sex || patient.sex)`; unknown never flags. Switches: `evaluate_order(order, ctx,
+  { disabled })`, `gate_rule_config.disabled_keys()` (60 s cache, absent table = all on). Rule text
+  (description / checks / example) lives on the RULES entries and feeds `/peaks/gate-rules`.
 - UI: `Needs Clarification` already exists everywhere (status options, list filter pills, prescriber views);
   the visit page's Notes card shows type `Order Review` with a terracotta "Review" badge.
 
