@@ -12,7 +12,7 @@ prs:
   - "emed_app#515 (feat->main)"
 tags: ["1.0.241", "1.0.313", "1.0.314"]
 created: 2026-08-30
-updated: 2026-09-07
+updated: 2026-09-08
 related: ["[[patient-portal-secure-messaging]]", "[[facility-scope-groups]]"]
 ---
 
@@ -29,6 +29,14 @@ related: ["[[patient-portal-secure-messaging]]", "[[facility-scope-groups]]"]
 - 2026-09-05 — Enhancement (nicholas-cardell): **pick-up orders → Deliver To 'Pick Up' + `*PICK UP*`** (tag **1.0.310**). Verified: a pick-up order is identified by its Woo shipping line (`local_pickup` / "… Pick up …"), not by a blank shipping address (peaknow.com pick-up customers still enter one; 11 of the first 12 real pick-up orders). `shipping_method_id/title` now staged on both order tables (emed_sql 2026-09-05_add_woo_orders_shipping_method, applied dev+prod, PeakNow rows backfilled); Peaks Orders / Add Visit badge follows the method. ETL follow-up: the "Ready for Pickup" email still keys on blank address + $0 → switch the peaknow site to the shipping method.
 - 2026-09-05 — Enhancement (nicholas-cardell): **expedited shipping → priority 5 + OVERNIGHT SHIPPING** (PR emed_app#663, tag **1.0.309**). peaknow.com charges shipping only for Expedited Shipping, so `shipping_total > 0` (or an expedited shipping-line title) marks the visit at ingest (`wc_ingest` step 3b) and on Re-process; idempotent through the instruction row; never lowers priority. Same day: GIP/GLP-1 program Step 1/2/3 name-keyed Clinic Products rows (78–80 → tirzepatide 1/2/3 mL + syringes) and the 1.0.308 auto-approve claim fix (see refill-aware-intake).
 - 2026-08-30 — In-Progress → Completed in Production (nicholas-cardell), tag **1.0.241**.
+
+- 2026-09-08 — WordPress plugin `emed-patient-portal` **v1.9.0** (nicholas-cardell): the first-phone-sign-in account-confirm step
+  accepts the account's Peak Now PASSWORD as an alternative to the emailed 6-digit code (chooser + code screen; 5 tries per
+  choice, 10/hour per account), the code screen can resend the code (1/min, max 3), and wp-admin user profiles gain
+  "Link this phone to this account" so support can finish the link for a caller. Why: customers reported the code email
+  never arriving; the email is this plugin's, sent via WP Mail SMTP -> SendGrid (account u26413404, not eMed's CRM one),
+  DNS/DKIM correct, all 1,183 emails in 14 days accepted — post-acceptance fate needs that SendGrid dashboard. Migrated
+  users kept their old-site password hashes, so old passwords work. Deployed by SFTP with `php -l`; `.bak-1.8.0` kept on the server.
 
 ## Summary
 Integrates the rebranded Peaks Curative WooCommerce site (**Peak Now**, `test.peaknow.com`) with eMed.
