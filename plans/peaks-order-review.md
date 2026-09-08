@@ -8,7 +8,7 @@ branches:
 developers:
   - nicholas-cardell
 prs: ["emed_app#669 (feat->main, merged 2026-09-05)"]
-tags: ["1.0.311", "1.0.312", "1.0.315", "1.0.316"]
+tags: ["1.0.311", "1.0.312", "1.0.315", "1.0.316", "1.0.319"]
 created: 2026-09-05
 updated: 2026-09-08
 related: [peaknow-portal-integration, refill-aware-intake]
@@ -40,6 +40,11 @@ related: [peaknow-portal-integration, refill-aware-intake]
   new rule `sex_restricted_product` off the Clinic Products "For" column (`sex_restriction`); **Peaks -> Gate Rules page**
   (`PeaksGateRules`) with per-rule description / checks / example / 30-day holds and an on-off switch stored in
   `emed_gate_rule` (fail-open). Real cases: 1049621 Chris/Christopher (alias), 1049347 Dave/Kimberly Burson (transfer).
+
+- 2026-09-08 — **1.0.319** (nicholas-cardell): the intake -> patient write-back (DOB fill-only, name-gated; vitals) now also runs at the top of staff
+  **Re-process** and at order ingest (`wc_ingest._apply_intake`). Visit 1049569's form was completed 2h25m before 1.0.315 deployed and
+  Re-process never re-ran the write-back, so the visit reached the prescriber without a DOB. 11 prod patients in the same state
+  backfilled via `scripts/oneoff/backfill_intake_dob_2026-09-08.js` (all filled).
 
 ## Summary
 Some Peaks / PeakNow orders should be seen by Peaks STAFF before a prescriber or the pharmacy: the
