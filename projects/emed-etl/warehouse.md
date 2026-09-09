@@ -34,14 +34,14 @@ The raw clone tables and dbt staging views live side-by-side in `stg`. The custo
 
 - Uses Azure SQL **elastic query** so data flows server-side between the two DBs (no Python-side transfer).
 - Source schemas in `liberty_link_stage` are **flattened**: `<any_schema>.<table>` lands as `etst_warehouse.stg.<table>`.
-- A source table is loaded **only if** `stg.<table>` already exists in the warehouse. DDL is owned by the `emed_sql` migrations, not by this flow.
+- A source table is loaded **only if** `stg.<table>` already exists in the warehouse. Warehouse DDL is hand-applied and tracked in `emed_sql/warehouse/` (dated files, e.g. `2026-08-19_stg_drift_repair.sql`, `2026-09-09_stg_pn_woo_orders.sql`); `etst_warehouse` has no dev/prod split or `apply_migration.py` path. The nightly run log names every skipped table (`no warehouse target: dbo.<t>`) and every unloaded column (`SCHEMA DRIFT`) — a new prod table or column is invisible to the warehouse until someone reads that log and applies DDL. Real case: `dbo.pn_woo_orders` was skipped for 10 days after the peaknow.com cutover (see below).
 - Tables in `clone_prod_to_warehouse_stage_exclusions.json` are skipped.
 - Collisions (two source schemas with the same table name) are skipped — operator must rename in the warehouse or exclude one source schema.
 - Concurrency: 4 tables in parallel by default (`DEFAULT_CONCURRENCY = 4`).
 - Shares the underlying clone primitives with `clone_prod_to_dev_database.py` via `flows/utilities/db_clone.py`. Unlike the dev clone, this flow does **not** enable the empty-source guard (`preserve_dest_on_empty_source`) — `stg` mirrors prod exactly, so a table emptied in prod also empties in the warehouse.
 
 ### DDL generator
-`flows/utilities/generate_warehouse_stg_ddl.py` emits a migration for warehouse `stg` tables based on live source metadata. Run this when a new source table needs to be added to the warehouse; commit the generated migration to `emed_sql`.
+`flows/utilities/generate_warehouse_stg_ddl.py` emits `IF OBJECT_ID IS NULL CREATE TABLE` DDL for every prod base table from live source metadata (IDENTITY/PK/defaults/indexes stripped). It **only CREATEs, never ALTERs**, so a column added to an existing prod table needs a hand-written `ALTER TABLE stg.<t> ADD ...`. Its full output would also create ~190 stg tables nobody loads today — take the table(s) you need into a dated `emed_sql/warehouse/` file rather than applying it wholesale.
 
 ## dbt Project (`dbt/`)
 
@@ -103,12 +103,19 @@ Reconciliation hook (not yet built): Stripe payout rows (`reporting_category='pa
 **Why (the gotcha):** WooCommerce `order_id`s are per-install auto-increment sequences, so PeaksCurative order `1234` and PeakNow order `1234` are *different* orders sharing an id. Keying `fct_order` on `order_id` alone would collide and conflate them the moment a second storefront lands (the SK `unique` test breaks, or worse, rows silently merge). Same logic for `transaction_id` across pharmacies.
 
 **Conventions:**
-- Stamp the discriminator at the **staging boundary** as a literal — each `stg_*` view maps 1:1 to one source's physical table (`stg_woo_orders` → `'peaks_curative'`). When a second source lands, add its own staging models (`stg_pn_woo_*` → `'peaknow'`) and `UNION ALL` in the fact; don't re-key.
+- Stamp the discriminator at the **staging boundary** as a literal, one per source branch. Since 2026-09-09 `stg_woo_orders` / `stg_woo_order_items` are each a `UNION ALL` of the two raw tables (`stg.woo_orders` → `'peaks_curative'`, `stg.pn_woo_orders` → `'peaknow'`), so `fct_order` needed no change — its joins were already source-aware. Every branch exposes the same column list; site-specific normalization stays inside its branch.
 - Make every cross-table join inside the fact **source-aware** (`on a.order_id = b.order_id and a.source_site = b.source_site`), or the union cross-joins sources.
 - Marts grain by the discriminator too (`mart_daily_orders` is per `(date_key, source_site)`); enforce uniqueness with a `dbt_utils.unique_combination_of_columns` test on the combo, and let consumers `SUM(...) GROUP BY date_key` to roll sources up.
 - Adding the discriminator while there's still one source is **non-breaking** (a constant column / one-row-per-day) and far cheaper than retrofitting after the keyspace is polluted — do it early.
 
 > `source_site` (storefront: peaks_curative / peaknow) and `pharmacy` (payment tenant: rxcs / mmed) are **different axes** — don't conflate them. The order↔payment join (`fct_payment_transaction.order_id`) crosses the two.
+
+### WooCommerce orders after the peaknow.com cutover (2026-09-03)
+
+- `stg.woo_orders` / `stg.woo_order_items` are **frozen at 2026-09-03 04:16 UTC**: the legacy Peaks orchestrator that fed them was paused at cutover, and legacy-numbered orders that still ship never update `woo_orders` either (eMed's `PEAKNOW_MIN_ORDER_ID` guard skips them on the new site's webhook). Any "orders stop on 09/03" report is this.
+- New orders arrive in prod `dbo.pn_woo_orders` from **eMed's WooCommerce webhook** (`wc_ingest.js`), not from any ETL, and the rows differ from the ETL-written `woo_orders` in ways the staging views paper over: `date_created`/`date_modified` (the Woo order timestamps) are **NULL** (only `date_created_local` is set, by the table default — ingestion time, seconds after the order), `subtotal` is NULL (summed from the line items), and **line items exist only in the `line_items` JSON column** — `pn_woo_order_items` stays empty because eMed builds visits straight from the payload in JS. `stg_woo_order_items` explodes the JSON with `OPENJSON ... WITH (...)`.
+- `pn_woo_orders` also holds ~34 invalidated migrated legacy orders (ids < 100000) from the 2026-08-31 re-ingest incident; the staging views apply `woo_order_id >= 100000` (real PeakNow orders start at 100241) so a legacy order can never count once per site.
+- `Peaks-ETL-Orchestrator-PeakNow` (the ETL variant that would have written `pn_woo_orders` / `pn_woo_order_items` / `pn_wpforms_*`) never ran and was unscheduled 2026-09-09 — PeakNow intake forms live in eMed's portal, so it has no job.
 
 ## Database Users
 
