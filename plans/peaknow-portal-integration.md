@@ -10,15 +10,16 @@ developers:
   - nicholas-cardell
 prs:
   - "emed_app#515 (feat->main)"
-tags: ["1.0.241", "1.0.313", "1.0.314", "1.0.329", "1.0.330"]
+tags: ["1.0.241", "1.0.313", "1.0.314", "1.0.329", "1.0.330", "1.0.345"]
 created: 2026-08-30
-updated: 2026-09-11
+updated: 2026-09-15
 related: ["[[patient-portal-secure-messaging]]", "[[facility-scope-groups]]"]
 ---
 
 # Peak Now Patient-Portal Integration
 
 ## Status & history
+- 2026-09-15 — Feature (nicholas-cardell), tag **1.0.345** (PR emed_app#805): **intake for household orders, corrections, single-use links, legacy wind-down** — no schema change, staff-driven (Nick: every case handled this week). Visit page Intake Forms card: "Second person on this order" (split/copy lines to a new visit for the other person, held for THEIR forms, private single-use link texted/emailed — no account needed; the transfer no longer inherits the customer's phone/email/DOB), "Correct" / "Wrong person" on completed forms (superseded, never deleted; visit back to Missing Forms; patient told why), "Send link" on outstanding forms + a revocable list of live links, "Accept questionnaire as intake" for legacy visits; Peaks Visits bulk "Close legacy visits" (store order already completed/shipped/refunded/cancelled). Gate scopes a split visit to its own lines; review rules re-judge per rule; link and staff submissions release holds + audit. Same day on peaknow.com: 44 purchase notes rewritten to point at the account, 20 legacy consultation pages replaced by a moved notice (backups in wp_options + revisions).
 - 2026-09-11 — Store hygiene (nicholas-cardell, Nick's go): peaknow.com wp-config `WP_DEBUG` / `WP_DEBUG_LOG` → false (WP_DEBUG_DISPLAY was already false), the 1.44 GB `wp-content/debug.log` deleted, all 14 `uploads/wc-logs/webhooks-delivery-*.log` files (full order bodies) purged; WooCommerce now logs delivery outcomes without bodies. Backup `/tmp/wp-config.php.bak-2026-09-11`. Open for Jorge: the other wc-logs sources (gateway/subscriptions, 173 files / 17 MB) and the 30-day WC log retention; debug on staging only.
 - 2026-09-10 — Fix (nicholas-cardell), tag **1.0.330** (PR emed_app#737): **the WooCommerce webhook receiver is no longer behind the 60/min per-IP API limiter** — `rate_limiter.webhook_limiters({ is_trusted })` gives HMAC-signed posts a 1,200/min ceiling (circuit breaker) and keeps unsigned posts at 60/min; `wc_webhook_verify.verified(req)` memoises the HMAC. Webhook #9 (order.updated) was then **re-activated on peaknow.com with its failure counter reset** (12:52 GMT, `wp eval-file`: set_failure_count(0) + set_status(active) in one save). Store hygiene still open for Jorge: WP_DEBUG=true in production (1.36 GB debug.log; WooCommerce logs full webhook bodies to uploads/wc-logs — not web-fetchable, at-rest only).
 - 2026-09-10 — Enhancement (nicholas-cardell), tag **1.0.329** (PR emed_app#734): **Add Visit clinic follows the store order number** — the staff form and `POST /api/moct/new-visit` set the clinic from the Clinic Order # (`peaks_sites.clinic_for_order_number` / main.js `peaksClinicForOrder`: a Peaks store clinic + number >= 100000 -> PeakNow, else Peaks Curative; strict on the two store clinics, other clinics untouched). Hand-created PeakNow visits had defaulted to Peaks Curative (1049747 on #112970) and sat on the wrong Orders page. The person lookup for a store visit now spans both store clinics and keeps the found row's clinic (no duplicate patient), and the Add Visit picker lists both stores' patients.
