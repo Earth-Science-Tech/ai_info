@@ -18,6 +18,13 @@ related: [externalrep-blaze-orders, facility-scope-groups, portal-foundations]
 
 ## Status & history
 - 2026-09-16 — Not Started → In-Progress (nicholas-cardell): built on the feature branch, unit suite green (6,834 tests), not yet on dev.
+- 2026-09-16 — Smoke-tested end to end on the LOCAL app against `liberty_link_dev` via View-As Grant (promoted
+  to ExternalRepAdmin on dev): My Team add / promote / demote / disable / re-enable + every guard (self-demote,
+  self-disable, out-of-group 404, bad body); My Facilities → Issue API credential → show-once modal → Basic-auth
+  `/api/public/ping` 200 with the header, 403 with a wrong header, `/scripts` 200 → Revoke → ping 403. Found and
+  fixed one real bug the mocked tests hid: `sql.upsert` needs `'id'` as key_name (its default null = INSERT →
+  identity error) on the role-change and revoke paths; tests now pin the key argument. Dev leftovers: user 218
+  (`rep.devsmoke@rxcs.net`, disabled) and 219 (revoked API account) in group 8.
 
 ## Summary
 Three asks from Nick for Grant (GC Consulting, `emed_user` 60, ExternalRep, sales group 8 "GC Consulting",
