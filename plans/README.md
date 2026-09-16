@@ -10,6 +10,7 @@ change its status. Full rules: [`skills/plan-tracking.md`](../skills/plan-tracki
 
 | Status | Plan | Project | Branch | Developers | Updated |
 |--------|------|---------|--------|------------|---------|
+| In-Progress | [Rep Team (ExternalRepAdmin + My Team) and rep-mintable facility API credentials](rep-team-and-facility-api-credentials.md) | emed_app | `feat/rep-team-and-facility-api-credentials` | Nicholas Cardell | 2026-09-16 |
 | Completed in Production | [MFA phone: self-service page, IT Support set/clear, first-login offer](mfa-phone-self-service.md) | emed_app | `feat/mfa-phone-self-service` (1.0.347) | Nicholas Cardell | 2026-09-16 |
 | Completed in Production | [Peaks order review lane (Needs Clarification before prescriber / pharmacy)](peaks-order-review.md) | emed_app | `feat/order-review-lane` (1.0.311, banner 1.0.312) | Nicholas Cardell | 2026-09-05 |
 | Completed in Production | [Refill-aware intake forms + any-origin refill candidates (Peaks / PeakNow)](refill-aware-intake.md) | emed_app | `feat/refill-aware-intake` | Nicholas Cardell | 2026-09-04 |
