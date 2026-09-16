@@ -106,18 +106,21 @@ gotchas (read-completeness, money/PHI granularity, single-capability pages, empt
 
 **ITSupport / Helpdesk role** — narrow recovery-only role for non-Admin support staff:
 - Single permission: `Manage_User_Auth` (no business-data access)
-- Endpoints under `/api/it-support/*` — `reset-password`, `reset-mfa`, `unlock`, `users`
+- Endpoints under `/api/it-support/*` — `reset-password`, `reset-mfa`, `mfa-phone` (set/replace/clear the SMS-MFA number), `unlock`, `users` (returns `has_mfa_phone` + `mfa_phone_masked`, last 4 only)
 - `reset-password` supports two modes: `send_email=true` (server generates 16-char temp password and emails it via `email_azure`) or `new_password=<str>` (manual). Both modes set `password_change_required=1`.
 - **Privilege-escalation guard** in `route_api.js → load_helpdesk_target`: ITSupport actors blocked from operating on Admin/SuperUser/ITSupport targets, AND the attempt is audit-logged as `HELPDESK_PRIVILEGE_ESCALATION_BLOCKED`. Privileged users are also filtered from the list endpoint so they're invisible to ITSupport.
 - UI at `/it-support` (sidebar gated on `View_Menu_IT_Support`)
 
 **MFA phone number capture (`emed_user.mfa_phone`):**
 - SECURITY-CRITICAL: phone numbers can ONLY be written in trusted contexts. An earlier bug let `/api/auth/mfa/magic-link/send` save a phone from the request body during the pending-MFA window, which let an attacker with a stolen password supply their own phone and bypass MFA. Closed 2026-05-01.
-- Trusted-write contexts:
-  1. `POST /api/auth/mfa/setup/verify` — during initial TOTP enrollment (user has proved possession of authenticator app)
-  2. `POST /api/auth/change-password` — after current-password verification
-- `/api/auth/mfa/magic-link/send` rejects SMS delivery with 400 if no `mfa_phone` is on file (audit logged as `MFA_SMS_UNAVAILABLE`). The login page's "no phone" screen is info-only — no input.
-- UI: phone field shown on MFA-setup screen (`login.ejs`) and on `views/auth/change-password.ejs` when the user has no phone on file.
+- **ONE writer (2026-09-15):** `server/mfa.js` `set_mfa_phone(user_id, raw, {via, actor, only_if_empty, req})` / `clear_mfa_phone` / `mask_phone` ('(•••) •••-5885'). Normalizes via `sms.normalize_phone` and REFUSES anything but `+1` + a NANP number (the normalizer passes `+44…` / `'+'` / dropped-digit numbers through); treats `upsert()`'s `{rows_modified:0, error}` and `select()`'s `null` as FAILURE (sql.js never throws); audits `MFA_PHONE_SET` / `MFA_PHONE_CLEARED` with via/actor/last4/replaced (failures with `success=0`).
+- **Posture: users ADD once (`only_if_empty` → 409 `ALREADY_SET`), IT Support CHANGES.** Trusted-write contexts (all pass `only_if_empty` except IT Support):
+  1. `POST /api/auth/mfa/setup/verify` — during TOTP enrollment (the setup form hides the field when a number is on file; a re-enrollment never overwrites)
+  2. `POST /api/auth/change-password` — after current-password verification, BEFORE the password write (a refused phone leaves the account untouched)
+  3. `POST /api/auth/mfa/phone` — self-service ADD with the current password: the `GET /mfa-phone` page (user menu → "MFA Phone (SMS login)"; the menu also has "Change Password") and the login page's first-login offer (`login.ejs` `#phoneOfferForm`, shown after the FIRST magic-link login when `/login` said `mfa_setup_required && !has_phone`; Save re-sends the password still in `#inputPassword`). `mfa_rate_limiter`; bad password → `MFA_PHONE_REJECTED`.
+  4. `POST /api/it-support/mfa-phone` `{user_id, mfa_phone}` set/replace or `{user_id, clear:true}` (strict) — `Manage_User_Auth` + `load_helpdesk_target`; a clear with nothing on file says so and audits nothing.
+- `/api/auth/mfa/magic-link/send` rejects SMS delivery with 400 if no `mfa_phone` is on file (audit logged as `MFA_SMS_UNAVAILABLE`). The login page's "no phone" screen is info-only — no input; it points at the user menu / IT Support.
+- UI: phone field on the MFA-setup screen (`login.ejs`) and on `views/auth/change-password.ejs` when the user has no phone on file; `views/auth/mfa-phone.ejs` (throws without `ext.has_mfa_phone`, retry notice on `ext.lookup_failed`); masked MFA Phone column + Phone modal on `/it-support`.
 
 **Forced password change** (column `emed_user.password_change_required` BIT NOT NULL DEFAULT 0):
 - Set to `1` by any helpdesk reset (manual or email)
