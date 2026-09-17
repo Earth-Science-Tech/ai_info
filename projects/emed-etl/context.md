@@ -57,6 +57,7 @@ See [warehouse.md](warehouse.md) for the warehouse layer in detail.
 
 Credentials in `.env` and Prefect Secret blocks (manually synced with emed_app):
 - Azure SQL credentials (`emed-database-*`, `etst-warehouse-etl-*`) — runtime data writes only; schema tooling uses `../emed_sql/.env`
+- **`{prefix}-image-root` — REQUIRED per pharmacy** (the UNC folder of that tenant's Liberty hardcopy PDFs, e.g. `mdvo-image-root`). Missing = the hardcopy META-tag step reads the wrong server and stamps every PDF checked-with-no-tag; Meduvo ran that way for six weeks. Onboarding a tenant = database secrets + this one. See [hardcopy-image-root-secrets.md](hardcopy-image-root-secrets.md).
 - WooCommerce API keys
 - SSH/SFTP credentials (Cloudways)
 - eMed API credentials
