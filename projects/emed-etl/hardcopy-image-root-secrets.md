@@ -38,10 +38,41 @@ Until 2026-09-17 the code had ONE default (`DEFAULT_IMAGE_ROOT`, the RXCS server
   renamed RXCS server: its own Liberty host *is* `libertyserver`, so the old default had worked
   for months. 19 scripts were stamped in the two hours before it was caught
   (`[Errno 2] No such file ... \\LIBERTYSVRRXCS\...`).
-- The failure is **silent by construction**: `_tag_from_hardcopy` returns found=1/tag_count=0 on a
-  read error, the ledger gets `checked=1`, and the candidate query anti-joins the ledger, so the
-  script is never re-checked. Same trap as the RXCS-JOBSERVER-2 share failure
+- The failure **was silent by construction** (until emed_etl PR #76, next section):
+  `_tag_from_hardcopy` returned found=1/tag_count=0 on a read error, the ledger got `checked=1`,
+  and the candidate query anti-joins the ledger, so the script was never re-checked. Same trap as
+  the RXCS-JOBSERVER-2 share failure
   ([run-all-etl-silent-task-failures.md](run-all-etl-silent-task-failures.md)).
+
+## Ledger semantics since emed_etl PR #76 (2026-09-17): an unreadable PDF is never "checked"
+
+`{prefix}_hardcopy_tag_log` gained `readable BIT NULL`, `read_attempts INT NOT NULL DEFAULT 0` and
+`read_error NVARCHAR(400)` on all three tenants (emed_sql
+`migrations/applied/2026-09-17_add_read_tracking_to_hardcopy_tag_log.sql`, applied dev + prod).
+The decision rules are pure functions in `flows/utilities/hardcopy_ledger.py` (`ledger_state`,
+`is_share_outage`, `format_read_error`; `tests/test_hardcopy_ledger.py`):
+
+| Outcome of the read | `checked` | `readable` | `read_attempts` | `read_error` |
+|---|---|---|---|---|
+| no PDF catalogued for the script | 1 | NULL | unchanged | NULL |
+| PDF opened and parsed (tag or not) | 1 | 1 | unchanged | NULL |
+| PDF could not be opened / parsed | **0** (retried next run) | 0 | +1 | `Class: message` |
+| ... after `MAX_READ_ATTEMPTS` (8) failures, about 2 h of 15-min runs | 1 (gave up) | 0 | 8 | last error |
+
+- An unreadable row (retrying or given up) stays eligible for the note fallback
+  (`tag_full_orders_from_note` takes `l.checked = 1 OR l.readable = 0`). The code never re-opens a
+  given-up row; a **manual reset** does, once the share is fixed:
+  `UPDATE {prefix}_hardcopy_tag_log SET checked = 0 WHERE readable = 0 AND applied = 0`.
+- **Share-outage detection:** a batch with at least `OUTAGE_MIN_FOUND` (5) PDFs catalogued and 0
+  readable ends the step for that run (every further read would fail the same way), logs
+  `HARDCOPY SHARE OUTAGE: N PDFs catalogued, 0 readable ...` at ERROR, writes an `ERROR` row to
+  `dbo.sql_log` (`cat = '{prefix}_hardcopy_tag ETL'`, `log LIKE 'Share outage:%'`, `info` = the first
+  read error) and emails the Secret / env `etl-alert-email` (default `support@myonlineconsultation.com`),
+  subject `[eMed ETL] <PREFIX>: hardcopy PDFs unreadable - META tags are not being applied`. One email
+  per tenant per 6 h, throttled through that `sql_log` row. Alerting is best-effort; the ledger is the
+  source of truth.
+- Run summary line: `Hardcopy tag step complete. Scripts checked: N; rxqFullOrder rows tagged: M`
+  followed by `; unreadable (retry next run): K` only when a read failed.
 
 ## How to spot it
 
@@ -52,6 +83,9 @@ Until 2026-09-17 the code had ONE default (`DEFAULT_IMAGE_ROOT`, the RXCS server
   `Access is denied`.
 - eMed: `view_emed_full_order` rows for the pharmacy with `MocTag`/`RxTag` NULL while
   `TrackingNumber` is set; the PC/PN Orders page shows shipped orders with no tracking.
+- Since PR #76 the failure is loud: `{prefix}_hardcopy_tag_log WHERE readable = 0` (with
+  `read_error` naming the cause), `dbo.sql_log` rows with `cat = '{prefix}_hardcopy_tag ETL'`, the
+  alert email, and `HARDCOPY SHARE OUTAGE` / `unreadable (retry next run): K` in the worker log.
 
 ## How to fix / recover
 
@@ -59,14 +93,17 @@ Until 2026-09-17 the code had ONE default (`DEFAULT_IMAGE_ROOT`, the RXCS server
    reachable from laptops and needs the worker's auth): a small Python script that builds the UNC
    from a bare host name — **never pass `\\host\share` on an ssh command line; the backslashes
    collapse** — and calls `Secret(value=...).save("<prefix>-image-root", overwrite=True)`.
-2. Reset the ledger rows that were stamped while the root was wrong
-   (`UPDATE {prefix}_hardcopy_tag_log SET checked = 0 WHERE checked = 1 AND found = 1 AND
-   tag_count = 0 AND applied = 0 [AND checked_date >= <when it broke>]`) so the next 15-minute
-   run re-checks them. Limit by date for a long-healthy tenant — old found-but-untagged rows are
-   legitimately tag-less documents.
-3. Watch the next run: `Hardcopy tag batch: N scripts ... rows tagged: M`. If reads then fail with
-   `Access is denied`, the *service account's* Credential Manager vault needs the file-server
-   credential (RXCS lesson: an SSH-context probe is not the service context).
+2. Reset the ledger rows that were stamped while the root was wrong so the next 15-minute run
+   re-checks them. Since PR #76 an unreadable PDF is not stamped, so only rows that **gave up** need
+   it: `UPDATE {prefix}_hardcopy_tag_log SET checked = 0 WHERE readable = 0 AND applied = 0`.
+   Rows stamped **before** 2026-09-17 (`readable IS NULL`) need the old predicate
+   `UPDATE {prefix}_hardcopy_tag_log SET checked = 0 WHERE checked = 1 AND found = 1 AND
+   tag_count = 0 AND applied = 0 [AND checked_date >= <when it broke>]` — limit by date for a
+   long-healthy tenant; old found-but-untagged rows are legitimately tag-less documents.
+3. Watch the next run: `Hardcopy tag batch: N scripts ... rows tagged: M` and the
+   `Hardcopy tag step complete` summary, which must carry no `unreadable` suffix once healthy. If
+   reads fail with `Access is denied`, the *service account's* Credential Manager vault needs the
+   file-server credential (RXCS lesson: an SSH-context probe is not the service context).
 
 ## Related
 
