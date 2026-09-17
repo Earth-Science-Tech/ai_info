@@ -1,12 +1,12 @@
 ---
 title: Affiliate Portal — invite-only affiliates, single-use QR codes → patient portal → MOCT visit
 slug: affiliate-portal
-status: Completed in Dev
+status: Completed in Production
 project: multi
 branches:
   - emed_app: feat/affiliate-catalog        # PR-A — catalog + pricing groundwork (ships dark)
   - emed_app: feat/affiliate-portal         # PR-B — the module
-  - emed_sql: feat/affiliate-portal-schema  # 6 migrations, dev-applied, PENDING PROD
+  - emed_sql: feat/affiliate-portal-schema  # 7 migrations (incl. the intake-form map) — applied to prod 2026-09-17, tag 1.0.359
 developers:
   - mariotabraue
 prs:
@@ -50,6 +50,25 @@ related: ["[[patient-portal-secure-messaging]]", "[[peaknow-portal-integration]]
   cherry-picked from dev at Mario's request (e784b536 -> 2ed7f5dc app, 80abd06 -> 2bda541 sql) because they depend on PR-A/B
   code. eMed CI (lint, cut-from-main, schema-dependency section) passed at open; the migration files must reach emed_sql
   main and prod before the paired eMed PR deploys.
+
+- 2026-09-17 — Completed in Dev → Completed in Production (nicholas-cardell): eMed **#851** + **#852** merged to `main`
+  after review; emed_sql **#97** + **#98** merged and every migration applied to `liberty_link_stage` with
+  `apply_migration.py --db both --confirm`; tagged **1.0.359** (with #849 Show Pricing and #850 rep lead notes).
+  Review commit `da953535` on #852 (all tests green, 356 files / 7,707): reversing a payable sale already on a
+  submitted/approved/paid statement now POSTS AN ADJUSTMENT instead of editing the locked statement (a draft is
+  recomputed); the sweep keys rejections off the visit's CURRENT status, not history, and skips already-adjusted
+  sales; `payments.gateway_for('moct')` THROWS when `PROPELR_MOCT_*` is unset (was: silently fell back to the
+  pharmacy merchant) and the public tokenization key answers '' so checkout refuses cleanly; W-9 uploads are
+  `field_crypto`-encrypted at rest (legacy plaintext rows still read) and capped at 5 MB; `/api/affiliate/me` returns
+  a `SELF_FIELDS` whitelist (no `*_enc`, notes, tokens); a second `submit` answers 409; the Facility editor may KEEP
+  `type='Affiliate'` but can neither set nor clear it (it drives MOC-billing exclusion); the User editor refuses
+  only MINTING/PROMOTING the Affiliate role (editing an existing affiliate login works again); `sql_error()` reads
+  `db.__last_error` (the config object, not the wrapper) across the affiliate modules; `handle()` maps a null query
+  result to a `db` error; `order_context_for_visit` fences the `AF-<id>` fallback to the sale's own facility;
+  `ready()` caches a negative table probe for 60 s. #851 review: the public product-image route has its own
+  600/min limiter. **Still owed on the prod App Service:** `PROPELR_MOCT_SECURITY_KEY`,
+  `PROPELR_MOCT_PUBLIC_TOKENIZATION_KEY`, `AFFILIATE_ALERT_EMAIL` (and confirm `FIELD_ENCRYPTION_KEY`). Until then the
+  module is inert for every existing clinic/user — nothing changes until an application is approved.
 
 ## Summary
 Guerrilla-marketing channel: **affiliates** (non-medical individuals, invited by an eMed Admin) sell an admin-curated
@@ -214,12 +233,12 @@ All documented in `.env.example`.
 
 ## Rollout / remaining
 
-**Where it is (2026-09-17).** Both PRs' worth of code is on `dev` and live on the dev slot (`https://emed-dev.azurewebsites.net`).
+**Where it is (2026-09-17, later).** SHIPPED to production in **1.0.359** (eMed #851/#852 + emed_sql #97/#98, all migrations on `liberty_link_stage`). Earlier the same day: both PRs' worth of code was on `dev` and live on the dev slot (`https://emed-dev.azurewebsites.net`).
 The PRs to `main` are **held until Mario OKs**: PR-A (`feat/affiliate-catalog`) first, then PR-B (`feat/affiliate-portal`),
 never stacked, each paired with the emed_sql PR from `feat/affiliate-portal-schema` (cross-link, state deploy order:
 migrations before or with the app deploy — the PR-A columns are hard dependencies).
 
-**Dev-slot prerequisites before real testing** (Azure app settings on the dev slot, then prod):
+**Prerequisites before real testing** (Azure app settings — dev slot done by Mario; **PROD STILL OWED** as of the 1.0.359 tag):
 1. `FIELD_ENCRYPTION_KEY` — without it every Invite / Submit answers `encryption_unavailable`.
 2. `PROPELR_MOCT_SECURITY_KEY` + `PROPELR_MOCT_PUBLIC_TOKENIZATION_KEY` — the "My Online Consultation" Propelr account.
 3. `AFFILIATE_ALERT_EMAIL` — recipient of the paid-but-no-visit alert.

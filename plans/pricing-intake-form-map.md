@@ -1,11 +1,11 @@
 ---
 title: Pricing → Intake Form Map (global product → intake-form map + product images)
 slug: pricing-intake-form-map
-status: Completed in Dev
+status: Completed in Production
 project: multi
 branches:
   - emed_app: feat/pricing-intake-form-map (merges into dev — depends on Mario's Affiliate Portal PR-A/PR-B, dev-only today)
-  - emed_sql: feat/pricing-intake-form-map (migrations/pending/2026-09-17_add_emed_catalog_required_form.sql — dev-applied, PENDING PROD)
+  - emed_sql: feat/pricing-intake-form-map (migrations/applied/2026-09-17_add_emed_catalog_required_form.sql — applied to prod 2026-09-17 via emed_sql #98)
 developers:
   - nicholas-cardell
   - mariotabraue (Affiliate Portal owner — the first consumer; template clone + quick-adds stay his)
@@ -29,6 +29,12 @@ related: ["[[affiliate-portal]]"]
   feat/affiliate-portal-schema, PR #98) so it ships to prod with the module it depends on — no separate promotion PR is
   needed for this branch. Also: open item 2 (a global Rx-preset twin) is closed — QR readiness now keys off the intake-form
   rule alone (see [[affiliate-portal]]).
+
+- 2026-09-17 — Completed in Dev → Completed in Production (nicholas-cardell): shipped inside eMed **#852** / emed_sql **#98**;
+  `emed_catalog_required_form` created on `liberty_link_stage`; tag **1.0.359**. Two review tweaks rode along in
+  `da953535`: GLOBAL rows make an order "configured" only when the order is catalog-keyed (affiliate / portal sales) —
+  a Peaks store line that no global row can ever match is never held as `no_rule` (tests added in
+  `product_required_form_order_context.test.js`); the table probe caches a NEGATIVE result for 60 s.
 
 ## Summary
 The Affiliate Portal (Mario, `feat/affiliate-portal`, as-built in `emed_app/docs/plans/affiliate-portal.md`) creates
@@ -106,7 +112,7 @@ through global rows), `pricing_images.test.js` (+2 for `apply_to_product`). Regi
   already applied to `liberty_link_dev`. Smoke on the dev slot: Pricing → Intake Form Map lists 408 products; assign a
   form; check `emed_catalog_required_form`; create an affiliate QR sale for a mapped product → visit lands in
   **Missing Forms** with that form due.
-- **Prod (with the Affiliate Portal ship, not before):** the emed_sql migration ships through `push prod` (it is the only
+- **Prod — DONE 2026-09-17 in 1.0.359 (with the Affiliate Portal ship):** the emed_sql migration shipped through `push prod` (it is the only
   schema object; no data backfill). Code ships dark — until the table exists the module answers `[]` and the page
   shows the "table not on this database" banner. PERM 26 means a redeploy-time perm rebuild for live sessions.
 - **Verified on dev (2026-09-17):** Arousal Melt Troche (8 sizes) → 2 forms; `product_required_form.resolve_required_forms(1967,
