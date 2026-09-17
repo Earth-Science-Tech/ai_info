@@ -76,3 +76,7 @@ Until 2026-09-17 the code had ONE default (`DEFAULT_IMAGE_ROOT`, the RXCS server
 - The store side of the same incident: peaknow.com's AST Pro provider table had no provider
   enabled (`display_in_order = 1` on none of 1,078 rows) after the site migration, so the admin
   "Shipping Provider" dropdown was empty; FedEx (id 64, slug `fedex`) was enabled 2026-09-17.
+- **AST Pro does not dedupe by tracking number.** A tracking line added by hand (`ast_insert_tracking_number`)
+  sits beside the ETL's later REST push as a second identical line; prefer fixing the tag so the ETL writes
+  it, and if you add one by hand, remove it with `delete_tracking_item($order_id, $tracking_id)` once the
+  ETL line lands.
