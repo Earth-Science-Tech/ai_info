@@ -1,16 +1,16 @@
 ---
 title: Rep Team (ExternalRepAdmin + My Team) and rep-mintable facility API credentials
 slug: rep-team-and-facility-api-credentials
-status: In-Progress
+status: Completed in Production
 project: emed_app
 branches:
   - emed_app: feat/rep-team-and-facility-api-credentials
 developers:
   - nicholas-cardell
-prs: []
-tags: []
+prs: ["emed_app#845 (feat->main)"]
+tags: ["1.0.357"]
 created: 2026-09-16
-updated: 2026-09-16
+updated: 2026-09-17
 related: [externalrep-blaze-orders, facility-scope-groups, portal-foundations]
 ---
 
@@ -25,6 +25,10 @@ related: [externalrep-blaze-orders, facility-scope-groups, portal-foundations]
   fixed one real bug the mocked tests hid: `sql.upsert` needs `'id'` as key_name (its default null = INSERT →
   identity error) on the role-change and revoke paths; tests now pin the key argument. Dev leftovers: user 218
   (`rep.devsmoke@rxcs.net`, disabled) and 219 (revoked API account) in group 8.
+- 2026-09-17 — In-Progress → Completed in Production (nicholas-cardell): merged `origin/main` @ 1.0.356 (two
+  additive conflicts with Mario's #832 "My Team · portal users" resolved; page relabelled "Rep Team" per Nick),
+  PR emed_app#845 merged, tag **1.0.357**. Full suite 330 files / 7,365 tests; CI green. **Post-deploy data step
+  still owed:** set Grant (`emed_user` 60) → ExternalRepAdmin in User Management.
 
 ## Summary
 Three asks from Nick for Grant (GC Consulting, `emed_user` 60, ExternalRep, sales group 8 "GC Consulting",
@@ -59,7 +63,10 @@ for many clinics and is hiring reps to work his territory:
   recipients ×2, `clarifications.ejs` ×2, `lead-tasks.ejs`. Pinned by `external_rep_admin_role.test.js`
   ("admin derives EXACTLY ExternalRep's page set + Write_Page_RepTeam").
 
-**My Team (`server/rep_team.js`, `/api/rep/team*`, `views/reptools/team.ejs`, page `RepTeam`).**
+**Rep Team (`server/rep_team.js`, `/api/rep/team*`, `views/reptools/team.ejs`, page `RepTeam`).** Labelled
+"Rep Team" (Nick, 2026-09-17): Mario's 1.0.352 (#832) already put a "My Team · portal users" section — a
+FACILITY's prescribers/staff via `server/portal_team.js` — on the My Facilities detail panel, and the two must read
+differently. The rep-team page and the facility API panel merged cleanly alongside his section.
 - The team IS the facility group: members = `emed_user.scope_group_id = <actor's group>` with a rep role.
   A new member is scoped to the same group, so territory access (facilities, GCC leads, prescriptions,
   pricing, order sets) is immediate with zero new access code.
