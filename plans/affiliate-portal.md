@@ -32,6 +32,14 @@ related: ["[[patient-portal-secure-messaging]]", "[[peaknow-portal-integration]]
   (emed_sql `47f488c`, dev-applied, pending prod with the rest), floor = drug_cost × quantity + consult + shipping, no default,
   `no_quantity` rows are not sellable, the QR snapshot / sale line / visit `Drug[].Quantity` carry it; the Retail table was
   re-laid out (fixed colgroup, shipping price inside the select, cost-source pill under the cost). On dev.
+- 2026-09-17 — still Completed in Dev (mariotabraue): **QR readiness keys off the INTAKE-FORM rule, not the prescription
+  template** (Mario: "no prescription template is preventing me from adding products — only the intake should be required;
+  check the intake form association against the Intake Form Map page"). `affiliate_qr.list_products` now asks
+  `product_required_form.list_for_facility` for ANY rule on the catalog id — the facility's Clinic Products row or Nick's
+  global `emed_catalog_required_form` row ([[pricing-intake-form-map]]) — and answers `no_intake_form` only when there is
+  none; `mappable` (quick-adds present) is informational. `affiliate_visits.create_visit_for_sale` still runs the forms
+  step for a line without a template and leaves the visit in Received for the provider to prescribe by hand. This closes
+  the map plan's open item 2 (a global Rx-preset twin is no longer needed for QR readiness). On dev.
 
 ## Summary
 Guerrilla-marketing channel: **affiliates** (non-medical individuals, invited by an eMed Admin) sell an admin-curated
@@ -127,8 +135,10 @@ Affiliate, scope_facility_id)`, Affiliates group membership (`group_type 'affili
 sellable }`. An explicit retail is stamped and never auto-changed; cost drift flags it (the special-sheet `final_price`
 lesson). `quote_lines` refuses unsellable lines and returns the frozen per-line snapshot.
 
-**QR.** `mint` = sellable ∩ mappable (the facility's Clinic Products row for the catalog id carries live quick-adds, so
-`auto_prescribe_for_visit` covers every request) → `quote_lines` → `INSERT emed_affiliate_qr` (hash, `token_enc`,
+**QR.** `mint` = sellable ∩ covered by an intake-form rule (a Clinic Products row of the facility or a global Pricing →
+Intake Form Map row for the catalog id, as `product_required_form.list_for_facility` merges them; an explicit no-form row
+counts, no row = `no_intake_form`; a missing prescription template does NOT block — the reviewing provider prescribes by
+hand, Mario 2026-09-17) → `quote_lines` → `INSERT emed_affiliate_qr` (hash, `token_enc`,
 `bundle_json`) → `https://<host>/a#t=<raw>` (fragment — the bearer never reaches access logs; ~71 bytes → QR v5).
 `resolve` → `invalid | too_many_attempts | revoked | claimed | expired | unavailable | repriced | reserved | active`; the
 floor re-check uses `effective_total_i = max(snapshot, live)` — eMed's floor is never eroded, the affiliate absorbs drift
