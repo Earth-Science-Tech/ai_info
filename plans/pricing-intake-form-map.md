@@ -9,7 +9,8 @@ branches:
 developers:
   - nicholas-cardell
   - mariotabraue (Affiliate Portal owner — the first consumer; template clone + quick-adds stay his)
-prs: []
+prs:
+  - "rides emed_app#852 (Affiliate Portal PR-B) as cherry-pick 2ed7f5dc and emed_sql#98 as 2bda541"
 tags: []
 created: 2026-09-17
 updated: 2026-09-17
@@ -23,6 +24,11 @@ related: ["[[affiliate-portal]]"]
   verified on the dev DB against Mario's test affiliate facility (1967).
 - 2026-09-17 — In-Progress → Completed in Dev (nicholas-cardell): `feat/pricing-intake-form-map` merged into `dev`
   (emed_app `deeaa708`, on top of Mario's `f9c779f2` affiliate merge); emed_sql branch pushed, migration PENDING PROD.
+- 2026-09-17 — still Completed in Dev (mariotabraue): at Mario's request the feature was CHERRY-PICKED into the Affiliate Portal
+  PR-B branch (emed_app e784b536 -> 2ed7f5dc on feat/affiliate-portal, PR #852; emed_sql 80abd06 -> 2bda541 on
+  feat/affiliate-portal-schema, PR #98) so it ships to prod with the module it depends on — no separate promotion PR is
+  needed for this branch. Also: open item 2 (a global Rx-preset twin) is closed — QR readiness now keys off the intake-form
+  rule alone (see [[affiliate-portal]]).
 
 ## Summary
 The Affiliate Portal (Mario, `feat/affiliate-portal`, as-built in `emed_app/docs/plans/affiliate-portal.md`) creates

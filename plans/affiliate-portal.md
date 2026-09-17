@@ -9,7 +9,11 @@ branches:
   - emed_sql: feat/affiliate-portal-schema  # 6 migrations, dev-applied, PENDING PROD
 developers:
   - mariotabraue
-prs: []                                     # held until Mario OKs; PR-A → main first, then PR-B (never stacked), each paired with its emed_sql PR
+prs:
+  - "emed_app#851 (feat/affiliate-catalog -> main, PR-A — merge FIRST)"
+  - "emed_app#852 (feat/affiliate-portal -> main, PR-B; includes Nick's Intake Form Map cherry-pick 2ed7f5dc)"
+  - "emed_sql#97 (feat/affiliate-catalog-schema -> main, pairs with #851)"
+  - "emed_sql#98 (feat/affiliate-portal-schema -> main, pairs with #852; includes Nick's emed_catalog_required_form migration)"
 tags: []
 created: 2026-09-17
 updated: 2026-09-17
@@ -40,6 +44,12 @@ related: ["[[patient-portal-secure-messaging]]", "[[peaknow-portal-integration]]
   none; `mappable` (quick-adds present) is informational. `affiliate_visits.create_visit_for_sale` still runs the forms
   step for a line without a template and leaves the visit in Received for the provider to prescribe by hand. This closes
   the map plan's open item 2 (a global Rx-preset twin is no longer needed for QR readiness). On dev.
+- 2026-09-17 — PRs OPEN (mariotabraue, on Mario's go): eMed #851 (PR-A) and #852 (PR-B), emed_sql #97 and #98; review requested
+  from nicholas-cardell. Order: emed_sql #97 -> apply to prod -> eMed #851 -> emed_sql #98 -> apply -> eMed #852 (both eMed PRs
+  target main, never stacked; #852 shows #851's commits until it merges). #852 / #98 carry Nick's Intake Form Map commits
+  cherry-picked from dev at Mario's request (e784b536 -> 2ed7f5dc app, 80abd06 -> 2bda541 sql) because they depend on PR-A/B
+  code. eMed CI (lint, cut-from-main, schema-dependency section) passed at open; the migration files must reach emed_sql
+  main and prod before the paired eMed PR deploys.
 
 ## Summary
 Guerrilla-marketing channel: **affiliates** (non-medical individuals, invited by an eMed Admin) sell an admin-curated
