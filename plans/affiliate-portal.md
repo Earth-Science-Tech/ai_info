@@ -27,6 +27,11 @@ related: ["[[patient-portal-secure-messaging]]", "[[peaknow-portal-integration]]
   `feat/affiliate-portal-schema` @ `e5aeff4` pushed, all six migrations applied to `liberty_link_dev`. Two UI fixes from
   Mario's dev test followed the same day (wizard picker keeps categories expanded; Facilities type filter offers Affiliate).
   **Handed to Nick for review and for the patient side** (see § Contract and § Rollout).
+- 2026-09-17 — still Completed in Dev (mariotabraue): **quantity per drug** (Mario: "when completing the retail pricing,
+  quantity should be a required field for each drug") — `emed_affiliate_product.quantity` + `emed_affiliate_sale_line.quantity`
+  (emed_sql `47f488c`, dev-applied, pending prod with the rest), floor = drug_cost × quantity + consult + shipping, no default,
+  `no_quantity` rows are not sellable, the QR snapshot / sale line / visit `Drug[].Quantity` carry it; the Retail table was
+  re-laid out (fixed colgroup, shipping price inside the select, cost-source pill under the cost). On dev.
 
 ## Summary
 Guerrilla-marketing channel: **affiliates** (non-medical individuals, invited by an eMed Admin) sell an admin-curated
@@ -50,7 +55,7 @@ below plus the verification checklist) and `CLAUDE.md` items **88** (PR-A) and *
 
 | Topic | Decision |
 |---|---|
-| Bundle math | **Per product, literal.** `total_i = drug_cost_i + consult + shipping_i`; `retail_i` = explicit price, else `total_i × (1 + markup%)` (program default +50 %, cap +100 %). A QR bundle's patient price = Σ retail_i — consult and shipping repeat per product by design. Affiliate margin_i = retail_i − total_i. |
+| Bundle math | **Per product, literal.** `total_i = drug_cost_i × quantity_i + consult + shipping_i`; `retail_i` = explicit price, else `total_i × (1 + markup%)` (program default +50 %, cap +100 %). A QR bundle's patient price = Σ retail_i — consult and shipping repeat per product by design. Affiliate margin_i = retail_i − total_i. **Quantity is a REQUIRED per-drug field on Retail** (Mario 2026-09-17): how many units of the catalog row the retail price buys; no default — a row without one is `no_quantity` / not sellable and `set_retail` refuses until it is typed. |
 | Earned when | Sale `pending` at patient payment → `payable` on the visit's first *Approved by Prescriber* / *Approved Refills* / *Approved OTC* → `reversed` on refund / Cancelled / Rejected. Statements include `payable` only. |
 | TIN / bank | `field_crypto` AES-256-GCM at rest, last-4 shown, reveal = `Admin_Affiliates` + `log_phi_access` + `no-store`. W-9 PDF as a base64 document. |
 | Payouts | Own ledger (`emed_affiliate_sale` / `_payout` / `_payout_payment`), not the Commissions module. Payment rows mirror `etst_commission_payment` so warehouse bank-matching can be added later. |
@@ -88,8 +93,8 @@ PR-A (hard deploy-order dependencies — selected unconditionally, named in `pri
 `emed_price_special.ship_2day/ship_overnight`; `emed_price_catalog_image` ships dark behind a probe.
 
 PR-B (ship dark behind `OBJECT_ID` probes): `emed_affiliate`, `emed_affiliate_invite_token`, `emed_affiliate_document`,
-`emed_affiliate_settings` (singleton, seeded 25 / 50 / 100 / 14 / 90 / 20), `emed_affiliate_product`,
-`emed_affiliate_promo`, `emed_affiliate_qr`, `emed_affiliate_sale`, `emed_affiliate_sale_line`, `emed_affiliate_payout`,
+`emed_affiliate_settings` (singleton, seeded 25 / 50 / 100 / 14 / 90 / 20), `emed_affiliate_product` (incl. `quantity`, 2026-09-17),
+`emed_affiliate_promo`, `emed_affiliate_qr`, `emed_affiliate_sale`, `emed_affiliate_sale_line` (incl. `quantity`), `emed_affiliate_payout`,
 `emed_affiliate_payout_payment`. Filtered unique indexes are the race backstops: one live affiliate per facility / user,
 one live selection row per (affiliate, catalog), one sale per QR and per payment transaction, one adjustment per paid
 sale, one non-void statement per (affiliate, month), one payment per bank key and per reversed payment. No triggers on
@@ -118,7 +123,7 @@ Affiliate, scope_facility_id)`, Affiliates group membership (`group_type 'affili
 
 **Retail.** `retail_rows(affiliate)` = selection LEFT JOIN catalog + `get_portal_catalog(facility)` effective price
 (FINAL sheet → base, promo if lower) + `get_shipping_rates_for_facility` per row's service + consult fee → `build_line`
-→ `{ total, floor, cap, retail, retail_source, margin, flags:{upon_request,no_shipping,below_floor,above_cap,unavailable},
+→ `{ quantity, drug_total, total, floor, cap, retail, retail_source, margin, flags:{upon_request,no_quantity,no_shipping,below_floor,above_cap,unavailable},
 sellable }`. An explicit retail is stamped and never auto-changed; cost drift flags it (the special-sheet `final_price`
 lesson). `quote_lines` refuses unsellable lines and returns the frozen per-line snapshot.
 
@@ -173,7 +178,7 @@ a patient charge never falls through to a pharmacy merchant. Boot log prints `mo
 | Price to charge | Nick → us | `affiliate_qr.price_for_claim({raw, promo_code})` → `{ok, gross, floor_total, discount_total, affiliate_due, promo, lines}` — charge `gross`, never a browser total. |
 | Pay | Nick | Collect.js keyed with `payments.public_tokenization_key('moct')`; `payments.assert_gateway('moct')` MUST pass; `payments.sale({vault_id, amount: gross, cvv, pharmacy:'moct', orderid:'AF-QR-<qr_id>', idempotency_key, email, customer_receipt:true})` → `emed_payment_transaction` row (`pharmacy='moct'`). Refunds through the same gateway. **`bill_to_type='patient'`** is new vocabulary Nick adds in `payments_methods` / `route_payment_capture` (today `'clinic'` is hard-coded and asserted). |
 | Claim | Nick → us | `affiliate_sales.claim_and_record({raw_token, patient_portal_user_id, promo_code, payment:{transaction_id, amount, gateway:'moct', gateway_ref}}, {app_user:'patient_checkout', app_name: clinic})` → `{ok, sale_id, order_id:'AF-<id>', affiliate, lines, gross, affiliate_due}` or `code: claim_lost | claimed | reserved_by_other | repriced | amount_mismatch | expired | revoked | unavailable | invalid | db` → **Nick refunds on failure**; our function never leaves a half-written sale; a retry with the same `transaction_id` is idempotent. |
-| Visit | Nick → us | `affiliate_visits.create_visit_for_sale(sale_id, patient, {app_user:'patient_checkout'})` with `patient = {first_name, last_name, date_of_birth 'YYYY-MM-DD', sex, email, phone, address, address2, city, state, zip, shipping:{name, phone, address, city, state, zip}}` → `{ok, visit_id, person_id, external_patient_ref, order_id, clinic, forms_due, advance:{advanced, reason}}`; retry ×3; a failure leaves the sale `pending` / `visit_id NULL` → cron alert + admin Attach. The visit's `PatientId` is `'PP'+patient_portal_user_id` (non-PHI, one `moct_person` per patient); `OrderId` is `'AF-'+sale_id`; `VisitType 'Affiliate Bundle'`; each `Drug[]` entry is a sale line named by its label. |
+| Visit | Nick → us | `affiliate_visits.create_visit_for_sale(sale_id, patient, {app_user:'patient_checkout'})` with `patient = {first_name, last_name, date_of_birth 'YYYY-MM-DD', sex, email, phone, address, address2, city, state, zip, shipping:{name, phone, address, city, state, zip}}` → `{ok, visit_id, person_id, external_patient_ref, order_id, clinic, forms_due, advance:{advanced, reason}}`; retry ×3; a failure leaves the sale `pending` / `visit_id NULL` → cron alert + admin Attach. The visit's `PatientId` is `'PP'+patient_portal_user_id` (non-PHI, one `moct_person` per patient); `OrderId` is `'AF-'+sale_id`; `VisitType 'Affiliate Bundle'`; each `Drug[]` entry is a sale line named by its label with `Quantity` = the line's affiliate quantity (the auto-prescribed draft keeps the quick-add template; the reviewing prescriber reconciles the two, as for a store order). |
 | Link | Nick | `patient_portal.link_person(uid, person_id, clinic, 'affiliate_qr')`. |
 | Later purchases | Nick → us | `affiliate_sales.record_portal_sale({person_id | affiliate_id, patient_portal_user_id, catalog_ids, promo_code, payment})` then `create_visit_for_sale` again. Products to offer = `affiliate_qr.list_products(affiliate).rows.filter(r => r.qr_ready)` (via `affiliate_sales.affiliate_for_person(person_id)`). |
 | Portal pages | Nick | add `products`, `payment_info` to `patient_portal_config.PORTAL_PAGES`; `emed_affiliate_settings.patient_portal_pages` (default `messages|my_prescriptions|intake_forms`) is what provisioning turns on per affiliate facility — add the new keys there once they exist. |
@@ -236,6 +241,9 @@ revoke → landing says revoked; raise a floor above retail → `repriced`.
   `{rows_modified, error}`); never a bare `OUTPUT INSERTED` on a triggered table — the module tables have no triggers but
   every claim still uses `OUTPUT … INTO @t`, keep it that way.
 - The QR floor re-check must stay at BOTH resolve and claim; `public_projection` must never grow a cost/floor/margin field.
+  When the affiliate changed a row's quantity after minting, the live floor is computed for the SNAPSHOT's quantity
+  (`affiliate_qr.live_total_for`) — never re-judge a printed code against a quantity it did not promise.
+- Quantity has NO default anywhere (product row, bulk tools, revive-on-reselect all leave it NULL); only the affiliate types it.
 - `_order_required` provider seam: any new non-Peaks ordering surface registers a provider in `ORDER_CONTEXT_PROVIDERS`
   rather than special-casing the clinic string.
 - Payout money is never stored as a total (`paid_total` = SUM of payments); a paid sale is corrected by an adjustment
