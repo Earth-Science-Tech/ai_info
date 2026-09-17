@@ -59,6 +59,9 @@ The decision rules are pure functions in `flows/utilities/hardcopy_ledger.py` (`
 | PDF could not be opened / parsed | **0** (retried next run) | 0 | +1 | `Class: message` |
 | ... after `MAX_READ_ATTEMPTS` (8) failures, about 2 h of 15-min runs | 1 (gave up) | 0 | 8 | last error |
 
+- **An open ledger row (`checked = 0`) is always a candidate, whatever the script's age** (emed_etl
+  PR #77, 2026-09-17). The scheduled step's `lookback_days` (90) bounds only the never-checked
+  backlog, so a retry or a deliberate re-open on an older script is never silently skipped.
 - An unreadable row (retrying or given up) stays eligible for the note fallback
   (`tag_full_orders_from_note` takes `l.checked = 1 OR l.readable = 0`). The code never re-opens a
   given-up row; a **manual reset** does, once the share is fixed:
@@ -73,6 +76,20 @@ The decision rules are pure functions in `flows/utilities/hardcopy_ledger.py` (`
   source of truth.
 - Run summary line: `Hardcopy tag step complete. Scripts checked: N; rxqFullOrder rows tagged: M`
   followed by `; unreadable (retry next run): K` only when a read failed.
+
+## Precedence: the PDF's own tag beats a hand-typed note (emed_sql, 2026-09-17)
+
+`usp_etl_{prefix}_rxqFullOrder_metadata` copies MOC/RX from `view_{prefix}_script_lut` (Type `F`
+notes) when the note is newer than the row's `tag_*_date`. Because the hardcopy step stamps
+`tag_*_date = GETDATE()`, a note edited *after* the PDF was applied used to win back on the next
+run (nine mistyped notes had cross-linked scripts to the wrong eMed order/Rx). Since emed_sql
+`migrations/applied/2026-09-17_metadata_proc_pdf_tag_wins_over_note.sql` the note MOC/RX blocks
+skip any script whose ledger row has `applied = 1` and whose PDF tag carried that value
+(`all_tags LIKE '%[MOC:n]%'` / `[RX:n]`). The eMed-emitted PDF tag is trustworthy by
+construction; **operator corrections go through `moct_script_link`** (Missing Scripts manual
+link), which stays authoritative over both. BLAZE / ESCRIPT notes, `moct_refill_lut` and
+`tag_order` are unchanged. The same migration re-opened the ledger rows a note had already
+overridden (`checked = 0`) so the ETL re-applied the PDF value: all 19 re-tagged from the PDF by 15:01Z (12 on the next scheduled runs; the 7 on scripts older than the 90-day lookback only after emed_etl PR #77), 0 fill-0 rows differ from their PDF tag on rxcs and mmed.
 
 ## How to spot it
 
