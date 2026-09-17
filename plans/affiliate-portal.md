@@ -7,6 +7,8 @@ branches:
   - emed_app: feat/affiliate-catalog        # PR-A — catalog + pricing groundwork (ships dark)
   - emed_app: feat/affiliate-portal         # PR-B — the module
   - emed_sql: feat/affiliate-portal-schema  # 7 migrations (incl. the intake-form map) — applied to prod 2026-09-17, tag 1.0.359
+  - emed_app: feat/affiliate-checkout       # patient checkout (3-page QR flow, OTP, portal Products) — on dev, PR held; payment seam for Jose
+  - emed_sql: feat/affiliate-checkout-schema # 2026-09-17_add_emed_affiliate_checkout.sql — dev-applied, PENDING PROD
 developers:
   - mariotabraue
 prs:
@@ -69,6 +71,29 @@ related: ["[[patient-portal-secure-messaging]]", "[[peaknow-portal-integration]]
   600/min limiter. **Still owed on the prod App Service:** `PROPELR_MOCT_SECURITY_KEY`,
   `PROPELR_MOCT_PUBLIC_TOKENIZATION_KEY`, `AFFILIATE_ALERT_EMAIL` (and confirm `FIELD_ENCRYPTION_KEY`). Until then the
   module is inert for every existing clinic/user — nothing changes until an application is approved.
+- 2026-09-17 — Completed in Production, NEXT PHASE In-Progress (mariotabraue): **the patient checkout** (Mario: "modify the
+  initial QR scan flow, which should be 3 pages") on `feat/affiliate-checkout` (worktree `affiliate-checkout`, off main @
+  1.0.359) + emed_sql `feat/affiliate-checkout-schema`. Page 1 `/a` (the order + promo) → page 2 `/a/account` (first/last
+  name, date of birth, mobile, email; a 6-digit code is texted and typed back — 10-min TTL, 5 guesses, 1 resend/min, salted
+  hash) → page 3 `/a/pay` (ship-to + payment) → the patient-portal account is populated (person, order lines, intake forms
+  due) and the browser is signed in on Intake Forms through a single-use `checkout_login` token. Portal **Products** page
+  (name · strength · quantity · price · image) → Checkout (discount code) → Pay → Intake Forms, behind ONE facility toggle
+  `products` — default ON for `type='Affiliate'` facilities, OFF for every other clinic portal (explicit rows win; the
+  migration turns it on for existing affiliates). State table `emed_affiliate_checkout`; core `server/affiliate_checkout.js`;
+  routers `route_affiliate_checkout_public.js` (`/api/public/affiliate/checkout/*`) + `route_patient_products.js`
+  (`/api/patient/products/*`). `patient_portal_pages.get_due_forms_for_patient` now resolves a store-less visit's lines
+  through the order-context providers, so an affiliate visit's forms show. **THE CARD CHARGE IS DELIBERATELY VACANT —
+  Mario: "leave the payment portion of the build vacant for Jose to complete once all is done"**: `server/
+  affiliate_checkout_payment.js` is the seam (default = `payment_not_configured`, pay pages say "payment is being
+  finalized"); Jose registers `{name:'moct', ready, tokenization_key, client_script, charge(ctx), refund(ctx)}` via
+  `set_provider` — contract in the module header (expected `emed_payment_transaction` rows: `bill_to_type 'patient'`,
+  `pharmacy 'moct'`; `misc.fmt_pharmacy('moct')` answers `'rxcs'`, use `payments.assert_gateway`; `payments.sale()` takes
+  only `vault_id` today). Dev switches (never prod): `AFFILIATE_CHECKOUT_SIMULATE_PAYMENT=1` (order recorded as gateway
+  `simulated`, no payment row) and `AFFILIATE_OTP_DEV_ECHO=1` (the code is echoed because OTP texts are suppressed off-prod)
+  — both needed on the dev slot for Mario's test. Verified end to end on localhost against the dev DB (QR → account → pay →
+  Intake Forms; Products → Checkout → Pay → a second visit on the same person). Suites: `affiliate_checkout` (22),
+  `affiliate_checkout_payment` (5), `route_affiliate_checkout_public` (5), `route_patient_products` (6),
+  `patient_portal_config_products` (5), `patient_portal_checkout_login` (3). Merged to dev for Mario's testing; PRs held.
 
 ## Summary
 Guerrilla-marketing channel: **affiliates** (non-medical individuals, invited by an eMed Admin) sell an admin-curated
