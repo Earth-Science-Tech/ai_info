@@ -16,6 +16,8 @@ prs:
   - "emed_app#852 (feat/affiliate-portal -> main, PR-B; includes Nick's Intake Form Map cherry-pick 2ed7f5dc)"
   - "emed_sql#97 (feat/affiliate-catalog-schema -> main, pairs with #851)"
   - "emed_sql#98 (feat/affiliate-portal-schema -> main, pairs with #852; includes Nick's emed_catalog_required_form migration)"
+  - "emed_app#854 (feat/affiliate-checkout -> main, the patient checkout; payment seam vacant for Jose)"
+  - "emed_sql#99 (feat/affiliate-checkout-schema -> main, pairs with #854 — merge + apply to prod FIRST)"
 tags: []
 created: 2026-09-17
 updated: 2026-09-17
@@ -93,7 +95,10 @@ related: ["[[patient-portal-secure-messaging]]", "[[peaknow-portal-integration]]
   — both needed on the dev slot for Mario's test. Verified end to end on localhost against the dev DB (QR → account → pay →
   Intake Forms; Products → Checkout → Pay → a second visit on the same person). Suites: `affiliate_checkout` (22),
   `affiliate_checkout_payment` (5), `route_affiliate_checkout_public` (5), `route_patient_products` (6),
-  `patient_portal_config_products` (5), `patient_portal_checkout_login` (3). Merged to dev for Mario's testing; PRs held.
+  `patient_portal_config_products` (5), `patient_portal_checkout_login` (3). Merged to dev (`940bc6a3`, dev-slot deploy
+  green). **PRs OPEN on Mario's go ("push PR to merge on prod once completed, will test there — Jose standing by"):**
+  eMed **#854** and emed_sql **#99**, reviewers nicholas-cardell + etst-josegonzalez; order: #99 → prod → #854. On prod the
+  pay pages say "payment is being finalized" until Jose registers the `moct` provider; the dev switches are refused there.
 
 ## Summary
 Guerrilla-marketing channel: **affiliates** (non-medical individuals, invited by an eMed Admin) sell an admin-curated
