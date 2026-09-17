@@ -1,14 +1,14 @@
 ---
 title: Portal-user add forms email the temporary password (My Facilities · portal My Team)
 slug: portal-team-emailed-temp-password
-status: In-Progress
+status: Completed in Production
 project: emed_app
 branches:
   - emed_app: feat/portal-team-emailed-temp-password
 developers:
   - nicholas-cardell
-prs: []
-tags: []
+prs: ["emed_app#848 (feat->main)"]
+tags: ["1.0.358"]
 created: 2026-09-17
 updated: 2026-09-17
 related: [rep-team-and-facility-api-credentials]
@@ -21,6 +21,9 @@ related: [rep-team-and-facility-api-credentials]
   tests), both forms exercised live on the dev DB (facility 1924 "Test Victoria": user 222 via My Facilities
   as staff, user 223 via the portal's My Team impersonating the Primary Prescriber; both emailed, both rosters
   refreshed, test memberships removed afterwards).
+- 2026-09-17 — In-Progress → Completed in Production (nicholas-cardell): PR emed_app#848 merged to main
+  (merge commit c38ae44a, all 4 CI checks green), changelog entry 1.0.358 curated, tag `1.0.358` pushed,
+  Azure deploy run 35180081820 succeeded. No schema change, no data step.
 
 ## Summary
 Nick, after 1.0.357 shipped: the "My Team · portal users" add form on My Facilities (Mario's #832, 1.0.352)
