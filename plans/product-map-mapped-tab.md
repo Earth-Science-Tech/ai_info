@@ -1,7 +1,7 @@
 ---
 title: Product Map "Mapped" view + Liberty-master drug names + seed mis-map fix
 slug: product-map-mapped-tab
-status: Completed in Dev
+status: Completed in Production
 project: multi
 branches:
   - emed_app: feat/product-map-mapped-tab
@@ -11,9 +11,9 @@ developers:
 prs:
   - "emed_app#842 (feat->main)"
   - "emed_sql#94 (feat->main, data migration)"
-tags: []
+tags: ["1.0.356"]
 created: 2026-09-16
-updated: 2026-09-16
+updated: 2026-09-17
 related: ["[[peaknow-portal-integration]]"]
 ---
 
@@ -22,6 +22,7 @@ related: ["[[peaknow-portal-integration]]"]
 ## Status & history
 - 2026-09-16 — Not Started → In-Progress (nicholas-cardell): Mario asked why "TIRZEPATIDE 10MG/ML SOLUTION" was not on Product Map.
 - 2026-09-16 — In-Progress → Completed in Dev (nicholas-cardell): migration applied to `liberty_link_dev`; verified live in the browser against dev; PRs open.
+- 2026-09-17 — Completed in Dev → Completed in Production (nicholas-cardell): emed_sql#94 merged + migration applied to prod (8 re-pointed / 3 retired / 3 queued, verified); eMed#842 merged; tag 1.0.356 deployed (run 35165377385 success); prod probe shows the new route live.
 
 ## Summary
 Mario's "missing" drug was mapped — to the WRONG catalog product — by the 2026-07-18 hand-review seed,
@@ -60,8 +61,7 @@ the 60-day invoice-line scan; both join `emed_price_drug_map` (pharmacy display 
 ## Rollout / remaining
 - [x] Dev: migration applied (8 re-pointed / 3 retired / 3 queued), app verified live (Mapped 498;
       Unlink → Pending → Map back → Resolved; Re-map 3→10→3 with audit rows).
-- [ ] Prod: merge emed_sql#94 + eMed#842, apply the migration with `push prod` (it is the only file in
-      `pending/`), tag. Then Product Map → Mapped, search "TIRZ": RXCS AFAA = Tirzepatide 10 mg/mL.
+- [x] Prod: emed_sql#94 + eMed#842 merged, migration applied to prod, tag 1.0.356 deployed 2026-09-17.
 - [ ] Mario: place BFRO (Metformin 500 ER), AXLD (Pyridoxine 85 mg/mL), ATJI (Glow Blend, now BPC/TB4 3 mg)
       from the Pending queue — or add catalog rows for them.
 - Landmines: never `MAX(drug_name)`; never look a DrugId up without its pharmacy; the browser preview tool
