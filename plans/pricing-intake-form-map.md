@@ -1,7 +1,7 @@
 ---
 title: Pricing → Intake Form Map (global product → intake-form map + product images)
 slug: pricing-intake-form-map
-status: In-Progress
+status: Completed in Dev
 project: multi
 branches:
   - emed_app: feat/pricing-intake-form-map (merges into dev — depends on Mario's Affiliate Portal PR-A/PR-B, dev-only today)
@@ -13,7 +13,7 @@ prs: []
 tags: []
 created: 2026-09-17
 updated: 2026-09-17
-related: []
+related: ["[[affiliate-portal]]"]
 ---
 
 # Pricing → Intake Form Map
@@ -21,6 +21,8 @@ related: []
 ## Status & history
 - 2026-09-17 — Not Started → In-Progress (nicholas-cardell): schema applied to dev, module + page + tests built and
   verified on the dev DB against Mario's test affiliate facility (1967).
+- 2026-09-17 — In-Progress → Completed in Dev (nicholas-cardell): `feat/pricing-intake-form-map` merged into `dev`
+  (emed_app `deeaa708`, on top of Mario's `f9c779f2` affiliate merge); emed_sql branch pushed, migration PENDING PROD.
 
 ## Summary
 The Affiliate Portal (Mario, `feat/affiliate-portal`, as-built in `emed_app/docs/plans/affiliate-portal.md`) creates
