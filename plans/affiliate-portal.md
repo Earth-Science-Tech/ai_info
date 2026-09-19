@@ -8,7 +8,9 @@ branches:
   - emed_app: feat/affiliate-portal         # PR-B — the module
   - emed_sql: feat/affiliate-portal-schema  # 7 migrations (incl. the intake-form map) — applied to prod 2026-09-17, tag 1.0.359
   - emed_app: feat/affiliate-checkout       # patient checkout (3-page QR flow, OTP, portal Products) — on dev, PR held; payment seam for Jose
-  - emed_sql: feat/affiliate-checkout-schema # 2026-09-17_add_emed_affiliate_checkout.sql — dev-applied, PENDING PROD
+  - emed_sql: feat/affiliate-checkout-schema # 2026-09-17_add_emed_affiliate_checkout.sql — applied to prod with 1.0.360
+  - emed_app: feat/affiliate-portal-v3       # batch #3 (MOC shell, delivery rules, syringes, program defaults, Help + videos, Min / order, mobile pass) — on dev, DRAFT PR #879
+  - emed_sql: feat/affiliate-portal-v3-schema # six 2026-09-19_* migrations — dev-applied, PENDING PROD (DRAFT PR #102, merge + apply FIRST)
 developers:
   - mariotabraue
 prs:
@@ -18,9 +20,13 @@ prs:
   - "emed_sql#98 (feat/affiliate-portal-schema -> main, pairs with #852; includes Nick's emed_catalog_required_form migration)"
   - "emed_app#854 (feat/affiliate-checkout -> main, the patient checkout; payment seam vacant for Jose)"
   - "emed_sql#99 (feat/affiliate-checkout-schema -> main, pairs with #854 — merge + apply to prod FIRST)"
+  - "emed_app#858 (Jose — TailoredPay `moct` payment provider behind the vacant seam; shipped 1.0.361)"
+  - "emed_app#864 + emed_sql#100 (batch #2 — MERGED, shipped 1.0.363)"
+  - "emed_app#879 (feat/affiliate-portal-v3 -> main, batch #3 + Min / order — DRAFT until Mario's dev-slot test)"
+  - "emed_sql#102 (feat/affiliate-portal-v3-schema -> main, six probed migrations — DRAFT; merge + apply to prod FIRST)"
 tags: []
 created: 2026-09-17
-updated: 2026-09-17
+updated: 2026-09-19
 related: ["[[patient-portal-secure-messaging]]", "[[peaknow-portal-integration]]", "[[facility-scope-groups]]"]
 ---
 
@@ -99,6 +105,30 @@ related: ["[[patient-portal-secure-messaging]]", "[[peaknow-portal-integration]]
   green). **PRs OPEN on Mario's go ("push PR to merge on prod once completed, will test there — Jose standing by"):**
   eMed **#854** and emed_sql **#99**, reviewers nicholas-cardell + etst-josegonzalez; order: #99 → prod → #854. On prod the
   pay pages say "payment is being finalized" until Jose registers the `moct` provider; the dev switches are refused there.
+- 2026-09-17 → 2026-09-18 — Completed in Production, 1.0.359 → 1.0.363 (Nick): #851/#852 (1.0.359), the patient checkout
+  #854 (1.0.360), Jose's TailoredPay `moct` provider #858 (1.0.361; `current()` yields to the simulation only when the
+  registered provider is not ready AND `AFFILIATE_CHECKOUT_SIMULATE_PAYMENT=1`, never prod), and batch #2 #864 + emed_sql
+  #100 (1.0.363: delivery choice v1, `MOC AF<id>` clinic names, W-9 fill/upload, Copy invite link, Products add-back,
+  admin QR panel, Affiliate Messages page, Retail pencil box, Drugs tab order limits + combined limits + consult-free
+  refills). All 12 affiliate migrations are in emed_sql `migrations/applied`.
+- 2026-09-19 — batch #3 Completed in Dev (mariotabraue): branch `feat/affiliate-portal-v3` off main @ 1.0.364, merged to
+  `dev` (`0b5f9919`, then `cefd9c35` with Min / order), **DRAFT PRs eMed #879 + emed_sql #102** (six `2026-09-19_*`
+  migrations — portal_show_logo, delivery_rules, video audience, syringes, program_defaults, min_per_order — dev-applied,
+  PENDING PROD; every new column is read behind a `COL_LENGTH` probe so the deploy order is free). Contents: questionnaires
+  on ANY MOC visit; OTP findings (the checkout code was never slow — the waits were the affiliate LOGIN's email magic link,
+  the ETL-ticked `emed_sms` queue and a login Resend that stopped polling) → `set_mfa_phone` at provisioning + bounded
+  Graph retries + direct SMS for affiliate-facility patients; consult-free refills need the same questionnaire + payout
+  confirmation (`waivers_unconfirmed` 409); **My Online Consultation** patient shell (sticky header, hamburger drawer,
+  `/patient/home`, per-facility approved-logo toggle `emed_facility.portal_show_logo`); delivery rules (never-lower price,
+  `patient_decides`, overnight upgrade fee to eMed, pickup + consolidated-shipping savings to the affiliate, pickup pharmacy
+  from the ship-to state); patient Products page by category; Admin → Affiliates full order detail; syringes on vial
+  products (pack cost inside the floor); Apply program defaults; **Min / order** beside Max on the Drugs tab (blank = 1 —
+  capsules and other oral units; enforced on Retail, program defaults, QR readiness, checkout); Help page `/affiliate/help`
+  with the shared `portal_videos.js` library (`emed_portal_video.audience`); phone layout for the affiliate + patient
+  portals (admin pages stay desktop, per Mario). Two how-to MP4s recorded (`scripts/oneoff/record_affiliate_howto_2026-09-19.js`)
+  and sent to Mario — staff upload them on Portal Content with Shown to = Affiliate portal. **After Mario's go:** mark both
+  PRs ready, #102 → prod FIRST, run `scripts/oneoff/backfill_affiliate_mfa_phone_2026-09-19.js --apply` on dev then prod,
+  set `AFFILIATE_OTP_DEV_ECHO=1` / `AFFILIATE_CHECKOUT_SIMULATE_PAYMENT=1` on the dev slot.
 
 ## Summary
 Guerrilla-marketing channel: **affiliates** (non-medical individuals, invited by an eMed Admin) sell an admin-curated
